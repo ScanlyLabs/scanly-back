@@ -24,7 +24,7 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @PostMapping
+    @PostMapping("/sign-up")
     @Operation(summary = "회원 가입", description = "회원가입을 진행합니다.")
     public ResponseEntity<ApiResponse<SignUpResponse>> signUp(
             @Valid @RequestBody SignUpRequest request
