@@ -59,7 +59,7 @@ public class MemberService {
      * @return 로그인 완료한 유저 정보
      */
     public LoginInfo login(LoginCommand command) {
-        Member member = memberRepository.findById(command.loginId())
+        Member member = memberRepository.findByLoginId(command.loginId())
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         if (!passwordEncoder.matches(command.password(), member.getPassword())) {

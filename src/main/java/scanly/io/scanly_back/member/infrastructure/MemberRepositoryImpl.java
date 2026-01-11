@@ -38,9 +38,25 @@ public class MemberRepositoryImpl implements MemberRepository {
         return memberJpaRepository.existsByLoginId(loginId);
     }
 
+    /**
+     * 아이디로 회원 조회
+     * @param id 회원 아이디
+     * @return 조회된 회원
+     */
     @Override
-    public Optional<Member> findById(String loginId) {
-        return memberJpaRepository.findById(loginId)
+    public Optional<Member> findById(String id) {
+        return memberJpaRepository.findById(id)
+                .map(memberMapper::toDomain);
+    }
+
+    /**
+     * 로그인 아이디로 회원 조회
+     * @param loginId 로그인 아이디
+     * @return 조회된 회원
+     */
+    @Override
+    public Optional<Member> findByLoginId(String loginId) {
+        return memberJpaRepository.findByLoginId(loginId)
                 .map(memberMapper::toDomain);
     }
 }
