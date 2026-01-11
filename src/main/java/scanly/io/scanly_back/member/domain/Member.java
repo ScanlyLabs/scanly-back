@@ -18,7 +18,14 @@ public class Member {
             String email, MemberStatus status,
             LocalDateTime withdrawnAt, LocalDateTime createdAt, LocalDateTime updatedAt
     ) {
-
+        this.id = id;
+        this.loginId = loginId;
+        this.password = password;
+        this.email = email;
+        this.status = status;
+        this.withdrawnAt = withdrawnAt;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public static Member signUP(String loginId, String password, String email) {
