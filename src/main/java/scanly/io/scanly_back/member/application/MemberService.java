@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
+import scanly.io.scanly_back.member.application.dto.LoginCommand;
+import scanly.io.scanly_back.member.application.dto.LoginInfo;
 import scanly.io.scanly_back.member.application.dto.SignUpCommand;
 import scanly.io.scanly_back.member.application.dto.SignUpInfo;
 import scanly.io.scanly_back.member.domain.Member;
@@ -49,5 +51,21 @@ public class MemberService {
         if (memberRepository.existsByLoginId(loginId)) {
             throw new CustomException(ErrorCode.DUPLICATE_LOGIN_ID);
         }
+    }
+
+    /**
+     * 회원 로그인
+     * @param command 로그인 정보
+     * @return 로그인 완료한 유저 정보
+     */
+    public LoginInfo login(LoginCommand command) {
+        Member member = memberRepository.findById(command.loginId())
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        if (!passwordEncoder.matches(command.password(), member.getPassword())) {
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        return LoginInfo.from(member);
     }
 }

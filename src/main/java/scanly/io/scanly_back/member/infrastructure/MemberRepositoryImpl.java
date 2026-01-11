@@ -6,6 +6,8 @@ import scanly.io.scanly_back.member.domain.Member;
 import scanly.io.scanly_back.member.domain.MemberRepository;
 import scanly.io.scanly_back.member.infrastructure.entity.MemberEntity;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class MemberRepositoryImpl implements MemberRepository {
@@ -34,5 +36,11 @@ public class MemberRepositoryImpl implements MemberRepository {
     @Override
     public boolean existsByLoginId(String loginId) {
         return memberJpaRepository.existsByLoginId(loginId);
+    }
+
+    @Override
+    public Optional<Member> findById(String loginId) {
+        return memberJpaRepository.findById(loginId)
+                .map(memberMapper::toDomain);
     }
 }

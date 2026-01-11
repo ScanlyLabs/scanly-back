@@ -23,6 +23,18 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(errorCode, e.getMessage()));
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        log.warn("Validation failed: {}", e.getMessage());
+        String message = e.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .findFirst()
+                .orElse("입력값이 올바르지 않습니다.");
+        return ResponseEntity
+                .badRequest()
+                .body(ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE, message));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleException(Exception e) {
         log.error("Unexpected error occurred", e);
