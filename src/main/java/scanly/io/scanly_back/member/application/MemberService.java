@@ -2,6 +2,7 @@ package scanly.io.scanly_back.member.application;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import scanly.io.scanly_back.member.application.dto.SignUpCommand;
@@ -16,6 +17,7 @@ import scanly.io.scanly_back.member.domain.MemberRepository;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 회원 가입
@@ -26,11 +28,10 @@ public class MemberService {
     public SignUpInfo signUp(SignUpCommand command) {
         Member member = Member.signUP(
                 command.loginId(),
-                command.password(),
-                command.password()
+                passwordEncoder.encode(command.password()),
+                command.email()
         );
 
-        log.info("member: {}", member);
         Member savedMember = memberRepository.save(member);
 
         return SignUpInfo.from(savedMember);
