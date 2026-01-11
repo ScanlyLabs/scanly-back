@@ -25,4 +25,14 @@ public class MemberRepositoryImpl implements MemberRepository {
 
         return memberMapper.toDomain(savedMemberEntity);
     }
+
+    /**
+     * 로그인 아이디 중복 확인
+     * @param loginId 로그인 아이디
+     * @return 중복 여부
+     */
+    @Override
+    public boolean existsByLoginId(String loginId) {
+        return memberJpaRepository.existsByLoginId(loginId);
+    }
 }

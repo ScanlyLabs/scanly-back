@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import scanly.io.scanly_back.common.exception.CustomException;
+import scanly.io.scanly_back.common.exception.ErrorCode;
 import scanly.io.scanly_back.member.application.dto.SignUpCommand;
 import scanly.io.scanly_back.member.application.dto.SignUpInfo;
 import scanly.io.scanly_back.member.domain.Member;
@@ -26,6 +28,8 @@ public class MemberService {
      */
     @Transactional
     public SignUpInfo signUp(SignUpCommand command) {
+        validateDuplicateLoginId(command.loginId());
+
         Member member = Member.signUP(
                 command.loginId(),
                 passwordEncoder.encode(command.password()),
@@ -35,5 +39,15 @@ public class MemberService {
         Member savedMember = memberRepository.save(member);
 
         return SignUpInfo.from(savedMember);
+    }
+
+    /**
+     * 로그인 아이디 중복 검사
+     * @param loginId 로그인 아이디
+     */
+    private void validateDuplicateLoginId(String loginId) {
+        if (memberRepository.existsByLoginId(loginId)) {
+            throw new CustomException(ErrorCode.DUPLICATE_LOGIN_ID);
+        }
     }
 }
