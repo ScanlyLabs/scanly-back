@@ -21,7 +21,7 @@ import scanly.io.scanly_back.member.persentaion.dto.response.SignUpResponse;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/member/v1")
+@RequestMapping("/api/members/v1")
 @Tag(name = "Member", description = "회원 API")
 public class MemberController {
 
