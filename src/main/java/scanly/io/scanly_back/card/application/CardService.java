@@ -3,6 +3,7 @@ package scanly.io.scanly_back.card.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import scanly.io.scanly_back.card.application.dto.ReadMeCardInfo;
 import scanly.io.scanly_back.card.application.dto.RegisterCardInfo;
 import scanly.io.scanly_back.card.application.dto.RegisterCardCommand;
 import scanly.io.scanly_back.card.application.dto.SocialLinkCommand;
@@ -77,5 +78,26 @@ public class CardService {
                 card.addSocialLink(linkCommand.type(), linkCommand.url());
             }
         }
+    }
+
+    /**
+     * 내 명함 조회
+     * @param memberId 내 명함 아이디
+     * @return 조회된 명함
+     */
+    public ReadMeCardInfo readMe(String memberId) {
+        Card card = findByMemberId(memberId);
+
+        return ReadMeCardInfo.from(card);
+    }
+
+    /**
+     * 회원 아이디로 명함 조회
+     * @param memberId 회원 아이디
+     * @return 조호된 명함
+     */
+    private Card findByMemberId(String memberId) {
+        return cardRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CARD_NOT_FOUND));
     }
 }
