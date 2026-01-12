@@ -80,6 +80,32 @@ public class Card {
     }
 
     /**
+     * 명함 수정
+     */
+    public void update(String name, String title, String company, String phone,
+                       String email, String bio, String profileImageUrl,
+                       String portfolioUrl, String location) {
+        this.name = name;
+        this.title = title;
+        this.company = company;
+        this.phone = phone;
+        this.email = email;
+        this.bio = bio;
+        this.profileImageUrl = profileImageUrl;
+        this.portfolioUrl = portfolioUrl;
+        this.location = location;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    /**
+     * 소셜 링크 초기화
+     */
+    public void clearSocialLinks() {
+        this.socialLinks.clear();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    /**
      * 소셜 링크 추가
      * @param type 소셜 링크 유형
      * @param url 소셜 링크 url
