@@ -24,21 +24,6 @@ public record RegisterCardInfo(
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
-    public record SocialLinkInfo(
-            String id,
-            SocialLinkType type,
-            String url,
-            int displayOrder
-    ) {
-        public static SocialLinkInfo from(SocialLink socialLink) {
-            return new SocialLinkInfo(
-                    socialLink.getId(),
-                    socialLink.getType(),
-                    socialLink.getUrl(),
-                    socialLink.getDisplayOrder()
-            );
-        }
-    }
 
     public static RegisterCardInfo from(Card card) {
         return new RegisterCardInfo(
