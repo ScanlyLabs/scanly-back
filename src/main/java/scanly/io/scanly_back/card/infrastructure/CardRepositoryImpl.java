@@ -38,4 +38,14 @@ public class CardRepositoryImpl implements CardRepository {
     public boolean existsByMemberId(String memberId) {
         return cardJpaRepository.existsByMemberId(memberId);
     }
+
+    /**
+     * 회원 아이디로 명함 조회
+     * @param memberId 회원 아이디
+     * @return 조호된 명함
+     */
+    @Override
+    public Optional<Card> findByMemberId(String memberId) {
+        return cardJpaRepository.findByMemberId(memberId).map(cardMapper::toDomain);
+    }
 }

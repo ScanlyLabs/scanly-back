@@ -17,8 +17,4 @@ public record RegisterCardCommand(
         String portfolioUrl,
         String location
 ) {
-    public record SocialLinkCommand(
-            SocialLinkType type,
-            String url
-    ) {}
 }
