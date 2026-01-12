@@ -56,6 +56,44 @@ public class Card {
         );
     }
 
+    public static Card create(String memberId, String name, String title, String company,
+                              String phone, String email, String bio, String profileImageUrl,
+                              String portfolioUrl, String location) {
+        LocalDateTime now = LocalDateTime.now();
+        return new Card(
+                null,
+                memberId,
+                name,
+                title,
+                company,
+                phone,
+                email,
+                bio,
+                new ArrayList<>(),
+                profileImageUrl,
+                portfolioUrl,
+                location,
+                null,
+                now,
+                now
+        );
+    }
+
+    /**
+     * 소셜 링크 추가
+     * @param type 소셜 링크 유형
+     * @param url 소셜 링크 url
+     */
+    public void addSocialLink(SocialLinkType type, String url) {
+        if (this.socialLinks.size() >= 10) {
+            throw new IllegalStateException("소셜 링크는 최대 10개까지 추가할 수 있습니다.");
+        }
+        int order = this.socialLinks.size();
+        SocialLink socialLink = SocialLink.create(type, url, order);
+        this.socialLinks.add(socialLink);
+        this.updatedAt = LocalDateTime.now();
+    }
+
     // Getters
     public String getId() {
         return id;

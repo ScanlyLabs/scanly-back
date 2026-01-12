@@ -93,4 +93,13 @@ public class CardEntity {
                 createdAt, updatedAt
         );
     }
+
+    /**
+     * 소셜 링크 추가
+     * @param socialLink 소셜 링크
+     */
+    public void addSocialLink(SocialLinkEntity socialLink) {
+        this.socialLinks.add(socialLink);
+        socialLink.setCard(this);
+    }
 }

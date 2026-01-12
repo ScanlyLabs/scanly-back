@@ -25,6 +25,24 @@ public class SocialLink {
         return new SocialLink(id, type, url, displayOrder, createdAt, updatedAt);
     }
 
+    public static SocialLink create(SocialLinkType type, String url, int displayOrder) {
+        validateUrl(url);
+        return new SocialLink(null, type, url, displayOrder, LocalDateTime.now(), LocalDateTime.now());
+    }
+
+    /**
+     * 소셜 링크 url 유효성 체크
+     * @param url 소셜 링크 url
+     */
+    private static void validateUrl(String url) {
+        if (url == null || url.isBlank()) {
+            throw new IllegalArgumentException("URL은 필수입니다.");
+        }
+        if (url.length() > 500) {
+            throw new IllegalArgumentException("URL은 500자를 초과할 수 없습니다.");
+        }
+    }
+
     // Getters
 
     public String getId() {
