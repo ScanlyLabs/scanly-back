@@ -14,6 +14,7 @@ import scanly.io.scanly_back.card.application.dto.RegisterCardInfo;
 import scanly.io.scanly_back.card.presentation.dto.response.ReadMeCardResponse;
 import scanly.io.scanly_back.card.presentation.dto.response.RegisterCardResponse;
 import scanly.io.scanly_back.card.presentation.dto.request.RegisterCardRequest;
+import scanly.io.scanly_back.card.presentation.dto.request.UpdateCardRequest;
 import scanly.io.scanly_back.common.response.ApiResponse;
 
 @RestController
@@ -44,6 +45,18 @@ public class CardController {
             @RequestHeader("X-Member-Id") String memberId
     ) {
         ReadMeCardInfo cardInfo = cardService.readMe(memberId);
+
+        return ResponseEntity.ok(ApiResponse.success(ReadMeCardResponse.from(cardInfo)));
+    }
+
+    @PostMapping("/me/update")
+    @Operation(summary = "내 명함 수정", description = "내 명함을 수정합니다.")
+    public ResponseEntity<ApiResponse<ReadMeCardResponse>> updateCard(
+            @Parameter(description = "회원 ID", required = true)
+            @RequestHeader("X-Member-Id") String memberId,
+            @Valid @RequestBody UpdateCardRequest request
+    ) {
+        ReadMeCardInfo cardInfo = cardService.updateCard(request.toCommand(memberId));
 
         return ResponseEntity.ok(ApiResponse.success(ReadMeCardResponse.from(cardInfo)));
     }

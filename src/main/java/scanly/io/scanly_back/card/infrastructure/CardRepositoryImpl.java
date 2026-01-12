@@ -30,6 +30,37 @@ public class CardRepositoryImpl implements CardRepository {
     }
 
     /**
+     * 명함 수정
+     * @param card 명함 정보
+     * @return 수정된 명함
+     */
+    @Override
+    public Card update(Card card) {
+        CardEntity entity = cardJpaRepository.findByMemberId(card.getMemberId())
+                .orElseThrow(() -> new IllegalArgumentException("명함을 찾을 수 없습니다."));
+
+        entity.update(
+                card.getName(),
+                card.getTitle(),
+                card.getCompany(),
+                card.getPhone(),
+                card.getEmail(),
+                card.getBio(),
+                card.getProfileImageUrl(),
+                card.getPortfolioUrl(),
+                card.getLocation()
+        );
+
+        entity.clearSocialLinks();
+        for (SocialLink socialLink : card.getSocialLinks()) {
+            SocialLinkEntity linkEntity = cardMapper.toEntity(socialLink);
+            entity.addSocialLink(linkEntity);
+        }
+
+        return cardMapper.toDomain(entity);
+    }
+
+    /**
      * 회원 아이디로 유효성 체크
      * @param memberId 회원 아이디
      * @return 존재하면 true, 아니면 false

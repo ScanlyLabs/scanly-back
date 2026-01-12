@@ -6,6 +6,8 @@ public interface CardRepository {
 
     Card save(Card card);
 
+    Card update(Card card);
+
     boolean existsByMemberId(String memberId);
 
     Optional<Card> findByMemberId(String memberId);

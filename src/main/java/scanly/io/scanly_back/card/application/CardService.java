@@ -7,6 +7,7 @@ import scanly.io.scanly_back.card.application.dto.ReadMeCardInfo;
 import scanly.io.scanly_back.card.application.dto.RegisterCardInfo;
 import scanly.io.scanly_back.card.application.dto.RegisterCardCommand;
 import scanly.io.scanly_back.card.application.dto.SocialLinkCommand;
+import scanly.io.scanly_back.card.application.dto.UpdateCardCommand;
 import scanly.io.scanly_back.card.domain.Card;
 import scanly.io.scanly_back.card.domain.CardRepository;
 import scanly.io.scanly_back.common.exception.CustomException;
@@ -88,6 +89,35 @@ public class CardService {
         Card card = findByMemberId(memberId);
 
         return ReadMeCardInfo.from(card);
+    }
+
+    /**
+     * 명함 수정
+     * @param command 수정할 명함 정보
+     * @return 수정된 명함 정보
+     */
+    @Transactional
+    public ReadMeCardInfo updateCard(UpdateCardCommand command) {
+        Card card = findByMemberId(command.memberId());
+
+        card.update(
+                command.name(),
+                command.title(),
+                command.company(),
+                command.phone(),
+                command.email(),
+                command.bio(),
+                command.profileImageUrl(),
+                command.portfolioUrl(),
+                command.location()
+        );
+
+        card.clearSocialLinks();
+        addSocialLinks(command.socialLinks(), card);
+
+        Card updatedCard = cardRepository.update(card);
+
+        return ReadMeCardInfo.from(updatedCard);
     }
 
     /**
