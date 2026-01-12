@@ -1,4 +1,4 @@
-package scanly.io.scanly_back.card.presentation.dto;
+package scanly.io.scanly_back.card.presentation.dto.request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;

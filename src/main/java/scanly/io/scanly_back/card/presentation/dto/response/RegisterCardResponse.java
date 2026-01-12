@@ -1,4 +1,4 @@
-package scanly.io.scanly_back.card.presentation.dto;
+package scanly.io.scanly_back.card.presentation.dto.response;
 
 import scanly.io.scanly_back.card.application.dto.RegisterCardInfo;
 import scanly.io.scanly_back.card.domain.SocialLinkType;
