@@ -49,7 +49,7 @@ public class CardService {
                 command.location()
         );
 
-        addSocialLink(command, card);
+        addSocialLinks(command.socialLinks(), card);
 
         Card savedCard = cardRepository.save(card);
 
@@ -68,11 +68,10 @@ public class CardService {
 
     /**
      * 소셜 링크 추가
-     * @param command 등록할 명함 정보
-     * @param card 등록할 명함
+     * @param linkCommands 소셜 링크 커맨드 리스트
+     * @param card 명함
      */
-    private static void addSocialLink(RegisterCardCommand command, Card card) {
-        List<SocialLinkCommand> linkCommands = command.socialLinks();
+    private void addSocialLinks(List<SocialLinkCommand> linkCommands, Card card) {
         if (linkCommands != null) {
             for (SocialLinkCommand linkCommand : linkCommands) {
                 card.addSocialLink(linkCommand.type(), linkCommand.url());
