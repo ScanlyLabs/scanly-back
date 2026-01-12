@@ -9,9 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import scanly.io.scanly_back.card.application.CardService;
+import scanly.io.scanly_back.card.application.dto.ReadMeCardInfo;
 import scanly.io.scanly_back.card.application.dto.RegisterCardInfo;
-import scanly.io.scanly_back.card.presentation.dto.RegisterCardResponse;
-import scanly.io.scanly_back.card.presentation.dto.RegisterCardRequest;
+import scanly.io.scanly_back.card.presentation.dto.response.ReadMeCardResponse;
+import scanly.io.scanly_back.card.presentation.dto.response.RegisterCardResponse;
+import scanly.io.scanly_back.card.presentation.dto.request.RegisterCardRequest;
 import scanly.io.scanly_back.common.response.ApiResponse;
 
 @RestController
@@ -33,5 +35,16 @@ public class CardController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success(RegisterCardResponse.from(registerCardInfo)));
+    }
+
+    @GetMapping("/me")
+    @Operation(summary = "내 명함 조회", description = "내 명함을 조회합니다.")
+    public ResponseEntity<ApiResponse<ReadMeCardResponse>> readMe(
+            @Parameter(description = "회원 ID", required = true)
+            @RequestHeader("X-Member-Id") String memberId
+    ) {
+        ReadMeCardInfo cardInfo = cardService.readMe(memberId);
+
+        return ResponseEntity.ok(ApiResponse.success(ReadMeCardResponse.from(cardInfo)));
     }
 }

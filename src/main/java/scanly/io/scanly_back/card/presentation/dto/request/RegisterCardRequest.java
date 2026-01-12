@@ -1,4 +1,4 @@
-package scanly.io.scanly_back.card.presentation.dto;
+package scanly.io.scanly_back.card.presentation.dto.request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import scanly.io.scanly_back.card.application.dto.RegisterCardCommand;
+import scanly.io.scanly_back.card.application.dto.SocialLinkCommand;
 import scanly.io.scanly_back.card.domain.SocialLinkType;
 
 import java.util.List;
@@ -52,13 +53,13 @@ public record RegisterCardRequest(
             @Size(max = 500, message = "URL은 500자를 초과할 수 없습니다.")
             String url
     ) {
-        public RegisterCardCommand.SocialLinkCommand toCommand() {
-            return new RegisterCardCommand.SocialLinkCommand(type, url);
+        public SocialLinkCommand toCommand() {
+            return new SocialLinkCommand(type, url);
         }
     }
 
     public RegisterCardCommand toCommand(String memberId) {
-        List<RegisterCardCommand.SocialLinkCommand> linkCommands = null;
+        List<SocialLinkCommand> linkCommands = null;
         if (socialLinks != null) {
             linkCommands = socialLinks.stream()
                     .map(SocialLinkRequest::toCommand)
