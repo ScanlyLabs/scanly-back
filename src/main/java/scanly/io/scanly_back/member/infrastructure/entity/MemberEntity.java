@@ -26,6 +26,7 @@ public class MemberEntity {
     @Column(nullable = false, unique = true)
     private String password;                        // 비밀번호
 
+    @Column(length = 50)
     private String email;                           // 이메일
 
     @Enumerated(EnumType.STRING)

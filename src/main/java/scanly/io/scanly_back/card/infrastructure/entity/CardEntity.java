@@ -32,10 +32,10 @@ public class CardEntity {
     @Column(nullable = false, length = 50)
     private String company;                 // 회사
 
-    @Column(length = 20)
+    @Column(nullable = false, length = 11)
     private String phone;                   // 전화번호
 
-    @Column(length = 100)
+    @Column(nullable = false, length = 50)
     private String email;                   // 이메일
 
     @Column(length = 300)
