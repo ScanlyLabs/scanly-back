@@ -23,21 +23,6 @@ public record RegisterCardResponse(
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
-    public record SocialLinkResponse(
-            String id,
-            SocialLinkType type,
-            String url,
-            int displayOrder
-    ) {
-        public static SocialLinkResponse from(RegisterCardInfo.SocialLinkInfo info) {
-            return new SocialLinkResponse(
-                    info.id(),
-                    info.type(),
-                    info.url(),
-                    info.displayOrder()
-            );
-        }
-    }
 
     public static RegisterCardResponse from(RegisterCardInfo info) {
         return new RegisterCardResponse(
