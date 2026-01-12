@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import scanly.io.scanly_back.card.application.dto.RegisterCardInfo;
 import scanly.io.scanly_back.card.application.dto.RegisterCardCommand;
+import scanly.io.scanly_back.card.application.dto.SocialLinkCommand;
 import scanly.io.scanly_back.card.domain.Card;
 import scanly.io.scanly_back.card.domain.CardRepository;
 import scanly.io.scanly_back.common.exception.CustomException;
@@ -70,9 +71,9 @@ public class CardService {
      * @param card 등록할 명함
      */
     private static void addSocialLink(RegisterCardCommand command, Card card) {
-        List<RegisterCardCommand.SocialLinkCommand> linkCommands = command.socialLinks();
+        List<SocialLinkCommand> linkCommands = command.socialLinks();
         if (linkCommands != null) {
-            for (RegisterCardCommand.SocialLinkCommand linkCommand : linkCommands) {
+            for (SocialLinkCommand linkCommand : linkCommands) {
                 card.addSocialLink(linkCommand.type(), linkCommand.url());
             }
         }
