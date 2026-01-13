@@ -17,7 +17,11 @@ public class CardMapper {
      * @return 엔티티
      */
     public CardEntity toEntity(Card domain) {
-        CardEntity entity = CardEntity.of(
+        if (domain == null) {
+            return null;
+        }
+
+        return CardEntity.of(
                 domain.getId(),
                 domain.getMemberId(),
                 domain.getName(),
@@ -33,23 +37,22 @@ public class CardMapper {
                 domain.getCreatedAt(),
                 domain.getUpdatedAt()
         );
-
-        for (SocialLink socialLink : domain.getSocialLinks()) {
-            SocialLinkEntity linkEntity = toEntity(socialLink);
-            entity.addSocialLink(linkEntity);
-        }
-
-        return entity;
     }
 
     /**
      * SocialLink domain -> entity 객체 변환
      * @param domain 도메인
+     * @param cardId 명함 ID
      * @return 엔티티
      */
-    public SocialLinkEntity toEntity(SocialLink domain) {
+    public SocialLinkEntity socialLinkToEntity(SocialLink domain, String cardId) {
+        if (domain == null) {
+            return null;
+        }
+
         return SocialLinkEntity.of(
                 domain.getId(),
+                cardId,
                 domain.getType(),
                 domain.getUrl(),
                 domain.getDisplayOrder(),
@@ -61,11 +64,16 @@ public class CardMapper {
     /**
      * Card entity -> domain 객체 변환
      * @param entity 엔티티
+     * @param socialLinkEntities 소셜 링크 엔티티 목록
      * @return 도메인
      */
-    public Card toDomain(CardEntity entity) {
-        List<SocialLink> socialLinks = entity.getSocialLinks().stream()
-                .map(this::toDomain)
+    public Card toDomain(CardEntity entity, List<SocialLinkEntity> socialLinkEntities) {
+        if (entity == null) {
+            return null;
+        }
+
+        List<SocialLink> socialLinks = socialLinkEntities.stream()
+                .map(this::socialLinkToDomain)
                 .toList();
 
         return Card.of(
@@ -92,7 +100,11 @@ public class CardMapper {
      * @param entity 엔티티
      * @return 도메인
      */
-    public SocialLink toDomain(SocialLinkEntity entity) {
+    public SocialLink socialLinkToDomain(SocialLinkEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+
         return SocialLink.of(
                 entity.getId(),
                 entity.getType(),
