@@ -8,4 +8,6 @@ import java.util.List;
 public interface SocialLinkJpaRepository extends JpaRepository<SocialLinkEntity, String> {
 
     List<SocialLinkEntity> findByCardIdOrderByDisplayOrderAsc(String cardId);
+
+    void deleteAllByCardId(String cardId);
 }

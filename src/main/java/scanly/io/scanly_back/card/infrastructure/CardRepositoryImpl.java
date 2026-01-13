@@ -29,8 +29,10 @@ public class CardRepositoryImpl implements CardRepository {
     @Override
     public Card save(Card card) {
         CardEntity cardEntity = cardMapper.toEntity(card);
+        // 1. 명함 저장
         CardEntity savedCardEntity = cardJpaRepository.save(cardEntity);
 
+        // 2. 소셜 링크 저장
         List<SocialLinkEntity> socialLinkEntities = card.getSocialLinks().stream()
                 .map(socialLink -> cardMapper.socialLinkToEntity(socialLink, savedCardEntity.getId()))
                 .toList();
@@ -41,33 +43,30 @@ public class CardRepositoryImpl implements CardRepository {
 
     /**
      * 명함 수정
+     * 1. 명함 수정
+     * 2. 소셜 링크 제거
+     * 3. 소셜 링크 저장
      * @param card 명함 정보
      * @return 수정된 명함
      */
     @Override
     public Card update(Card card) {
-        CardEntity entity = cardJpaRepository.findByMemberId(card.getMemberId())
-                .orElseThrow(() -> new IllegalArgumentException("명함을 찾을 수 없습니다."));
+        // 1. 명함 수정
+        CardEntity cardEntity = cardMapper.toEntity(card);
+        CardEntity savedCardEntity = cardJpaRepository.save(cardEntity);
 
-        entity.update(
-                card.getName(),
-                card.getTitle(),
-                card.getCompany(),
-                card.getPhone(),
-                card.getEmail(),
-                card.getBio(),
-                card.getProfileImageUrl(),
-                card.getPortfolioUrl(),
-                card.getLocation()
-        );
+        String cardId = savedCardEntity.getId();
+        
+        // 2. 소셜 링크 제거
+        socialLinkJpaRepository.deleteAllByCardId(cardId);
 
-        entity.clearSocialLinks();
-        for (SocialLink socialLink : card.getSocialLinks()) {
-            SocialLinkEntity linkEntity = cardMapper.toEntity(socialLink);
-            entity.addSocialLink(linkEntity);
-        }
+        // 3. 소셜 링크 저장
+        List<SocialLinkEntity> socialLinkEntities = card.getSocialLinks().stream()
+                .map(socialLink -> cardMapper.socialLinkToEntity(socialLink, cardId))
+                .toList();
+        List<SocialLinkEntity> savedSocialLinkEntities = socialLinkJpaRepository.saveAll(socialLinkEntities);
 
-        return cardMapper.toDomain(entity);
+        return cardMapper.toDomain(cardEntity, savedSocialLinkEntities);
     }
 
     /**
