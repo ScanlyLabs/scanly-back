@@ -1,7 +1,6 @@
 package scanly.io.scanly_back.card.presentation.dto.response;
 
-import scanly.io.scanly_back.card.application.dto.RegisterCardInfo;
-import scanly.io.scanly_back.card.domain.SocialLinkType;
+import scanly.io.scanly_back.card.application.dto.info.RegisterCardInfo;
 
 import java.time.LocalDateTime;
 import java.util.List;

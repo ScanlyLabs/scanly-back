@@ -1,4 +1,4 @@
-package scanly.io.scanly_back.card.application.dto;
+package scanly.io.scanly_back.card.application.dto.command;
 
 import scanly.io.scanly_back.card.domain.SocialLinkType;
 

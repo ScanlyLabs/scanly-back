@@ -1,6 +1,6 @@
 package scanly.io.scanly_back.card.presentation.dto.response;
 
-import scanly.io.scanly_back.card.application.dto.SocialLinkInfo;
+import scanly.io.scanly_back.card.application.dto.info.SocialLinkInfo;
 import scanly.io.scanly_back.card.domain.SocialLinkType;
 
 public record SocialLinkResponse(

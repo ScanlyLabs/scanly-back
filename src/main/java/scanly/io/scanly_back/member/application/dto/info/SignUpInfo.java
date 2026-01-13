@@ -1,4 +1,4 @@
-package scanly.io.scanly_back.member.application.dto;
+package scanly.io.scanly_back.member.application.dto.info;
 
 import scanly.io.scanly_back.member.domain.Member;
 

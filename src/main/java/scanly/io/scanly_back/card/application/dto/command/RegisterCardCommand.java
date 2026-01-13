@@ -1,8 +1,8 @@
-package scanly.io.scanly_back.card.application.dto;
+package scanly.io.scanly_back.card.application.dto.command;
 
 import java.util.List;
 
-public record UpdateCardCommand(
+public record RegisterCardCommand(
         String memberId,
         String name,
         String title,

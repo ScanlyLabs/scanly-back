@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
-import scanly.io.scanly_back.member.application.dto.LoginCommand;
-import scanly.io.scanly_back.member.application.dto.LoginInfo;
-import scanly.io.scanly_back.member.application.dto.SignUpCommand;
-import scanly.io.scanly_back.member.application.dto.SignUpInfo;
+import scanly.io.scanly_back.member.application.dto.command.LoginCommand;
+import scanly.io.scanly_back.member.application.dto.info.LoginInfo;
+import scanly.io.scanly_back.member.application.dto.command.SignUpCommand;
+import scanly.io.scanly_back.member.application.dto.info.SignUpInfo;
 import scanly.io.scanly_back.member.domain.Member;
 import scanly.io.scanly_back.member.domain.MemberRepository;
 

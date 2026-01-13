@@ -5,8 +5,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import scanly.io.scanly_back.card.application.dto.RegisterCardCommand;
-import scanly.io.scanly_back.card.application.dto.SocialLinkCommand;
+import scanly.io.scanly_back.card.application.dto.command.RegisterCardCommand;
+import scanly.io.scanly_back.card.application.dto.command.SocialLinkCommand;
 
 import java.util.List;
 

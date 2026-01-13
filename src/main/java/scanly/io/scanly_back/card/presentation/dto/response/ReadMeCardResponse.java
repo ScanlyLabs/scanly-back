@@ -1,6 +1,6 @@
 package scanly.io.scanly_back.card.presentation.dto.response;
 
-import scanly.io.scanly_back.card.application.dto.ReadMeCardInfo;
+import scanly.io.scanly_back.card.application.dto.info.ReadMeCardInfo;
 
 import java.util.List;
 

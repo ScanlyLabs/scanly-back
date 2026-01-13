@@ -3,7 +3,7 @@ package scanly.io.scanly_back.member.persentaion.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import scanly.io.scanly_back.member.application.dto.LoginCommand;
+import scanly.io.scanly_back.member.application.dto.command.LoginCommand;
 
 public record LoginRequest(
         @NotBlank(message = "로그인 아이디는 필수입니다.")

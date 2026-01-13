@@ -1,10 +1,8 @@
-package scanly.io.scanly_back.card.application.dto;
-
-import scanly.io.scanly_back.card.domain.SocialLinkType;
+package scanly.io.scanly_back.card.application.dto.command;
 
 import java.util.List;
 
-public record RegisterCardCommand(
+public record UpdateCardCommand(
         String memberId,
         String name,
         String title,

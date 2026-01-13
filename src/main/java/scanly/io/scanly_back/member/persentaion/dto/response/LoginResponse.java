@@ -1,6 +1,6 @@
 package scanly.io.scanly_back.member.persentaion.dto.response;
 
-import scanly.io.scanly_back.member.application.dto.LoginInfo;
+import scanly.io.scanly_back.member.application.dto.info.LoginInfo;
 
 public record LoginResponse(
         String id,
