@@ -40,11 +40,11 @@ public class CardController {
 
     @GetMapping("/me")
     @Operation(summary = "내 명함 조회", description = "내 명함을 조회합니다.")
-    public ResponseEntity<ApiResponse<ReadMeCardResponse>> readMe(
+    public ResponseEntity<ApiResponse<ReadMeCardResponse>> readMyCard(
             @Parameter(description = "회원 ID", required = true)
             @RequestHeader("X-Member-Id") String memberId
     ) {
-        ReadMeCardInfo cardInfo = cardService.readMe(memberId);
+        ReadMeCardInfo cardInfo = cardService.readMyCard(memberId);
 
         return ResponseEntity.ok(ApiResponse.success(ReadMeCardResponse.from(cardInfo)));
     }

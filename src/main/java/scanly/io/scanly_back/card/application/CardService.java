@@ -85,7 +85,7 @@ public class CardService {
      * @param memberId 내 명함 아이디
      * @return 조회된 명함
      */
-    public ReadMeCardInfo readMe(String memberId) {
+    public ReadMeCardInfo readMyCard(String memberId) {
         Card card = findByMemberId(memberId);
 
         return ReadMeCardInfo.from(card);
