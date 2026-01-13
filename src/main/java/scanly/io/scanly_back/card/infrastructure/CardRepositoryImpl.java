@@ -66,7 +66,7 @@ public class CardRepositoryImpl implements CardRepository {
                 .toList();
         List<SocialLinkEntity> savedSocialLinkEntities = socialLinkJpaRepository.saveAll(socialLinkEntities);
 
-        return cardMapper.toDomain(cardEntity, savedSocialLinkEntities);
+        return cardMapper.toDomain(savedCardEntity, savedSocialLinkEntities);
     }
 
     /**
