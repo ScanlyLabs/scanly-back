@@ -7,6 +7,7 @@ import scanly.io.scanly_back.card.application.dto.ReadMeCardInfo;
 import scanly.io.scanly_back.card.application.dto.RegisterCardInfo;
 import scanly.io.scanly_back.card.application.dto.RegisterCardCommand;
 import scanly.io.scanly_back.card.application.dto.SocialLinkCommand;
+import scanly.io.scanly_back.card.application.dto.UpdateCardCommand;
 import scanly.io.scanly_back.card.domain.Card;
 import scanly.io.scanly_back.card.domain.CardRepository;
 import scanly.io.scanly_back.common.exception.CustomException;
@@ -49,7 +50,7 @@ public class CardService {
                 command.location()
         );
 
-        addSocialLink(command, card);
+        addSocialLinks(command.socialLinks(), card);
 
         Card savedCard = cardRepository.save(card);
 
@@ -68,11 +69,10 @@ public class CardService {
 
     /**
      * 소셜 링크 추가
-     * @param command 등록할 명함 정보
-     * @param card 등록할 명함
+     * @param linkCommands 소셜 링크 커맨드 리스트
+     * @param card 명함
      */
-    private static void addSocialLink(RegisterCardCommand command, Card card) {
-        List<SocialLinkCommand> linkCommands = command.socialLinks();
+    private void addSocialLinks(List<SocialLinkCommand> linkCommands, Card card) {
         if (linkCommands != null) {
             for (SocialLinkCommand linkCommand : linkCommands) {
                 card.addSocialLink(linkCommand.type(), linkCommand.url());
@@ -89,6 +89,35 @@ public class CardService {
         Card card = findByMemberId(memberId);
 
         return ReadMeCardInfo.from(card);
+    }
+
+    /**
+     * 명함 수정
+     * @param command 수정할 명함 정보
+     * @return 수정된 명함 정보
+     */
+    @Transactional
+    public ReadMeCardInfo updateCard(UpdateCardCommand command) {
+        Card card = findByMemberId(command.memberId());
+
+        card.update(
+                command.name(),
+                command.title(),
+                command.company(),
+                command.phone(),
+                command.email(),
+                command.bio(),
+                command.profileImageUrl(),
+                command.portfolioUrl(),
+                command.location()
+        );
+
+        card.clearSocialLinks();
+        addSocialLinks(command.socialLinks(), card);
+
+        Card updatedCard = cardRepository.update(card);
+
+        return ReadMeCardInfo.from(updatedCard);
     }
 
     /**
