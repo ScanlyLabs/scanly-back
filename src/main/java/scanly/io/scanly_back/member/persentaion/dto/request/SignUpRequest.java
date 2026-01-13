@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import scanly.io.scanly_back.member.application.dto.SignUpCommand;
+import scanly.io.scanly_back.member.application.dto.command.SignUpCommand;
 
 public record SignUpRequest(
         @NotBlank(message = "로그인 아이디는 필수입니다.")
