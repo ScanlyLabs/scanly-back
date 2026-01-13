@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import scanly.io.scanly_back.card.domain.Card;
 import scanly.io.scanly_back.card.domain.CardRepository;
-import scanly.io.scanly_back.card.domain.SocialLink;
 import scanly.io.scanly_back.card.infrastructure.entity.CardEntity;
 import scanly.io.scanly_back.card.infrastructure.entity.SocialLinkEntity;
 
@@ -92,5 +91,21 @@ public class CardRepositoryImpl implements CardRepository {
                             .findByCardIdOrderByDisplayOrderAsc(cardEntity.getId());
                     return cardMapper.toDomain(cardEntity, socialLinks);
                 });
+    }
+
+    /**
+     * 회원 아이디로 내 명함 제거
+     * 1. 소셜 링크 제거
+     * 2. 명함 제거
+     */
+    @Override
+    public void delete(Card card) {
+        CardEntity cardEntity = cardMapper.toEntity(card);
+
+        String cardId = cardEntity.getId();
+        // 1. 소셜 링크 제거
+        socialLinkJpaRepository.deleteAllByCardId(cardId);
+        // 2. 명함 제거
+        cardJpaRepository.deleteById(cardId);
     }
 }
