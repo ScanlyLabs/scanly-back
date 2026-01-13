@@ -2,9 +2,9 @@ package scanly.io.scanly_back.card.infrastructure.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import scanly.io.scanly_back.card.domain.SocialLinkType;
 
 import java.time.LocalDateTime;
@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Entity
 @Table(name = "social_link")
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SocialLinkEntity {
 
@@ -19,10 +20,8 @@ public class SocialLinkEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "card_id", nullable = false)
-    @Setter(AccessLevel.PACKAGE)
-    private CardEntity card;
+    @Column(name = "card_id", nullable = false)
+    private String cardId;                          // 명함 id
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -40,24 +39,12 @@ public class SocialLinkEntity {
     @Column(nullable = false)
     private LocalDateTime updatedAt;                // 수정 일시
 
-    private SocialLinkEntity(
-            String id, SocialLinkType type, String url,
-            int displayOrder, LocalDateTime createdAt, LocalDateTime updatedAt
-    ) {
-        this.id = id;
-        this.type = type;
-        this.url = url;
-        this.displayOrder = displayOrder;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-
     public static SocialLinkEntity of(
-            String id, SocialLinkType type, String url,
+            String id, String cardId, SocialLinkType type, String url,
             int displayOrder, LocalDateTime createdAt, LocalDateTime updatedAt
     ) {
         return new SocialLinkEntity(
-                id, type, url,
+                id, cardId, type, url,
                 displayOrder, createdAt, updatedAt
         );
     }

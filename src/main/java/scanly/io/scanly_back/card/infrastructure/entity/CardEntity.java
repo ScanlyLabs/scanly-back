@@ -7,12 +7,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Entity
 @Table(name = "card")
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CardEntity {
 
@@ -41,10 +40,6 @@ public class CardEntity {
     @Column(length = 300)
     private String bio;                     // 자기소개
 
-    @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("displayOrder ASC")
-    private List<SocialLinkEntity> socialLinks = new ArrayList<>();
-
     private String profileImageUrl;          // 프로필 사진 url
 
     private String portfolioUrl;            // 포트폴리오 url
@@ -60,26 +55,6 @@ public class CardEntity {
     @Column(nullable = false)
     private LocalDateTime updatedAt;        // 수정 일시
 
-    private CardEntity(String id, String memberId, String name, String title, String company,
-                      String phone, String email, String bio, String profileImageUrl,
-                      String portfolioUrl, String location, String qrImageUrl,
-                      LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
-        this.memberId = memberId;
-        this.name = name;
-        this.title = title;
-        this.company = company;
-        this.phone = phone;
-        this.email = email;
-        this.bio = bio;
-        this.profileImageUrl = profileImageUrl;
-        this.portfolioUrl = portfolioUrl;
-        this.location = location;
-        this.qrImageUrl = qrImageUrl;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-
     public static CardEntity of(
             String id, String memberId, String name, String title, String company,
             String phone, String email, String bio, String profileImageUrl,
@@ -92,39 +67,5 @@ public class CardEntity {
                 portfolioUrl, location, qrImageUrl,
                 createdAt, updatedAt
         );
-    }
-
-    /**
-     * 소셜 링크 추가
-     * @param socialLink 소셜 링크
-     */
-    public void addSocialLink(SocialLinkEntity socialLink) {
-        this.socialLinks.add(socialLink);
-        socialLink.setCard(this);
-    }
-
-    /**
-     * 명함 수정
-     */
-    public void update(String name, String title, String company, String phone,
-                       String email, String bio, String profileImageUrl,
-                       String portfolioUrl, String location) {
-        this.name = name;
-        this.title = title;
-        this.company = company;
-        this.phone = phone;
-        this.email = email;
-        this.bio = bio;
-        this.profileImageUrl = profileImageUrl;
-        this.portfolioUrl = portfolioUrl;
-        this.location = location;
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    /**
-     * 소셜 링크 초기화
-     */
-    public void clearSocialLinks() {
-        this.socialLinks.clear();
     }
 }
