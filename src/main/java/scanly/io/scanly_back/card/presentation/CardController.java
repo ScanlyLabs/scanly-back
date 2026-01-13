@@ -60,4 +60,15 @@ public class CardController {
 
         return ResponseEntity.ok(ApiResponse.success(ReadMeCardResponse.from(cardInfo)));
     }
+
+    @PostMapping("/me/delete")
+    @Operation(summary = "내 명함 삭제", description = "내 명함을 삭제합니다.")
+    public ResponseEntity<ApiResponse<Void>> deleteMyCard(
+            @Parameter(description = "회원 ID", required = true)
+            @RequestHeader("X-Member-Id") String memberId
+    ) {
+        cardService.deleteMyCard(memberId);
+
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
 }

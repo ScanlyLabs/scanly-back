@@ -129,4 +129,16 @@ public class CardService {
         return cardRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CARD_NOT_FOUND));
     }
+
+    /**
+     * 내 명함 제거
+     * 1. 명함 조회
+     * 2. 명함 제거
+     * @param memberId 회원 아이디
+     */
+    @Transactional
+    public void deleteMyCard(String memberId) {
+        Card card = findByMemberId(memberId);
+        cardRepository.delete(card);
+    }
 }
