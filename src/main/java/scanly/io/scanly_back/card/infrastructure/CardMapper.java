@@ -114,4 +114,30 @@ public class CardMapper {
                 entity.getUpdatedAt()
         );
     }
+
+
+    /**
+     * SocialLink domain -> entity 객체 변환
+     * 삭제 후 재생성 패턴을 사용하므로 id는 null로 설정
+     * (id가 존재하면 JPA 가 UPDATE(merge)를 시도하여
+     * 삭제된 row에 대해 ObjectOptimisticLockingFailureException이 발생할 수 있음)
+     * @param domain 도메인
+     * @param cardId 명함 ID
+     * @return 신규 엔티티
+     */
+    public SocialLinkEntity socialLinkToNewEntity(SocialLink domain, String cardId) {
+        if (domain == null) {
+            return null;
+        }
+
+        return SocialLinkEntity.of(
+                null,
+                cardId,
+                domain.getType(),
+                domain.getUrl(),
+                domain.getDisplayOrder(),
+                domain.getCreatedAt(),
+                domain.getUpdatedAt()
+        );
+    }
 }
