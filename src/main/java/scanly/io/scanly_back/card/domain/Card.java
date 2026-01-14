@@ -120,6 +120,15 @@ public class Card {
         this.updatedAt = LocalDateTime.now();
     }
 
+    /**
+     * QR 코드 이미지 설정
+     * @param qrImageUrl QR 코드 이미지 (Base64)
+     */
+    public void assignQrCode(String qrImageUrl) {
+        this.qrImageUrl = qrImageUrl;
+        this.updatedAt = LocalDateTime.now();
+    }
+
     // Getters
     public String getId() {
         return id;

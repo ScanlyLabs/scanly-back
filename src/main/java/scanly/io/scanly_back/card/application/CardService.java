@@ -12,6 +12,8 @@ import scanly.io.scanly_back.card.domain.Card;
 import scanly.io.scanly_back.card.domain.CardRepository;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
+import scanly.io.scanly_back.common.service.S3Service;
+import scanly.io.scanly_back.common.util.QrCodeGenerator;
 
 import java.util.List;
 
@@ -21,11 +23,14 @@ import java.util.List;
 public class CardService {
 
     private final CardRepository cardRepository;
+    private final QrCodeGenerator qrCodeGenerator;
+    private final S3Service s3Service;
 
     /**
      * 명함 등록
      * 1. 중복 명함 확인(인당 명함 1개)
      * 2. 명함 생성
+     * 3. QR 코드 생성 및 S3 업로드
      * @param command 명함 등록 정보
      * @return 신규 명함 정보
      */
@@ -54,7 +59,13 @@ public class CardService {
 
         Card savedCard = cardRepository.save(card);
 
-        return RegisterCardInfo.from(savedCard);
+        // 3. QR 코드 생성 및 S3 업로드
+        byte[] qrCodeBytes = qrCodeGenerator.generateQrCodeBytesForCard(savedCard.getId());
+        String qrCodeUrl = s3Service.uploadBytes(qrCodeBytes, "qrcodes", "png", "image/png");
+        savedCard.assignQrCode(qrCodeUrl);
+        Card cardWithQr = cardRepository.updateOnlyCard(savedCard);
+
+        return RegisterCardInfo.from(cardWithQr);
     }
 
     /**

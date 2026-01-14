@@ -69,6 +69,23 @@ public class CardRepositoryImpl implements CardRepository {
     }
 
     /**
+     * 명함 수정
+     * @param card 명함 정보
+     * @return 수정된 명함
+     */
+    @Override
+    public Card updateOnlyCard(Card card) {
+        CardEntity cardEntity = cardMapper.toEntity(card);
+        CardEntity savedCardEntity = cardJpaRepository.save(cardEntity);
+
+        List<SocialLinkEntity> socialLinkEntities = card.getSocialLinks().stream()
+                .map(socialLink -> cardMapper.socialLinkToEntity(socialLink, savedCardEntity.getId()))
+                .toList();
+
+        return cardMapper.toDomain(savedCardEntity, socialLinkEntities);
+    }
+
+    /**
      * 회원 아이디로 유효성 체크
      * @param memberId 회원 아이디
      * @return 존재하면 true, 아니면 false
