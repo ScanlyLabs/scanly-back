@@ -61,7 +61,7 @@ public class CardRepositoryImpl implements CardRepository {
 
         // 3. 소셜 링크 저장
         List<SocialLinkEntity> socialLinkEntities = card.getSocialLinks().stream()
-                .map(socialLink -> cardMapper.socialLinkToEntity(socialLink, cardId))
+                .map(socialLink -> cardMapper.socialLinkToNewEntity(socialLink, cardId))
                 .toList();
         List<SocialLinkEntity> savedSocialLinkEntities = socialLinkJpaRepository.saveAll(socialLinkEntities);
 
