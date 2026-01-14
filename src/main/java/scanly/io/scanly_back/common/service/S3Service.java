@@ -27,6 +27,8 @@ public class S3Service {
     @Value("${cloud.aws.region.static}")
     private String region;
 
+    private final String AWS_S3_URL = "https://%s.s3.%s.amazonaws.com/";
+
     /**
      * 바이트 배열 S3 업로드
      * @param bytes 업로드할 바이트 배열
@@ -60,6 +62,37 @@ public class S3Service {
      * @return S3 파일 URL
      */
     private String getFileUrl(String fileName) {
-        return String.format("https://%s.s3.%s.amazonaws.com/%s", bucket, region, fileName);
+        return String.format(AWS_S3_URL+"%s", bucket, region, fileName);
+    }
+
+    /**
+     * S3 파일 삭제
+     * @param fileUrl 삭제할 파일의 S3 URL
+     */
+    public void delete(String fileUrl) {
+        String fileName = extractFileNameFromUrl(fileUrl);
+
+        try {
+            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(fileName)
+                    .build();
+
+            s3Client.deleteObject(deleteObjectRequest);
+            log.info("파일 삭제 완료: {}", fileName);
+        } catch (S3Exception e) {
+            log.error("S3 파일 삭제 중 오류 발생: {}", e.getMessage());
+            throw new RuntimeException("S3 파일 삭제에 실패했습니다.", e);
+        }
+    }
+
+    /**
+     * S3 URL에서 파일 키 추출
+     * @param fileUrl S3 파일 URL
+     * @return S3 파일 키
+     */
+    private String extractFileNameFromUrl(String fileUrl) {
+        String prefix = String.format(AWS_S3_URL, bucket, region);
+        return fileUrl.replace(prefix, "");
     }
 }
