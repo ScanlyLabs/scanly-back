@@ -8,6 +8,8 @@ public interface CardRepository {
 
     Card update(Card card);
 
+    Card updateOnlyCard(Card card);
+
     boolean existsByMemberId(String memberId);
 
     Optional<Card> findByMemberId(String memberId);
