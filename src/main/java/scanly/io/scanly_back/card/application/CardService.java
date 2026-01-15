@@ -60,7 +60,7 @@ public class CardService {
         Card savedCard = cardRepository.save(card);
 
         // 3. QR 코드 생성 및 S3 업로드
-        byte[] qrCodeBytes = qrCodeGenerator.generateQrCodeBytesForCard(savedCard.getId());
+        byte[] qrCodeBytes = qrCodeGenerator.generateQrCodeBytesForMember(memberId);
         String qrCodeUrl = s3Service.uploadBytes(qrCodeBytes, "qrcodes", "png", "image/png");
         savedCard.assignQrCode(qrCodeUrl);
         Card cardWithQr = cardRepository.updateOnlyCard(savedCard);
@@ -101,7 +101,6 @@ public class CardService {
 
         return ReadMeCardInfo.from(card);
     }
-
     /**
      * 명함 수정
      * @param command 수정할 명함 정보
