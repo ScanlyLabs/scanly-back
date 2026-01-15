@@ -24,12 +24,12 @@ public class QrCodeGenerator {
     private String baseUrl;
 
     /**
-     * 명함 ID로 QR 코드 바이트 배열 생성
-     * @param cardId 명함 ID
+     * 회원 ID로 QR 코드 바이트 배열 생성
+     * @param memberId 회원 ID
      * @return QR 코드 이미지 바이트 배열
      */
-    public byte[] generateQrCodeBytesForCard(String cardId) {
-        String url = baseUrl + "/api/cards/v1/" + cardId;
+    public byte[] generateQrCodeBytesForMember(String memberId) {
+        String url = baseUrl + "/api/cards/v1/member/" + memberId;
         return generateQrCodeBytes(url, DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
 
