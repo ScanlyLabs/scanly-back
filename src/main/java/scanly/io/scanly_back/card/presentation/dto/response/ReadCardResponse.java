@@ -1,10 +1,10 @@
 package scanly.io.scanly_back.card.presentation.dto.response;
 
-import scanly.io.scanly_back.card.application.dto.info.ReadMeCardInfo;
+import scanly.io.scanly_back.card.application.dto.info.ReadCardInfo;
 
 import java.util.List;
 
-public record ReadMeCardResponse(
+public record ReadCardResponse(
         String id,
         String name,
         String title,
@@ -18,8 +18,8 @@ public record ReadMeCardResponse(
         String location,
         String qrImageUrl
 ) {
-    public static ReadMeCardResponse from(ReadMeCardInfo info) {
-        return new ReadMeCardResponse(
+    public static ReadCardResponse from(ReadCardInfo info) {
+        return new ReadCardResponse(
             info.id(),
                 info.name(),
                 info.title(),
