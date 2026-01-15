@@ -4,7 +4,7 @@ import scanly.io.scanly_back.card.domain.Card;
 
 import java.util.List;
 
-public record ReadMeCardInfo(
+public record ReadCardInfo(
         String id,
         String name,
         String title,
@@ -19,8 +19,8 @@ public record ReadMeCardInfo(
         String qrImageUrl
 ) {
 
-    public static ReadMeCardInfo from(Card card) {
-        return new ReadMeCardInfo(
+    public static ReadCardInfo from(Card card) {
+        return new ReadCardInfo(
                 card.getId(),
                 card.getName(),
                 card.getTitle(),

@@ -3,7 +3,7 @@ package scanly.io.scanly_back.card.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import scanly.io.scanly_back.card.application.dto.info.ReadMeCardInfo;
+import scanly.io.scanly_back.card.application.dto.info.ReadCardInfo;
 import scanly.io.scanly_back.card.application.dto.info.RegisterCardInfo;
 import scanly.io.scanly_back.card.application.dto.command.RegisterCardCommand;
 import scanly.io.scanly_back.card.application.dto.command.SocialLinkCommand;
@@ -96,10 +96,10 @@ public class CardService {
      * @param memberId 내 명함 아이디
      * @return 조회된 명함
      */
-    public ReadMeCardInfo readMyCard(String memberId) {
+    public ReadCardInfo readMyCard(String memberId) {
         Card card = findByMemberId(memberId);
 
-        return ReadMeCardInfo.from(card);
+        return ReadCardInfo.from(card);
     }
     /**
      * 명함 수정
@@ -107,7 +107,7 @@ public class CardService {
      * @return 수정된 명함 정보
      */
     @Transactional
-    public ReadMeCardInfo updateCard(UpdateCardCommand command) {
+    public ReadCardInfo updateCard(UpdateCardCommand command) {
         Card card = findByMemberId(command.memberId());
 
         card.update(
@@ -127,7 +127,7 @@ public class CardService {
 
         Card updatedCard = cardRepository.update(card);
 
-        return ReadMeCardInfo.from(updatedCard);
+        return ReadCardInfo.from(updatedCard);
     }
 
     /**

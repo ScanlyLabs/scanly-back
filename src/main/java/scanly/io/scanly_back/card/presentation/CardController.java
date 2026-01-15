@@ -9,9 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import scanly.io.scanly_back.card.application.CardService;
-import scanly.io.scanly_back.card.application.dto.info.ReadMeCardInfo;
+import scanly.io.scanly_back.card.application.dto.info.ReadCardInfo;
 import scanly.io.scanly_back.card.application.dto.info.RegisterCardInfo;
-import scanly.io.scanly_back.card.presentation.dto.response.ReadMeCardResponse;
+import scanly.io.scanly_back.card.presentation.dto.response.ReadCardResponse;
 import scanly.io.scanly_back.card.presentation.dto.response.RegisterCardResponse;
 import scanly.io.scanly_back.card.presentation.dto.request.RegisterCardRequest;
 import scanly.io.scanly_back.card.presentation.dto.request.UpdateCardRequest;
@@ -40,25 +40,36 @@ public class CardController {
 
     @GetMapping("/me")
     @Operation(summary = "내 명함 조회", description = "내 명함을 조회합니다.")
-    public ResponseEntity<ApiResponse<ReadMeCardResponse>> readMyCard(
+    public ResponseEntity<ApiResponse<ReadCardResponse>> readMyCard(
             @Parameter(description = "회원 ID", required = true)
             @RequestHeader("X-Member-Id") String memberId
     ) {
-        ReadMeCardInfo cardInfo = cardService.readMyCard(memberId);
+        ReadCardInfo cardInfo = cardService.readMyCard(memberId);
 
-        return ResponseEntity.ok(ApiResponse.success(ReadMeCardResponse.from(cardInfo)));
+        return ResponseEntity.ok(ApiResponse.success(ReadCardResponse.from(cardInfo)));
+    }
+
+    @GetMapping("/member/{memberId}")
+    @Operation(summary = "회원 명함 조회", description = "특정 회원의 명함을 조회합니다.")
+    public ResponseEntity<ApiResponse<ReadCardResponse>> readCard(
+            @Parameter(description = "회원 ID", required = true)
+            @PathVariable String memberId
+    ) {
+        ReadCardInfo cardInfo = cardService.readMyCard(memberId);
+
+        return ResponseEntity.ok(ApiResponse.success(ReadCardResponse.from(cardInfo)));
     }
 
     @PostMapping("/me/update")
     @Operation(summary = "내 명함 수정", description = "내 명함을 수정합니다.")
-    public ResponseEntity<ApiResponse<ReadMeCardResponse>> updateCard(
+    public ResponseEntity<ApiResponse<ReadCardResponse>> updateCard(
             @Parameter(description = "회원 ID", required = true)
             @RequestHeader("X-Member-Id") String memberId,
             @Valid @RequestBody UpdateCardRequest request
     ) {
-        ReadMeCardInfo cardInfo = cardService.updateCard(request.toCommand(memberId));
+        ReadCardInfo cardInfo = cardService.updateCard(request.toCommand(memberId));
 
-        return ResponseEntity.ok(ApiResponse.success(ReadMeCardResponse.from(cardInfo)));
+        return ResponseEntity.ok(ApiResponse.success(ReadCardResponse.from(cardInfo)));
     }
 
     @PostMapping("/me/delete")
