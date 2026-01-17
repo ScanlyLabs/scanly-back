@@ -57,6 +57,7 @@ public class SecurityConfig {
                         // 인증 관련
                         .requestMatchers(
                                 "/api/auth/v1/login",
+                                "/api/auth/v1/reissue",
                                 "/api/members/v1/sign-up"
                         ).permitAll()
                         // 공개 명함 조회 (QR 스캔용)

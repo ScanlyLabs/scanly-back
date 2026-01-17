@@ -4,7 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import scanly.io.scanly_back.auth.application.dto.info.LoginInfo;
+import scanly.io.scanly_back.auth.application.dto.command.ReissueCommand;
+import scanly.io.scanly_back.auth.application.dto.info.TokenInfo;
 import scanly.io.scanly_back.auth.domain.RefreshToken;
 import scanly.io.scanly_back.auth.domain.RefreshTokenRepository;
 import scanly.io.scanly_back.common.exception.CustomException;
@@ -33,7 +34,7 @@ public class AuthService {
      * @return 로그인 정보
      */
     @Transactional
-    public LoginInfo login(LoginCommand command) {
+    public TokenInfo login(LoginCommand command) {
         // 1. 회원 조회
         Member member = memberService.findByLoginId(command.loginId());
 
@@ -47,14 +48,23 @@ public class AuthService {
         String refreshToken = jwtTokenProvider.createRefreshToken(member.getId());
 
         // 4. Redis에 refresh token 저장
+        saveRefreshToken(member.getId(), refreshToken);
+
+        return TokenInfo.from(accessToken, refreshToken);
+    }
+
+    /**
+     * Redis에 refresh token 저장
+     * @param memberId 회원 아이디
+     * @param refreshToken refresh token
+     */
+    private void saveRefreshToken(String memberId, String refreshToken) {
         RefreshToken refresh = RefreshToken.create(
-                member.getId(),
+                memberId,
                 refreshToken,
                 jwtTokenProvider.getRefreshTokenExpiration()
         );
         refreshTokenRepository.save(refresh);
-
-        return LoginInfo.from(accessToken, refreshToken);
     }
 
     /**
@@ -64,5 +74,49 @@ public class AuthService {
     @Transactional
     public void logout(String memberId) {
         refreshTokenRepository.deleteByMemberId(memberId);
+    }
+
+    /**
+     * Access Token 재발급
+     * 1. Refresh Token 검증
+     * 2. 새 토큰 발급
+     * 3. Redis에 새 Refresh Token 저장
+     * @param command 재발급 정보
+     * @return 토큰 정보
+     */
+    @Transactional
+    public TokenInfo reissue(ReissueCommand command) {
+        // 1. Refresh Token 검증
+        if (!jwtTokenProvider.validateToken(command.refreshToken())) {
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        String memberId = jwtTokenProvider.getMemberIdFromToken(command.refreshToken());
+
+        validateRedisRefreshToken(command.refreshToken(), memberId);
+
+        // 2. 새 토큰 발급
+        String newAccessToken = jwtTokenProvider.createAccessToken(memberId);
+        String newRefreshToken = jwtTokenProvider.createRefreshToken(memberId);
+
+        // 3. Redis에 새 Refresh Token 저장
+        saveRefreshToken(memberId, newRefreshToken);
+
+        return TokenInfo.from(newAccessToken, newRefreshToken);
+    }
+
+    /**
+     * refresh token 유효성 검사
+     * - Redis에 저장된 Refresh Token과 비교
+     * @param refreshToken refresh token
+     * @param memberId 회원 아이디
+     */
+    private void validateRedisRefreshToken(String refreshToken, String memberId) {
+        String storedToken = refreshTokenRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
+
+        if (!storedToken.equals(refreshToken)) {
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
     }
 }
