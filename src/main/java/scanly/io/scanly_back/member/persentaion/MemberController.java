@@ -12,11 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import scanly.io.scanly_back.common.response.ApiResponse;
 import scanly.io.scanly_back.member.application.MemberService;
-import scanly.io.scanly_back.member.application.dto.info.LoginInfo;
 import scanly.io.scanly_back.member.application.dto.info.SignUpInfo;
-import scanly.io.scanly_back.member.persentaion.dto.request.LoginRequest;
 import scanly.io.scanly_back.member.persentaion.dto.request.SignUpRequest;
-import scanly.io.scanly_back.member.persentaion.dto.response.LoginResponse;
 import scanly.io.scanly_back.member.persentaion.dto.response.SignUpResponse;
 
 @RestController
@@ -32,21 +29,10 @@ public class MemberController {
     public ResponseEntity<ApiResponse<SignUpResponse>> signUp(
             @Valid @RequestBody SignUpRequest request
     ) {
-
         SignUpInfo signUpInfo = memberService.signUp(request.toCommand());
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success(SignUpResponse.from(signUpInfo)));
-    }
-
-    @PostMapping("/login")
-    @Operation(summary = "로그인", description = "로그인을 진행합니다.")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(
-            @Valid @RequestBody LoginRequest request
-    ) {
-        LoginInfo loginInfo = memberService.login(request.toCommand());
-
-        return ResponseEntity.ok(ApiResponse.success(LoginResponse.from(loginInfo)));
     }
 }
