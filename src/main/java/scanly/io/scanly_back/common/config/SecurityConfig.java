@@ -16,6 +16,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import scanly.io.scanly_back.auth.application.JwtTokenProvider;
+import scanly.io.scanly_back.auth.infrastructure.JwtAccessDeniedHandler;
+import scanly.io.scanly_back.auth.infrastructure.JwtAuthenticationEntryPoint;
+import scanly.io.scanly_back.auth.infrastructure.JwtAuthenticationFilter;
 
 import java.util.List;
 
@@ -25,6 +28,9 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -34,6 +40,10 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler)
+                )
                 .authorizeHttpRequests(auth -> auth
                         // Swagger
                         .requestMatchers(
@@ -54,6 +64,9 @@ public class SecurityConfig {
                         // 그 외 모든 요청은 인증 필요
                         .anyRequest().authenticated()
                 )
+                .addFilterBefore(
+                        new JwtAuthenticationFilter(jwtTokenProvider),
+                        UsernamePasswordAuthenticationFilter.class
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable);
