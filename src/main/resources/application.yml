@@ -25,10 +25,6 @@ jwt:
   refresh-token:
     expiration: 604800000 # 7일
 
-spring.data.redis:
-  host: ${REDIS_HOST:localhost}
-  port: ${REDIS_PORT:6379}
-
 cloud:
   aws:
     credentials:
