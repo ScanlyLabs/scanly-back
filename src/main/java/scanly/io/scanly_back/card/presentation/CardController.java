@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import scanly.io.scanly_back.card.application.CardService;
 import scanly.io.scanly_back.card.application.dto.info.ReadCardInfo;
@@ -28,8 +29,7 @@ public class CardController {
     @PostMapping
     @Operation(summary = "명함 생성", description = "새로운 명함을 등록합니다.")
     public ResponseEntity<ApiResponse<RegisterCardResponse>> registerCard(
-            @Parameter(description = "회원 ID", required = true)
-            @RequestHeader("X-Member-Id") String memberId,
+            @AuthenticationPrincipal String memberId,
             @Valid @RequestBody RegisterCardRequest request
     ) {
         RegisterCardInfo registerCardInfo = cardService.registerCard(request.toCommand(memberId));
@@ -41,8 +41,7 @@ public class CardController {
     @GetMapping("/me")
     @Operation(summary = "내 명함 조회", description = "내 명함을 조회합니다.")
     public ResponseEntity<ApiResponse<ReadCardResponse>> readMyCard(
-            @Parameter(description = "회원 ID", required = true)
-            @RequestHeader("X-Member-Id") String memberId
+            @AuthenticationPrincipal String memberId
     ) {
         ReadCardInfo cardInfo = cardService.readMyCard(memberId);
 
@@ -63,8 +62,7 @@ public class CardController {
     @PostMapping("/me/update")
     @Operation(summary = "내 명함 수정", description = "내 명함을 수정합니다.")
     public ResponseEntity<ApiResponse<ReadCardResponse>> updateCard(
-            @Parameter(description = "회원 ID", required = true)
-            @RequestHeader("X-Member-Id") String memberId,
+            @AuthenticationPrincipal String memberId,
             @Valid @RequestBody UpdateCardRequest request
     ) {
         ReadCardInfo cardInfo = cardService.updateCard(request.toCommand(memberId));
@@ -75,8 +73,7 @@ public class CardController {
     @PostMapping("/me/delete")
     @Operation(summary = "내 명함 삭제", description = "내 명함을 삭제합니다.")
     public ResponseEntity<ApiResponse<Void>> deleteMyCard(
-            @Parameter(description = "회원 ID", required = true)
-            @RequestHeader("X-Member-Id") String memberId
+            @AuthenticationPrincipal String memberId
     ) {
         cardService.deleteMyCard(memberId);
 

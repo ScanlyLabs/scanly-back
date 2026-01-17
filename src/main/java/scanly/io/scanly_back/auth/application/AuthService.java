@@ -54,6 +54,6 @@ public class AuthService {
         );
         refreshTokenRepository.save(refresh);
 
-        return LoginInfo.from(member.getId(), member.getLoginId(), accessToken, refreshToken);
+        return LoginInfo.from(accessToken, refreshToken);
     }
 }
