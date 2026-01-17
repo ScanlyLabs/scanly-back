@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import scanly.io.scanly_back.auth.application.AuthService;
 import scanly.io.scanly_back.auth.application.dto.info.TokenInfo;
 import scanly.io.scanly_back.auth.presentation.dto.request.LoginRequest;
+import scanly.io.scanly_back.auth.presentation.dto.request.ReissueRequest;
 import scanly.io.scanly_back.auth.presentation.dto.response.TokenResponse;
 import scanly.io.scanly_back.common.response.ApiResponse;
 
@@ -40,5 +41,14 @@ public class AuthController {
     ) {
         authService.logout(memberId);
         return ResponseEntity.ok(ApiResponse.success());
+    }
+
+    @PostMapping("/reissue")
+    @Operation(summary = "토큰 재발급", description = "Refresh Token으로 새 Access Token을 발급받습니다.")
+    public ResponseEntity<ApiResponse<TokenResponse>> reissue(
+            @Valid @RequestBody ReissueRequest request
+    ) {
+        TokenInfo tokenInfo = authService.reissue(request.toCommand());
+        return ResponseEntity.ok(ApiResponse.success(TokenResponse.from(tokenInfo)));
     }
 }

@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     // auth
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "AT001", "비밀번호가 일치하지 않습니다"),
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "AT006", "유효하지 않은 리프레시 토큰입니다."),
+    REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "AT007", "리프레시 토큰을 찾을 수 없습니다."),
 
     // member
     DUPLICATE_LOGIN_ID(HttpStatus.CONFLICT, "M001", "이미 사용 중인 로그인 아이디입니다."),

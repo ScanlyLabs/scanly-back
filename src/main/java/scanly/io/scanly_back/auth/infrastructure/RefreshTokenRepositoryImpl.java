@@ -35,6 +35,18 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
     }
 
     /**
+     * 회원 ID로 Refresh Token 조회
+     * @param memberId 회원 ID
+     * @return Refresh Token (없으면 empty)
+     */
+    @Override
+    public Optional<String> findByMemberId(String memberId) {
+        String key = KEY_PREFIX + memberId;
+        String token = redisTemplate.opsForValue().get(key);
+        return Optional.ofNullable(token);
+    }
+
+    /**
      * 회원 아이디로 Refresh Token 삭제
      * @param memberId 회원 아이디
      */
