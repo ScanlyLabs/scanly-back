@@ -33,4 +33,14 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
                 Duration.ofMillis(refreshToken.getExpiration())
         );
     }
+
+    /**
+     * 회원 아이디로 Refresh Token 삭제
+     * @param memberId 회원 아이디
+     */
+    @Override
+    public void deleteByMemberId(String memberId) {
+        String key = KEY_PREFIX + memberId;
+        redisTemplate.delete(key);
+    }
 }

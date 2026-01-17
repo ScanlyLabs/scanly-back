@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,4 +33,12 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success(LoginResponse.from(loginInfo)));
     }
 
+    @PostMapping("/logout")
+    @Operation(summary = "로그아웃", description = "로그아웃하고 Refresh Token을 삭제합니다.")
+    public ResponseEntity<ApiResponse<Void>> logout(
+            @AuthenticationPrincipal String memberId
+    ) {
+        authService.logout(memberId);
+        return ResponseEntity.ok(ApiResponse.success());
+    }
 }

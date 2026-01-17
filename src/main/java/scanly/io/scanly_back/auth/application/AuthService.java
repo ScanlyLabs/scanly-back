@@ -56,4 +56,13 @@ public class AuthService {
 
         return LoginInfo.from(accessToken, refreshToken);
     }
+
+    /**
+     * 로그아웃 (Refresh Token 삭제)
+     * @param memberId 회원 ID
+     */
+    @Transactional
+    public void logout(String memberId) {
+        refreshTokenRepository.deleteByMemberId(memberId);
+    }
 }
