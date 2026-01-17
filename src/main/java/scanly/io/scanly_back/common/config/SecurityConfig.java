@@ -54,6 +54,8 @@ public class SecurityConfig {
                         ).permitAll()
                         // H2 Console
                         .requestMatchers("/h2-console/**").permitAll()
+                        // Actuator
+                        .requestMatchers("/actuator/**").permitAll()
                         // 인증 관련
                         .requestMatchers(
                                 "/api/auth/v1/login",
