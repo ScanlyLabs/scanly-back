@@ -28,6 +28,7 @@ public class AuthService {
      * 1. 회원 조회
      * 2. 비밀번호 검사
      * 3. access token 및 refresh token 발급
+     * 4. Redis에 refresh token 저장
      * @param command 로그인 정보
      * @return 로그인 정보
      */
@@ -44,6 +45,14 @@ public class AuthService {
         // 3. access token 및 refresh token 발급
         String accessToken = jwtTokenProvider.createAccessToken(member.getId());
         String refreshToken = jwtTokenProvider.createRefreshToken(member.getId());
+
+        // 4. Redis에 refresh token 저장
+        RefreshToken refresh = RefreshToken.create(
+                member.getId(),
+                refreshToken,
+                jwtTokenProvider.getRefreshTokenExpiration()
+        );
+        refreshTokenRepository.save(refresh);
 
         return LoginInfo.from(member.getId(), member.getLoginId(), accessToken, refreshToken);
     }
