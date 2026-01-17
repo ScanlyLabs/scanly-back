@@ -7,8 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
-import scanly.io.scanly_back.member.application.dto.command.LoginCommand;
-import scanly.io.scanly_back.member.application.dto.info.LoginInfo;
 import scanly.io.scanly_back.member.application.dto.command.SignUpCommand;
 import scanly.io.scanly_back.member.application.dto.info.SignUpInfo;
 import scanly.io.scanly_back.member.domain.Member;
@@ -22,6 +20,16 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+
+    /**
+     * 로그인 아이디로 회원 조회
+     * @param loginId 로그인 아이디
+     * @return 조회된 회원
+     */
+    public Member findByLoginId(String loginId) {
+        return memberRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    }
 
     /**
      * 회원 가입
@@ -51,21 +59,5 @@ public class MemberService {
         if (memberRepository.existsByLoginId(loginId)) {
             throw new CustomException(ErrorCode.DUPLICATE_LOGIN_ID);
         }
-    }
-
-    /**
-     * 회원 로그인
-     * @param command 로그인 정보
-     * @return 로그인 완료한 유저 정보
-     */
-    public LoginInfo login(LoginCommand command) {
-        Member member = memberRepository.findByLoginId(command.loginId())
-                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-
-        if (!passwordEncoder.matches(command.password(), member.getPassword())) {
-            throw new CustomException(ErrorCode.INVALID_PASSWORD);
-        }
-
-        return LoginInfo.from(member);
     }
 }
