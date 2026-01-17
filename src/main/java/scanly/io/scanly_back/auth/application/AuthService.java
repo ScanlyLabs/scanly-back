@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import scanly.io.scanly_back.auth.application.dto.info.LoginInfo;
+import scanly.io.scanly_back.auth.application.dto.info.TokenInfo;
 import scanly.io.scanly_back.auth.domain.RefreshToken;
 import scanly.io.scanly_back.auth.domain.RefreshTokenRepository;
 import scanly.io.scanly_back.common.exception.CustomException;
@@ -33,7 +33,7 @@ public class AuthService {
      * @return 로그인 정보
      */
     @Transactional
-    public LoginInfo login(LoginCommand command) {
+    public TokenInfo login(LoginCommand command) {
         // 1. 회원 조회
         Member member = memberService.findByLoginId(command.loginId());
 
@@ -54,7 +54,7 @@ public class AuthService {
         );
         refreshTokenRepository.save(refresh);
 
-        return LoginInfo.from(accessToken, refreshToken);
+        return TokenInfo.from(accessToken, refreshToken);
     }
 
     /**
