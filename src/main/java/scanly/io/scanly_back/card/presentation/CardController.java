@@ -48,13 +48,13 @@ public class CardController {
         return ResponseEntity.ok(ApiResponse.success(ReadCardResponse.from(cardInfo)));
     }
 
-    @GetMapping("/member/{memberId}")
+    @GetMapping("/{loginId}")
     @Operation(summary = "회원 명함 조회", description = "특정 회원의 명함을 조회합니다.")
     public ResponseEntity<ApiResponse<ReadCardResponse>> readCard(
-            @Parameter(description = "회원 ID", required = true)
-            @PathVariable String memberId
+            @Parameter(description = "로그인 ID", required = true)
+            @PathVariable String loginId
     ) {
-        ReadCardInfo cardInfo = cardService.readMyCard(memberId);
+        ReadCardInfo cardInfo = cardService.readCardByLoginId(loginId);
 
         return ResponseEntity.ok(ApiResponse.success(ReadCardResponse.from(cardInfo)));
     }

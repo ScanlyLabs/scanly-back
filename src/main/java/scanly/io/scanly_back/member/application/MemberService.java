@@ -22,6 +22,16 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
     /**
+     * 회원 ID로 회원 조회
+     * @param id 회원 ID
+     * @return 조회된 회원
+     */
+    public Member findById(String id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    /**
      * 로그인 아이디로 회원 조회
      * @param loginId 로그인 아이디
      * @return 조회된 회원

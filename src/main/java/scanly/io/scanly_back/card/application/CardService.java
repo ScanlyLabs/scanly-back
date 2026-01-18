@@ -14,6 +14,8 @@ import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
 import scanly.io.scanly_back.common.service.S3Service;
 import scanly.io.scanly_back.common.util.QrCodeGenerator;
+import scanly.io.scanly_back.member.application.MemberService;
+import scanly.io.scanly_back.member.domain.Member;
 
 import java.util.List;
 
@@ -23,6 +25,7 @@ import java.util.List;
 public class CardService {
 
     private final CardRepository cardRepository;
+    private final MemberService memberService;
     private final QrCodeGenerator qrCodeGenerator;
     private final S3Service s3Service;
 
@@ -60,7 +63,8 @@ public class CardService {
         Card savedCard = cardRepository.save(card);
 
         // 3. QR 코드 생성 및 S3 업로드
-        byte[] qrCodeBytes = qrCodeGenerator.generateQrCodeBytesForMember(memberId);
+        Member member = memberService.findById(memberId);
+        byte[] qrCodeBytes = qrCodeGenerator.generateQrCodeBytes(member.getLoginId());
         String qrCodeUrl = s3Service.uploadBytes(qrCodeBytes, "qrcodes", "png", "image/png");
         savedCard.assignQrCode(qrCodeUrl);
         Card cardWithQr = cardRepository.updateOnlyCard(savedCard);
@@ -98,6 +102,18 @@ public class CardService {
      */
     public ReadCardInfo readMyCard(String memberId) {
         Card card = findByMemberId(memberId);
+
+        return ReadCardInfo.from(card);
+    }
+
+    /**
+     * 로그인 ID로 명함 조회
+     * @param loginId 로그인 아이디
+     * @return 조회된 명함
+     */
+    public ReadCardInfo readCardByLoginId(String loginId) {
+        Member member = memberService.findByLoginId(loginId);
+        Card card = findByMemberId(member.getId());
 
         return ReadCardInfo.from(card);
     }
