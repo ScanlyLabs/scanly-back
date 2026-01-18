@@ -48,7 +48,7 @@ public class CardController {
         return ResponseEntity.ok(ApiResponse.success(ReadCardResponse.from(cardInfo)));
     }
 
-    @GetMapping("/{loginId}")
+    @GetMapping("/member/{loginId}")
     @Operation(summary = "회원 명함 조회", description = "특정 회원의 명함을 조회합니다.")
     public ResponseEntity<ApiResponse<ReadCardResponse>> readCard(
             @Parameter(description = "로그인 ID", required = true)

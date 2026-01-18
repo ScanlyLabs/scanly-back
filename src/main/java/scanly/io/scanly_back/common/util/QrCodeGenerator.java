@@ -29,7 +29,7 @@ public class QrCodeGenerator {
      * @return QR 코드 이미지 바이트 배열
      */
     public byte[] generateQrCodeBytes(String loginId) {
-        String url = baseUrl + "/api/cards/v1/" + loginId;
+        String url = baseUrl + "/api/cards/v1/member" + loginId;
         return generateQrCodeBytes(url, DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
 
