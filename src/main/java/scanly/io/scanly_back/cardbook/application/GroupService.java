@@ -35,4 +35,13 @@ public class GroupService {
 
         return GroupInfo.from(savedGroup);
     }
+
+    /**
+     * 그룹 아이디에 해당되는 그룹 삭제
+     * @param id 그룹 아이디
+     */
+    @Transactional
+    public void deleteGroup(String id) {
+        groupRepository.deleteById(id);
+    }
 }
