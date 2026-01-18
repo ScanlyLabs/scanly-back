@@ -19,40 +19,43 @@ public class CardEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "member_id", nullable = false, unique = true)
     private String memberId;                // 소유자 ID
 
-    @Column(nullable = false, length = 30)
+    @Column(name = "name", nullable = false, length = 30)
     private String name;                    // 이름
 
-    @Column(nullable = false, length = 50)
+    @Column(name = "title", nullable = false, length = 50)
     private String title;                   // 직함
 
-    @Column(nullable = false, length = 50)
+    @Column(name = "company", nullable = false, length = 50)
     private String company;                 // 회사
 
-    @Column(nullable = false, length = 11)
+    @Column(name = "phone", nullable = false, length = 11)
     private String phone;                   // 전화번호
 
-    @Column(nullable = false, length = 50)
+    @Column(name = "email", nullable = false, length = 50)
     private String email;                   // 이메일
 
-    @Column(length = 300)
+    @Column(name = "bio", length = 300)
     private String bio;                     // 자기소개
 
+    @Column(name = "profile_image_url")
     private String profileImageUrl;          // 프로필 사진 url
 
+    @Column(name = "portfolio_url")
     private String portfolioUrl;            // 포트폴리오 url
 
-    @Column(length = 100)
+    @Column(name = "location", length = 100)
     private String location;                // 회사 위치
 
+    @Column(name = "qr_image_url")
     private String qrImageUrl;              // qr 이미지 url
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;        // 생성 일시
 
-    @Column(nullable = false)
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;        // 수정 일시
 
     public static CardEntity of(

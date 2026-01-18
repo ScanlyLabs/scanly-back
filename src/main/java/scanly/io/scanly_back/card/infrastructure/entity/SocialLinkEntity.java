@@ -24,19 +24,19 @@ public class SocialLinkEntity {
     private String cardId;                          // 명함 id
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(name = "type", nullable = false, length = 20)
     private SocialLinkType type;                    // 소셜 링크 타입
 
-    @Column(nullable = false, length = 500)
+    @Column(name = "url", nullable = false, length = 500)
     private String url;                             // url
 
-    @Column(nullable = false)
+    @Column(name = "display_order", nullable = false)
     private int displayOrder;                       // 표시 순서
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;                // 생성 일시
 
-    @Column(nullable = false)
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;                // 수정 일시
 
     public static SocialLinkEntity of(
