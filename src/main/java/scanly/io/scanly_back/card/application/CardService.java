@@ -105,6 +105,18 @@ public class CardService {
 
         return ReadCardInfo.from(card);
     }
+
+    /**
+     * 로그인 ID로 명함 조회
+     * @param loginId 로그인 아이디
+     * @return 조회된 명함
+     */
+    public ReadCardInfo readCardByLoginId(String loginId) {
+        Member member = memberService.findByLoginId(loginId);
+        Card card = findByMemberId(member.getId());
+
+        return ReadCardInfo.from(card);
+    }
     /**
      * 명함 수정
      * @param command 수정할 명함 정보
