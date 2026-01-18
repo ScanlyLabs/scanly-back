@@ -34,4 +34,13 @@ public class GroupRepositoryImpl implements GroupRepository {
         GroupEntity savedGroupEntity = groupJpaRepository.save(groupEntity);
         return groupMapper.toDomain(savedGroupEntity);
     }
+
+    /**
+     * 그룹 아이디에 해당되는 그룹 삭제
+     * @param id 그룹 아이디
+     */
+    @Override
+    public void deleteById(String id) {
+        groupJpaRepository.deleteById(id);
+    }
 }

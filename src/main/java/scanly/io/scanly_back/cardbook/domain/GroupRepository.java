@@ -4,4 +4,6 @@ public interface GroupRepository {
     long countByMemberId(String memberId);
 
     Group save(Group group);
+
+    void deleteById(String id);
 }
