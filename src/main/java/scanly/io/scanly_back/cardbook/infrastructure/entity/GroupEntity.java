@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Entity
-@Table(name = "group")
+@Table(name = "card_book_group")
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GroupEntity {
@@ -25,8 +25,8 @@ public class GroupEntity {
     @Column(name = "name", nullable = false, length = 30)
     private String name;                    // 그룹명
 
-    @Column(name = "order", nullable = false)
-    private int order;                      // 정렬 순서
+    @Column(name = "sort_order", nullable = false)
+    private int sortOrder;                      // 정렬 순서
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;                // 생성 일시
@@ -35,9 +35,9 @@ public class GroupEntity {
     private LocalDateTime updatedAt;                // 수정 일시
 
     public static GroupEntity of(
-            String id, String memberId, String name, int order,
+            String id, String memberId, String name, int sortOrder,
             LocalDateTime createdAt, LocalDateTime updatedAt
     ) {
-        return new GroupEntity(id, memberId, name, order, createdAt, updatedAt);
+        return new GroupEntity(id, memberId, name, sortOrder, createdAt, updatedAt);
     }
 }
