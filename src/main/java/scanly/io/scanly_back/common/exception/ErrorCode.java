@@ -23,6 +23,10 @@ public enum ErrorCode {
     CARD_ALREADY_EXISTS(HttpStatus.CONFLICT, "CD001", "명함이 이미 존재합니다."),
     CARD_NOT_FOUND(HttpStatus.NOT_FOUND, "CD002", "명함을 찾을 수 없습니다."),
 
+    // card_book
+    // group
+    GROUP_NOT_FOUND(HttpStatus.NOT_FOUND, "CBG001", "명함첩 그룹이 존재하지 않습니다."),
+
     // common
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "C001", "입력값이 올바르지 않습니다."),
 

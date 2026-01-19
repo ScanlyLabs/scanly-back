@@ -19,7 +19,7 @@ public class GroupEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "member_id", nullable = false, unique = true)
+    @Column(name = "member_id", nullable = false)
     private String memberId;                // 소유자 ID
 
     @Column(name = "name", nullable = false, length = 30)
