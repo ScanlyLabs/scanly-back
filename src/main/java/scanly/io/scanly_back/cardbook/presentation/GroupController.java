@@ -71,10 +71,11 @@ public class GroupController {
     @PostMapping("/{id}/delete")
     @Operation(summary = "명함첩 그룹 삭제", description = "특정 명함첩 그룹을 삭제합니다.")
     public ResponseEntity<ApiResponse<Void>> deleteGroup(
+            @AuthenticationPrincipal String memberId,
             @Parameter(description = "명함첩 그룹 ID", required = true)
             @PathVariable String id
     ) {
-        groupService.deleteGroup(id);
+        groupService.deleteGroup(id, memberId);
 
         return ResponseEntity.ok(ApiResponse.success(null));
     }

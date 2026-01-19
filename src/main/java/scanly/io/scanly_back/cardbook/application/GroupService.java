@@ -140,7 +140,8 @@ public class GroupService {
      * @param id 그룹 아이디
      */
     @Transactional
-    public void deleteGroup(String id) {
+    public void deleteGroup(String id, String memberId) {
+        findByIdAndMemberId(id, memberId);
         groupRepository.deleteById(id);
     }
 }
