@@ -10,6 +10,8 @@ public interface GroupRepository {
 
     List<Group> findAllByIds(List<String> ids);
 
+    List<Group> findAllByMemberId(String memberId);
+
     long countByMemberId(String memberId);
 
     Group save(Group group);

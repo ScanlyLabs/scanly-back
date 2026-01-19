@@ -52,6 +52,18 @@ public class GroupRepositoryImpl implements GroupRepository {
     }
 
     /**
+     * 내 명함첩 그룹 목록 조회
+     * @param memberId 회원 아이디
+     * @return 조회된 그룹 목록
+     */
+    @Override
+    public List<Group> findAllByMemberId(String memberId) {
+        return groupJpaRepository.findAllByMemberId(memberId).stream()
+                .map(groupMapper::toDomain)
+                .toList();
+    }
+
+    /**
      * 회원 아이디로 명함첩 그룹 수 조회
      * @param memberId 회원 아이디
      * @return 그룹 수
