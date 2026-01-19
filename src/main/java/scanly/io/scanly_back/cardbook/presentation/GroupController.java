@@ -45,9 +45,10 @@ public class GroupController {
     public ResponseEntity<ApiResponse<GroupResponse>> rename(
             @Parameter(description = "명함첩 그룹 ID", required = true)
             @PathVariable String id,
+            @AuthenticationPrincipal String memberId,
             @Valid @RequestBody RenameGroupRequest request
     ) {
-        GroupInfo groupInfo = groupService.rename(request.toCommand(id));
+        GroupInfo groupInfo = groupService.rename(request.toCommand(id, memberId));
 
         return ResponseEntity.ok(ApiResponse.success(GroupResponse.from(groupInfo)));
     }

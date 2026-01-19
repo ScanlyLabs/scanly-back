@@ -9,7 +9,7 @@ public record RenameGroupRequest(
         @Size(min = 1, max = 30, message = "그룹명은 1-30자여야 합니다.")
         String name
 ) {
-    public RenameGroupCommand toCommand(String id) {
-        return new RenameGroupCommand(id, name);
+    public RenameGroupCommand toCommand(String id, String memberId) {
+        return new RenameGroupCommand(id, memberId, name);
     }
 }

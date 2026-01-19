@@ -28,6 +28,18 @@ public class GroupRepositoryImpl implements GroupRepository {
     }
 
     /**
+     * 명함첩 그룹 단건 조회
+     * @param id 명함첩 그룹 아이디
+     * @param memberId 회원 아이디
+     * @return 조회된 명함첩 그룹
+     */
+    @Override
+    public Optional<Group> findByIdAndMemberId(String id, String memberId) {
+        return groupJpaRepository.findByIdAndMemberId(id, memberId)
+                .map(groupMapper::toDomain);
+    }
+
+    /**
      * 여러 명함첩 그룹 조회
      * @param ids 명함첩 그룹 아이디 목록
      * @return 조회된 명함첩 그룹 목록

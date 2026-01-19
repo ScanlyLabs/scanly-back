@@ -55,6 +55,17 @@ public class GroupService {
     }
 
     /**
+     * 명함첩 그룹 단건 조회
+     * @param id 명함첩 그룹 아이디
+     * @param memberId 회원 아이디
+     * @return 조회된 명함첩 그룹
+     */
+    public Group findByIdAndMemberId(String id, String memberId) {
+        return groupRepository.findByIdAndMemberId(id, memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
+    }
+
+    /**
      * 명함첩 그룹명 변경
      * 1. 그룹 조회
      * 2. 그룹명 변경
@@ -66,7 +77,7 @@ public class GroupService {
         String id = command.id();
 
         // 1. 그룹 조회
-        Group group = findById(id);
+        Group group = findByIdAndMemberId(id, command.memberId());
 
         // 2. 그룹명 변경
         group.rename(command.name());

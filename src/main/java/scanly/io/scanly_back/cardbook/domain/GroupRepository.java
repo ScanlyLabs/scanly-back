@@ -6,6 +6,8 @@ import java.util.Optional;
 public interface GroupRepository {
     Optional<Group> findById(String id);
 
+    Optional<Group> findByIdAndMemberId(String id, String memberId);
+
     List<Group> findAllByIds(List<String> ids);
 
     long countByMemberId(String memberId);
