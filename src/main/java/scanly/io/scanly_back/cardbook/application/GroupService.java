@@ -91,7 +91,7 @@ public class GroupService {
      * 1. 그룹 ID 목록으로 그룹 목록 조회
      * 2. 본인 소유 그룹인지 검증
      * 3. 각 그룹의 순서 업데이트
-     * 4. 저장
+     * 4. 순서 저장
      * @param command 순서 변경 정보
      * @return 수정된 그룹 목록
      */
@@ -127,8 +127,8 @@ public class GroupService {
             }
         });
 
-        // 4. 저장
-        List<Group> savedGroups = groupRepository.saveAll(groups);
+        // 4. 순서 저장
+        List<Group> savedGroups = groupRepository.reorder(groups);
 
         return savedGroups.stream()
                 .map(GroupInfo::from)

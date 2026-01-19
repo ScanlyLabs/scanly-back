@@ -14,7 +14,7 @@ public interface GroupRepository {
 
     Group save(Group group);
 
-    List<Group> saveAll(List<Group> groups);
+    List<Group> reorder(List<Group> groups);
 
     Group rename(Group group);
 

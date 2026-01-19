@@ -74,12 +74,12 @@ public class GroupRepositoryImpl implements GroupRepository {
     }
 
     /**
-     * 여러 명함첩 그룹 저장
+     * 여러 명함첩 그룹 순서 저장
      * @param groups 그룹 목록
      * @return 저장된 그룹 목록
      */
     @Override
-    public List<Group> saveAll(List<Group> groups) {
+    public List<Group> reorder(List<Group> groups) {
         List<GroupEntity> entities = groups.stream()
                 .map(groupMapper::toEntity)
                 .toList();
