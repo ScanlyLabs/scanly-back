@@ -7,6 +7,8 @@ import scanly.io.scanly_back.cardbook.application.dto.command.CreateGroupCommand
 import scanly.io.scanly_back.cardbook.application.dto.info.GroupInfo;
 import scanly.io.scanly_back.cardbook.domain.Group;
 import scanly.io.scanly_back.cardbook.domain.GroupRepository;
+import scanly.io.scanly_back.common.exception.CustomException;
+import scanly.io.scanly_back.common.exception.ErrorCode;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +38,15 @@ public class GroupService {
         return GroupInfo.from(savedGroup);
     }
 
+    /**
+     * 명함첩 그룹 단건 조회
+     * @param id 명함첩 그룹 아이디
+     * @return 조회된 명함첩 그룹
+     */
+    public Group findById(String id) {
+        return groupRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
+    }
     /**
      * 그룹 아이디에 해당되는 그룹 삭제
      * @param id 그룹 아이디

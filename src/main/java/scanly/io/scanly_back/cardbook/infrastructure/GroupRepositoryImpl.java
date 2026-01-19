@@ -6,6 +6,8 @@ import scanly.io.scanly_back.cardbook.domain.Group;
 import scanly.io.scanly_back.cardbook.domain.GroupRepository;
 import scanly.io.scanly_back.cardbook.infrastructure.entity.GroupEntity;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class GroupRepositoryImpl implements GroupRepository {
@@ -13,6 +15,16 @@ public class GroupRepositoryImpl implements GroupRepository {
     private final GroupJpaRepository groupJpaRepository;
     private final GroupMapper groupMapper;
 
+    /**
+     * 명함첩 그룹 조회
+     * @param id 명함첩 그룹 아이디
+     * @return 조회된 명함첩 그룹
+     */
+    @Override
+    public Optional<Group> findById(String id) {
+        return groupJpaRepository.findById(id)
+                .map(groupMapper::toDomain);
+    }
     /**
      * 회원 아이디로 명함첩 그룹 수 조회
      * @param memberId 회원 아이디
