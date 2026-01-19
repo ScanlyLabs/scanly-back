@@ -45,6 +45,19 @@ public class GroupService {
     }
 
     /**
+     * 내 명함첩 그룹 목록 조회
+     * @param memberId 회원 아이디
+     * @return 조회된 그룹 목록
+     */
+    public List<GroupInfo> getAll(String memberId) {
+        List<Group> groups = groupRepository.findAllByMemberId(memberId);
+
+        return groups.stream()
+                .map(GroupInfo::from)
+                .toList();
+    }
+
+    /**
      * 명함첩 그룹 단건 조회
      * @param id 명함첩 그룹 아이디
      * @return 조회된 명함첩 그룹

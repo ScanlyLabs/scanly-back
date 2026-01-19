@@ -40,6 +40,19 @@ public class GroupController {
                 .body(ApiResponse.success(GroupResponse.from(groupInfo)));
     }
 
+    @GetMapping
+    @Operation(summary = "명함첩 그룹 목록 조회", description = "명함첩 그룹 목록을 조회합니다.")
+    public ResponseEntity<ApiResponse<List<GroupResponse>>> getGroups(
+            @AuthenticationPrincipal String memberId
+    ) {
+        List<GroupInfo> groupInfos = groupService.getAll(memberId);
+        List<GroupResponse> responses = groupInfos.stream()
+                .map(GroupResponse::from)
+                .toList();
+
+        return ResponseEntity.ok(ApiResponse.success(responses));
+    }
+
     @PostMapping("/{id}/rename")
     @Operation(summary = "명함첩 그룹명 수정", description = "특정 명함첩 그룹명을 수정합니다.")
     public ResponseEntity<ApiResponse<GroupResponse>> rename(
