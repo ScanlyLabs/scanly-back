@@ -9,5 +9,7 @@ public interface GroupRepository {
 
     Group save(Group group);
 
+    Group rename(Group group);
+
     void deleteById(String id);
 }

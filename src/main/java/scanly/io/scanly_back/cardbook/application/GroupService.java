@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import scanly.io.scanly_back.cardbook.application.dto.command.CreateGroupCommand;
+import scanly.io.scanly_back.cardbook.application.dto.command.RenameGroupCommand;
 import scanly.io.scanly_back.cardbook.application.dto.info.GroupInfo;
 import scanly.io.scanly_back.cardbook.domain.Group;
 import scanly.io.scanly_back.cardbook.domain.GroupRepository;
@@ -47,6 +48,28 @@ public class GroupService {
         return groupRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
     }
+
+    /**
+     * 명함첩 그룹명 변경
+     * 1. 그룹 조회
+     * 2. 그룹명 변경
+     * @param command 수정할 명함첩 정보
+     * @return 수정된 그룹 정보
+     */
+    @Transactional
+    public GroupInfo rename(RenameGroupCommand command) {
+        String id = command.id();
+
+        // 1. 그룹 조회
+        Group group = findById(id);
+
+        // 2. 그룹명 변경
+        group.rename(command.name());
+        Group renamedGroup = groupRepository.rename(group);
+
+        return GroupInfo.from(renamedGroup);
+    }
+
     /**
      * 그룹 아이디에 해당되는 그룹 삭제
      * @param id 그룹 아이디

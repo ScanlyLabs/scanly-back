@@ -49,6 +49,15 @@ public class Group {
         );
     }
 
+    /**
+     * 그룹명 변경
+     * @param name 변경할 그룹명
+     */
+    public void rename(String name) {
+        this.name = name;
+        this.updatedAt = LocalDateTime.now();
+    }
+
     // getters
     public String getId() {
         return id;

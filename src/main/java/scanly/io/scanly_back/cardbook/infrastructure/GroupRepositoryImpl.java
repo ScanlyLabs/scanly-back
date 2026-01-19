@@ -48,6 +48,18 @@ public class GroupRepositoryImpl implements GroupRepository {
     }
 
     /**
+     * 명함첩 그룹명 변경
+     * @param group 변경할 그룹 정보
+     * @return 변경된 그룹 정보
+     */
+    @Override
+    public Group rename(Group group) {
+        GroupEntity groupEntity = groupMapper.toEntity(group);
+        GroupEntity renamedGroupEntity = groupJpaRepository.save(groupEntity);
+        return groupMapper.toDomain(renamedGroupEntity);
+    }
+
+    /**
      * 그룹 아이디에 해당되는 그룹 삭제
      * @param id 그룹 아이디
      */
