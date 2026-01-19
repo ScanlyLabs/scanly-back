@@ -5,11 +5,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import scanly.io.scanly_back.cardbook.application.dto.command.CreateGroupCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.RenameGroupCommand;
+import scanly.io.scanly_back.cardbook.application.dto.command.ReorderGroupCommand;
 import scanly.io.scanly_back.cardbook.application.dto.info.GroupInfo;
 import scanly.io.scanly_back.cardbook.domain.Group;
 import scanly.io.scanly_back.cardbook.domain.GroupRepository;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -68,6 +73,55 @@ public class GroupService {
         Group renamedGroup = groupRepository.rename(group);
 
         return GroupInfo.from(renamedGroup);
+    }
+
+    /**
+     * 명함첩 그룹 순서 변경
+     * 1. 그룹 ID 목록으로 그룹 목록 조회
+     * 2. 본인 소유 그룹인지 검증
+     * 3. 각 그룹의 순서 업데이트
+     * 4. 저장
+     * @param command 순서 변경 정보
+     * @return 수정된 그룹 목록
+     */
+    @Transactional
+    public List<GroupInfo> reorder(ReorderGroupCommand command) {
+        String memberId = command.memberId();
+        List<ReorderGroupCommand.GroupOrder> groupOrders = command.groups();
+
+        // 1. 그룹 ID 목록으로 그룹 목록 조회
+        List<String> groupIds = groupOrders.stream()
+                .map(ReorderGroupCommand.GroupOrder::id)
+                .toList();
+        List<Group> groups = groupRepository.findAllByIds(groupIds);
+
+        // 2. 본인 소유 그룹인지 검증
+        boolean allOwnedByMember = groups.stream()
+                .allMatch(group -> group.getMemberId().equals(memberId));
+        if (!allOwnedByMember) {
+            throw new CustomException(ErrorCode.GROUP_NOT_FOUND);
+        }
+
+        // 3. 각 그룹의 순서 업데이트
+        Map<String, Integer> orderMap = groupOrders.stream()
+                .collect(Collectors.toMap(
+                        ReorderGroupCommand.GroupOrder::id,
+                        ReorderGroupCommand.GroupOrder::sortOrder
+                ));
+
+        groups.forEach(group -> {
+            Integer newOrder = orderMap.get(group.getId());
+            if (newOrder != null) {
+                group.reorder(newOrder);
+            }
+        });
+
+        // 4. 저장
+        List<Group> savedGroups = groupRepository.saveAll(groups);
+
+        return savedGroups.stream()
+                .map(GroupInfo::from)
+                .toList();
     }
 
     /**

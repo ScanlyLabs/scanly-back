@@ -58,6 +58,15 @@ public class Group {
         this.updatedAt = LocalDateTime.now();
     }
 
+    /**
+     * 그룹 순서 변경
+     * @param sortOrder 변경할 순서
+     */
+    public void reorder(int sortOrder) {
+        this.sortOrder = sortOrder;
+        this.updatedAt = LocalDateTime.now();
+    }
+
     // getters
     public String getId() {
         return id;

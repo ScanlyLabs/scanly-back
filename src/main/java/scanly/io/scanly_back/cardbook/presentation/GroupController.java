@@ -13,8 +13,11 @@ import scanly.io.scanly_back.cardbook.application.GroupService;
 import scanly.io.scanly_back.cardbook.application.dto.info.GroupInfo;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.CreateGroupRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.RenameGroupRequest;
+import scanly.io.scanly_back.cardbook.presentation.dto.request.ReorderGroupRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.response.GroupResponse;
 import scanly.io.scanly_back.common.response.ApiResponse;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -47,6 +50,21 @@ public class GroupController {
         GroupInfo groupInfo = groupService.rename(request.toCommand(id));
 
         return ResponseEntity.ok(ApiResponse.success(GroupResponse.from(groupInfo)));
+    }
+
+    @PostMapping("/reorder")
+    @Operation(summary = "명함첩 그룹 순서 변경", description = "여러 명함첩 그룹의 순서를 한 번에 변경합니다.")
+    public ResponseEntity<ApiResponse<List<GroupResponse>>> reorder(
+            @AuthenticationPrincipal String memberId,
+            @Valid @RequestBody ReorderGroupRequest request
+    ) {
+        List<GroupInfo> groupInfos = groupService.reorder(request.toCommand(memberId));
+
+        List<GroupResponse> responses = groupInfos.stream()
+                .map(GroupResponse::from)
+                .toList();
+
+        return ResponseEntity.ok(ApiResponse.success(responses));
     }
 
     @PostMapping("/{id}/delete")

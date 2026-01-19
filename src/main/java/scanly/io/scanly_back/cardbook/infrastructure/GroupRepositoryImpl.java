@@ -6,6 +6,7 @@ import scanly.io.scanly_back.cardbook.domain.Group;
 import scanly.io.scanly_back.cardbook.domain.GroupRepository;
 import scanly.io.scanly_back.cardbook.infrastructure.entity.GroupEntity;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -25,6 +26,19 @@ public class GroupRepositoryImpl implements GroupRepository {
         return groupJpaRepository.findById(id)
                 .map(groupMapper::toDomain);
     }
+
+    /**
+     * 여러 명함첩 그룹 조회
+     * @param ids 명함첩 그룹 아이디 목록
+     * @return 조회된 명함첩 그룹 목록
+     */
+    @Override
+    public List<Group> findAllByIds(List<String> ids) {
+        return groupJpaRepository.findAllById(ids).stream()
+                .map(groupMapper::toDomain)
+                .toList();
+    }
+
     /**
      * 회원 아이디로 명함첩 그룹 수 조회
      * @param memberId 회원 아이디
@@ -45,6 +59,22 @@ public class GroupRepositoryImpl implements GroupRepository {
         GroupEntity groupEntity = groupMapper.toEntity(group);
         GroupEntity savedGroupEntity = groupJpaRepository.save(groupEntity);
         return groupMapper.toDomain(savedGroupEntity);
+    }
+
+    /**
+     * 여러 명함첩 그룹 저장
+     * @param groups 그룹 목록
+     * @return 저장된 그룹 목록
+     */
+    @Override
+    public List<Group> saveAll(List<Group> groups) {
+        List<GroupEntity> entities = groups.stream()
+                .map(groupMapper::toEntity)
+                .toList();
+        List<GroupEntity> savedEntities = groupJpaRepository.saveAll(entities);
+        return savedEntities.stream()
+                .map(groupMapper::toDomain)
+                .toList();
     }
 
     /**
