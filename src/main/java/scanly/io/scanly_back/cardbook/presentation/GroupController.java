@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import scanly.io.scanly_back.cardbook.application.GroupService;
 import scanly.io.scanly_back.cardbook.application.dto.info.GroupInfo;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.CreateGroupRequest;
-import scanly.io.scanly_back.cardbook.presentation.dto.response.CreateGroupResponse;
+import scanly.io.scanly_back.cardbook.presentation.dto.response.GroupResponse;
 import scanly.io.scanly_back.common.response.ApiResponse;
 
 @RestController
@@ -25,7 +25,7 @@ public class GroupController {
 
     @PostMapping
     @Operation(summary = "명함첩 그룹 생성", description = "새로운 명함첩 그룹을 생성합니다.")
-    public ResponseEntity<ApiResponse<CreateGroupResponse>> createGroup(
+    public ResponseEntity<ApiResponse<GroupResponse>> createGroup(
             @AuthenticationPrincipal String memberId,
             @Valid @RequestBody CreateGroupRequest request
     ) {
@@ -33,7 +33,8 @@ public class GroupController {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponse.success(CreateGroupResponse.from(groupInfo)));
+                .body(ApiResponse.success(GroupResponse.from(groupInfo)));
+    }
     }
 
     @PostMapping("/{id}/delete")

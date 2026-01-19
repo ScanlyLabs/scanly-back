@@ -4,15 +4,15 @@ import scanly.io.scanly_back.cardbook.application.dto.info.GroupInfo;
 
 import java.time.LocalDateTime;
 
-public record CreateGroupResponse(
+public record GroupResponse(
         String id,
         String name,
         int sortOrder,
         LocalDateTime createdAt
 ) {
 
-    public static CreateGroupResponse from(GroupInfo groupInfo) {
-        return new CreateGroupResponse(
+    public static GroupResponse from(GroupInfo groupInfo) {
+        return new GroupResponse(
                 groupInfo.id(),
                 groupInfo.name(),
                 groupInfo.sortOrder(),
