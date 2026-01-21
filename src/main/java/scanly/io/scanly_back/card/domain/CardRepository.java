@@ -12,6 +12,8 @@ public interface CardRepository {
 
     boolean existsByMemberId(String memberId);
 
+    Optional<Card> findById(String id);
+
     Optional<Card> findByMemberId(String memberId);
 
     void delete(Card card);
