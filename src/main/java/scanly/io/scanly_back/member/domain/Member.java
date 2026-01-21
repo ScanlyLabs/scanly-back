@@ -1,36 +1,33 @@
 package scanly.io.scanly_back.member.domain;
 
+import scanly.io.scanly_back.common.domain.BaseDomain;
+
 import java.time.LocalDateTime;
 
-public class Member {
+public class Member extends BaseDomain {
 
     private String id;
-    private String loginId;                 // 로그인 아이디
-    private String password;                // 비밀번호
-    private String email;                   // 이메일
-    private MemberStatus status;            // 회원 상태
-    private LocalDateTime withdrawnAt;      // 탈퇴 요청일시
-    private LocalDateTime createdAt;        // 생성 일시
-    private LocalDateTime updatedAt;        // 수정 일시
+    private String loginId;
+    private String password;
+    private String email;
+    private MemberStatus status;
+    private LocalDateTime withdrawnAt;
 
     private Member(
             String id, String loginId, String password,
             String email, MemberStatus status,
             LocalDateTime withdrawnAt, LocalDateTime createdAt, LocalDateTime updatedAt
     ) {
+        super(createdAt, updatedAt);
         this.id = id;
         this.loginId = loginId;
         this.password = password;
         this.email = email;
         this.status = status;
         this.withdrawnAt = withdrawnAt;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     public static Member signUP(String loginId, String password, String email) {
-        LocalDateTime now = LocalDateTime.now();
-
         return new Member(
                 null,
                 loginId,
@@ -38,12 +35,16 @@ public class Member {
                 email,
                 MemberStatus.ACTIVE,
                 null,
-                now,
-                now
+                null,
+                null
         );
     }
 
-    public static Member of(String id, String loginId, String password, String email, MemberStatus status, LocalDateTime withdrawnAt, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public static Member of(
+            String id, String loginId, String password, String email,
+            MemberStatus status, LocalDateTime withdrawnAt,
+            LocalDateTime createdAt, LocalDateTime updatedAt
+    ) {
         return new Member(
                 id,
                 loginId,
@@ -79,13 +80,5 @@ public class Member {
 
     public LocalDateTime getWithdrawnAt() {
         return withdrawnAt;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
     }
 }

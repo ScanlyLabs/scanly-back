@@ -6,15 +6,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import scanly.io.scanly_back.card.domain.SocialLinkType;
-
-import java.time.LocalDateTime;
+import scanly.io.scanly_back.common.entity.BaseEntity;
 
 @Getter
 @Entity
 @Table(name = "social_link")
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SocialLinkEntity {
+public class SocialLinkEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -33,19 +32,7 @@ public class SocialLinkEntity {
     @Column(name = "display_order", nullable = false)
     private int displayOrder;                       // 표시 순서
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;                // 생성 일시
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;                // 수정 일시
-
-    public static SocialLinkEntity of(
-            String id, String cardId, SocialLinkType type, String url,
-            int displayOrder, LocalDateTime createdAt, LocalDateTime updatedAt
-    ) {
-        return new SocialLinkEntity(
-                id, cardId, type, url,
-                displayOrder, createdAt, updatedAt
-        );
+    public static SocialLinkEntity of(String id, String cardId, SocialLinkType type, String url, int displayOrder) {
+        return new SocialLinkEntity(id, cardId, type, url, displayOrder);
     }
 }

@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import scanly.io.scanly_back.common.entity.BaseEntity;
 import scanly.io.scanly_back.member.domain.MemberStatus;
 
 import java.time.LocalDateTime;
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @Table(name = "member")
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MemberEntity {
+public class MemberEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -36,18 +37,10 @@ public class MemberEntity {
     @Column(name = "withdrawn_at")
     private LocalDateTime withdrawnAt;              // 탈퇴 요청일시
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;        // 생성 일시
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;        // 수정 일시
-
-
     public static MemberEntity of(
             String id, String loginId, String password,
-            String email, MemberStatus status,
-            LocalDateTime withdrawnAt, LocalDateTime createdAt, LocalDateTime updatedAt
+            String email, MemberStatus status, LocalDateTime withdrawnAt
     ) {
-        return new MemberEntity(id, loginId, password, email, status, withdrawnAt, createdAt, updatedAt);
+        return new MemberEntity(id, loginId, password, email, status, withdrawnAt);
     }
 }

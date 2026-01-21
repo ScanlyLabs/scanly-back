@@ -5,15 +5,14 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import scanly.io.scanly_back.common.entity.BaseEntity;
 
 @Getter
 @Entity
 @Table(name = "card_book_group")
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class GroupEntity {
+public class GroupEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -28,16 +27,7 @@ public class GroupEntity {
     @Column(name = "sort_order", nullable = false)
     private int sortOrder;                      // 정렬 순서
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;                // 생성 일시
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;                // 수정 일시
-
-    public static GroupEntity of(
-            String id, String memberId, String name, int sortOrder,
-            LocalDateTime createdAt, LocalDateTime updatedAt
-    ) {
-        return new GroupEntity(id, memberId, name, sortOrder, createdAt, updatedAt);
+    public static GroupEntity of(String id, String memberId, String name, int sortOrder) {
+        return new GroupEntity(id, memberId, name, sortOrder);
     }
 }
