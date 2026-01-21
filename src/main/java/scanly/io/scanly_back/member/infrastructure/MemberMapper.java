@@ -23,9 +23,7 @@ public class MemberMapper {
                 member.getPassword(),
                 member.getEmail(),
                 member.getStatus(),
-                member.getWithdrawnAt(),
-                member.getCreatedAt(),
-                member.getUpdatedAt()
+                member.getWithdrawnAt()
         );
     }
 

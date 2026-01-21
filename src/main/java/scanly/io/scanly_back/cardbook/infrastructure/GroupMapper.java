@@ -21,9 +21,7 @@ public class GroupMapper {
                 domain.getId(),
                 domain.getMemberId(),
                 domain.getName(),
-                domain.getSortOrder(),
-                domain.getCreatedAt(),
-                domain.getUpdatedAt()
+                domain.getSortOrder()
         );
     }
 

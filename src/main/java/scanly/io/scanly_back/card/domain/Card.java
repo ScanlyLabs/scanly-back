@@ -1,10 +1,12 @@
 package scanly.io.scanly_back.card.domain;
 
+import scanly.io.scanly_back.common.domain.BaseDomain;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Card {
+public class Card extends BaseDomain {
 
     private String id;
     private final String memberId;
@@ -19,13 +21,12 @@ public class Card {
     private String portfolioUrl;
     private String location;
     private String qrImageUrl;
-    private final LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
     private Card(String id, String memberId, String name, String title, String company,
                  String phone, String email, String bio, List<SocialLink> socialLinks,
-                 String profileImageUrl,  String portfolioUrl, String location, String qrImageUrl,
+                 String profileImageUrl, String portfolioUrl, String location, String qrImageUrl,
                  LocalDateTime createdAt, LocalDateTime updatedAt) {
+        super(createdAt, updatedAt);
         this.id = id;
         this.memberId = memberId;
         this.name = name;
@@ -39,8 +40,6 @@ public class Card {
         this.portfolioUrl = portfolioUrl;
         this.location = location;
         this.qrImageUrl = qrImageUrl;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     public static Card of(
@@ -59,7 +58,6 @@ public class Card {
     public static Card create(String memberId, String name, String title, String company,
                               String phone, String email, String bio, String profileImageUrl,
                               String portfolioUrl, String location) {
-        LocalDateTime now = LocalDateTime.now();
         return new Card(
                 null,
                 memberId,
@@ -74,8 +72,8 @@ public class Card {
                 portfolioUrl,
                 location,
                 null,
-                now,
-                now
+                null,
+                null
         );
     }
 
@@ -94,7 +92,6 @@ public class Card {
         this.profileImageUrl = profileImageUrl;
         this.portfolioUrl = portfolioUrl;
         this.location = location;
-        this.updatedAt = LocalDateTime.now();
     }
 
     /**
@@ -102,7 +99,6 @@ public class Card {
      */
     public void clearSocialLinks() {
         this.socialLinks.clear();
-        this.updatedAt = LocalDateTime.now();
     }
 
     /**
@@ -117,7 +113,6 @@ public class Card {
         int order = this.socialLinks.size();
         SocialLink socialLink = SocialLink.create(type, url, order);
         this.socialLinks.add(socialLink);
-        this.updatedAt = LocalDateTime.now();
     }
 
     /**
@@ -126,7 +121,6 @@ public class Card {
      */
     public void assignQrCode(String qrImageUrl) {
         this.qrImageUrl = qrImageUrl;
-        this.updatedAt = LocalDateTime.now();
     }
 
     // Getters
@@ -180,13 +174,5 @@ public class Card {
 
     public List<SocialLink> getSocialLinks() {
         return socialLinks;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
     }
 }

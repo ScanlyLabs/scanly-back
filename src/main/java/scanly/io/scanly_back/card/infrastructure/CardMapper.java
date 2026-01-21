@@ -33,9 +33,7 @@ public class CardMapper {
                 domain.getProfileImageUrl(),
                 domain.getPortfolioUrl(),
                 domain.getLocation(),
-                domain.getQrImageUrl(),
-                domain.getCreatedAt(),
-                domain.getUpdatedAt()
+                domain.getQrImageUrl()
         );
     }
 
@@ -55,9 +53,7 @@ public class CardMapper {
                 cardId,
                 domain.getType(),
                 domain.getUrl(),
-                domain.getDisplayOrder(),
-                domain.getCreatedAt(),
-                domain.getUpdatedAt()
+                domain.getDisplayOrder()
         );
     }
 
@@ -135,9 +131,7 @@ public class CardMapper {
                 cardId,
                 domain.getType(),
                 domain.getUrl(),
-                domain.getDisplayOrder(),
-                domain.getCreatedAt(),
-                domain.getUpdatedAt()
+                domain.getDisplayOrder()
         );
     }
 }

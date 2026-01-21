@@ -5,15 +5,14 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import scanly.io.scanly_back.common.entity.BaseEntity;
 
 @Getter
 @Entity
 @Table(name = "card")
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CardEntity {
+public class CardEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -52,23 +51,15 @@ public class CardEntity {
     @Column(name = "qr_image_url")
     private String qrImageUrl;              // qr 이미지 url
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;        // 생성 일시
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;        // 수정 일시
-
     public static CardEntity of(
             String id, String memberId, String name, String title, String company,
             String phone, String email, String bio, String profileImageUrl,
-            String portfolioUrl, String location, String qrImageUrl,
-            LocalDateTime createdAt, LocalDateTime updatedAt
+            String portfolioUrl, String location, String qrImageUrl
     ) {
         return new CardEntity(
                 id, memberId, name, title, company,
                 phone, email, bio, profileImageUrl,
-                portfolioUrl, location, qrImageUrl,
-                createdAt, updatedAt
+                portfolioUrl, location, qrImageUrl
         );
     }
 }

@@ -1,25 +1,25 @@
 package scanly.io.scanly_back.cardbook.domain;
 
+import scanly.io.scanly_back.common.domain.BaseDomain;
+
 import java.time.LocalDateTime;
 
-public class Group {
+public class Group extends BaseDomain {
+
     private String id;
-    private String memberId;            // 소유자 ID
-    private String name;                // 그룹명
-    private int sortOrder;                  // 순서
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String memberId;
+    private String name;
+    private int sortOrder;
 
     private Group(
             String id, String memberId, String name, int sortOrder,
             LocalDateTime createdAt, LocalDateTime updatedAt
     ) {
+        super(createdAt, updatedAt);
         this.id = id;
         this.memberId = memberId;
         this.name = name;
         this.sortOrder = sortOrder;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     public static Group of(
@@ -37,16 +37,7 @@ public class Group {
      * @return 그룹
      */
     public static Group create(String memberId, String name, int sortOrder) {
-        LocalDateTime now = LocalDateTime.now();
-
-        return new Group(
-                null,
-                memberId,
-                name,
-                sortOrder,
-                now,
-                now
-        );
+        return new Group(null, memberId, name, sortOrder, null, null);
     }
 
     /**
@@ -55,7 +46,6 @@ public class Group {
      */
     public void rename(String name) {
         this.name = name;
-        this.updatedAt = LocalDateTime.now();
     }
 
     /**
@@ -64,26 +54,22 @@ public class Group {
      */
     public void reorder(int sortOrder) {
         this.sortOrder = sortOrder;
-        this.updatedAt = LocalDateTime.now();
     }
 
     // getters
     public String getId() {
         return id;
     }
+
     public String getMemberId() {
         return memberId;
     }
+
     public String getName() {
         return name;
     }
+
     public int getSortOrder() {
         return sortOrder;
-    }
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
     }
 }

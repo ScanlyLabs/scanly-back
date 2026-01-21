@@ -1,23 +1,23 @@
 package scanly.io.scanly_back.card.domain;
 
+import scanly.io.scanly_back.common.domain.BaseDomain;
+
 import java.time.LocalDateTime;
 
-public class SocialLink {
+public class SocialLink extends BaseDomain {
 
     private String id;
     private SocialLinkType type;
     private String url;
     private int displayOrder;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
 
-    private SocialLink(String id, SocialLinkType type, String url, int displayOrder, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    private SocialLink(String id, SocialLinkType type, String url, int displayOrder,
+                       LocalDateTime createdAt, LocalDateTime updatedAt) {
+        super(createdAt, updatedAt);
         this.id = id;
         this.type = type;
         this.url = url;
         this.displayOrder = displayOrder;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     public static SocialLink of(String id, SocialLinkType type, String url,
@@ -27,7 +27,7 @@ public class SocialLink {
 
     public static SocialLink create(SocialLinkType type, String url, int displayOrder) {
         validateUrl(url);
-        return new SocialLink(null, type, url, displayOrder, LocalDateTime.now(), LocalDateTime.now());
+        return new SocialLink(null, type, url, displayOrder, null, null);
     }
 
     /**
@@ -44,7 +44,6 @@ public class SocialLink {
     }
 
     // Getters
-
     public String getId() {
         return id;
     }
@@ -59,13 +58,5 @@ public class SocialLink {
 
     public int getDisplayOrder() {
         return displayOrder;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
     }
 }
