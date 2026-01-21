@@ -24,6 +24,9 @@ public enum ErrorCode {
     CARD_NOT_FOUND(HttpStatus.NOT_FOUND, "CD002", "명함을 찾을 수 없습니다."),
 
     // card_book
+    CARDBOOK_ALREADY_EXISTS(HttpStatus.CONFLICT, "CB001", "이미 저장된 명함입니다."),
+    CANNOT_SAVE_OWN_CARD(HttpStatus.BAD_REQUEST, "CB002", "본인 명함은 저장할 수 없습니다."),
+
     // group
     GROUP_NOT_FOUND(HttpStatus.NOT_FOUND, "CBG001", "명함첩 그룹이 존재하지 않습니다."),
 

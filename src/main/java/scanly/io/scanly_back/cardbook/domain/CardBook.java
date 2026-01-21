@@ -37,6 +37,18 @@ public class CardBook extends BaseDomain {
         );
     }
 
+    public static CardBook create(String memberId, String cardId, String profileSnapshot, String groupId) {
+        return new CardBook(
+                null,
+                memberId,
+                cardId,
+                profileSnapshot,
+                groupId,
+                null,
+                false
+        );
+    }
+
     // getters
     public String getId() {
         return id;

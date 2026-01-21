@@ -96,6 +96,21 @@ public class CardRepositoryImpl implements CardRepository {
     }
 
     /**
+     * 명함 ID로 명함 조회
+     * @param id 명함 ID
+     * @return 조회된 명함
+     */
+    @Override
+    public Optional<Card> findById(String id) {
+        return cardJpaRepository.findById(id)
+                .map(cardEntity -> {
+                    List<SocialLinkEntity> socialLinks = socialLinkJpaRepository
+                            .findByCardIdOrderByDisplayOrderAsc(cardEntity.getId());
+                    return cardMapper.toDomain(cardEntity, socialLinks);
+                });
+    }
+
+    /**
      * 회원 아이디로 명함 조회
      * @param memberId 회원 아이디
      * @return 조회된 명함
