@@ -72,6 +72,25 @@ public class CardBookService {
     }
 
     /**
+     * 명함첩 유효성 검사
+     * - 타인 명함이 맞는지, 중복 저장은 아닌지 검사
+     * @param cardMemberId 명함첩 소유자 아이디
+     * @param memberId 회원 아이디
+     * @param cardId 명함 아이디
+     */
+    private void validateCardBook(String cardMemberId, String memberId, String cardId) {
+        // 보인 소유 명함 검증
+        if (cardMemberId.equals(memberId)) {
+            throw new CustomException(ErrorCode.CANNOT_SAVE_OWN_CARD);
+        }
+
+        // 중복 저장 검증
+        if (cardBookRepository.existsByMemberIdAndCardId(memberId, cardId)) {
+            throw new CustomException(ErrorCode.CARDBOOK_ALREADY_EXISTS);
+        }
+    }
+
+    /**
      * 명함 교환 내역 저장
      * 1. 명함 조회
      * 2. 명함 교환 내역 저장
@@ -101,7 +120,6 @@ public class CardBookService {
      * 2. 명함 교환 이벤트 발행
      * @param senderId 발신자 아이디
      * @param receiverId 수신자 아이디
-     * @throws JsonProcessingException JSON 변환 실패 예외
      */
     private void publishCardExchangedEvent(String senderId, String receiverId) {
         // 1. 발신자 조회
@@ -142,25 +160,6 @@ public class CardBookService {
                 receiverId
         );
         return cardExchangeRepository.save(cardExchange);
-    }
-
-    /**
-     * 명함첩 유효성 검사
-     * - 타인 명함이 맞는지, 중복 저장은 아닌지 검사
-     * @param cardMemberId 명함첩 소유자 아이디
-     * @param memberId 회원 아이디
-     * @param cardId 명함 아이디
-     */
-    private void validateCardBook(String cardMemberId, String memberId, String cardId) {
-        // 보인 소유 명함 검증
-        if (cardMemberId.equals(memberId)) {
-            throw new CustomException(ErrorCode.CANNOT_SAVE_OWN_CARD);
-        }
-
-        // 중복 저장 검증
-        if (cardBookRepository.existsByMemberIdAndCardId(memberId, cardId)) {
-            throw new CustomException(ErrorCode.CARDBOOK_ALREADY_EXISTS);
-        }
     }
 
     /**

@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import scanly.io.scanly_back.notification.domain.model.NotificationStatus;
 import scanly.io.scanly_back.notification.domain.model.NotificationType;
 
 @Getter
@@ -19,6 +20,10 @@ public class NotificationEntity {
 
     @Column(name = "receiver_id", nullable = false, updatable = false)
     private String receiverId;            // 수신자 ID
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private NotificationStatus status;                // 알림 전송 상태
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, updatable = false)
@@ -37,9 +42,9 @@ public class NotificationEntity {
     private boolean isRead;             // 읽음 여부
 
     public static NotificationEntity of(
-            String id, String receiverId, NotificationType type,
+            String id, String receiverId, NotificationStatus status, NotificationType type,
             String title, String body, String data, boolean isRead
     ) {
-        return new NotificationEntity(id, receiverId, type, title, body, data, isRead);
+        return new NotificationEntity(id, receiverId, status, type, title, body, data, isRead);
     }
 }
