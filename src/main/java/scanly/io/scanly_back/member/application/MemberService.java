@@ -52,6 +52,7 @@ public class MemberService {
 
         Member member = Member.signUP(
                 command.loginId(),
+                command.name(),
                 passwordEncoder.encode(command.password()),
                 command.email()
         );
