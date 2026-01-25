@@ -57,6 +57,14 @@ public class CardBook extends BaseDomain {
         this.groupId = groupId;
     }
 
+    /**
+     * 명함첩 메모 수정
+     * @param memo 메모
+     */
+    public void updateMemo(String memo) {
+        this.memo = memo;
+    }
+
     // getters
     public String getId() {
         return id;

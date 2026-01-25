@@ -13,6 +13,7 @@ import scanly.io.scanly_back.cardbook.application.CardBookService;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardBookInfo;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.SaveCardBookRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.UpdateCardBookGroupRequest;
+import scanly.io.scanly_back.cardbook.presentation.dto.request.UpdateCardBookMemoRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.response.CardBookResponse;
 import scanly.io.scanly_back.common.response.ApiResponse;
 
@@ -72,6 +73,19 @@ public class CardBookController {
             @Valid @RequestBody UpdateCardBookGroupRequest request
     ) {
         CardBookInfo cardBookInfo = cardBookService.updateGroup(request.toCommand(memberId, id));
+
+        return ResponseEntity.ok(ApiResponse.success(CardBookResponse.from(cardBookInfo)));
+    }
+
+    @PostMapping("/{id}/memo")
+    @Operation(summary = "명함첩 메모 수정", description = "명함첩의 메모를 수정합니다.")
+    public ResponseEntity<ApiResponse<CardBookResponse>> updateMemo(
+            @AuthenticationPrincipal String memberId,
+            @Parameter(description = "명함첩 ID", required = true)
+            @PathVariable String id,
+            @RequestBody UpdateCardBookMemoRequest request
+    ) {
+        CardBookInfo cardBookInfo = cardBookService.updateMemo(request.toCommand(memberId, id));
 
         return ResponseEntity.ok(ApiResponse.success(CardBookResponse.from(cardBookInfo)));
     }
