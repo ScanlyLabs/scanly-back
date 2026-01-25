@@ -1,5 +1,7 @@
 package scanly.io.scanly_back.cardbook.infrastructure;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import scanly.io.scanly_back.cardbook.infrastructure.entity.CardBookEntity;
 
@@ -11,6 +13,8 @@ public interface CardBookJpaRepository extends JpaRepository<CardBookEntity, Str
     boolean existsByMemberIdAndCardId(String memberId, String cardId);
 
     List<CardBookEntity> findAllByMemberId(String memberId);
+
+    Page<CardBookEntity> findAllByMemberId(String memberId, Pageable pageable);
 
     Optional<CardBookEntity> findByIdAndMemberId(String id, String memberId);
 }

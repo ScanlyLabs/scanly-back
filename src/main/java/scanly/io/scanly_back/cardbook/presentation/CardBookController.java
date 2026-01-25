@@ -5,6 +5,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,8 +20,7 @@ import scanly.io.scanly_back.cardbook.presentation.dto.request.UpdateCardBookGro
 import scanly.io.scanly_back.cardbook.presentation.dto.request.UpdateCardBookMemoRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.response.CardBookResponse;
 import scanly.io.scanly_back.common.response.ApiResponse;
-
-import java.util.List;
+import scanly.io.scanly_back.common.response.PageResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,15 +44,15 @@ public class CardBookController {
     }
 
     @GetMapping
-    @Operation(summary = "명함첩 목록 조회", description = "명함첩 목록을 조회합니다.")
-    public ResponseEntity<ApiResponse<List<CardBookResponse>>> readCardBookList(
-            @AuthenticationPrincipal String memberId
+    @Operation(summary = "명함첩 목록 조회", description = "명함첩 목록을 페이징하여 조회합니다.")
+    public ResponseEntity<ApiResponse<PageResponse<CardBookResponse>>> readCardBookList(
+            @AuthenticationPrincipal String memberId,
+            @PageableDefault(size = 20) Pageable pageable
     ) {
-        List<CardBookInfo> cardBookInfos = cardBookService.readAll(memberId);
-        List<CardBookResponse> cardBookResponses
-                = cardBookInfos.stream().map(CardBookResponse::from).toList();
+        Page<CardBookInfo> cardBookInfos = cardBookService.readAll(memberId, pageable);
+        Page<CardBookResponse> cardBookResponses = cardBookInfos.map(CardBookResponse::from);
 
-        return ResponseEntity.ok(ApiResponse.success(cardBookResponses));
+        return ResponseEntity.ok(ApiResponse.success(PageResponse.from(cardBookResponses)));
     }
 
     @GetMapping("/{id}")

@@ -1,6 +1,8 @@
 package scanly.io.scanly_back.cardbook.infrastructure;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import scanly.io.scanly_back.cardbook.domain.CardBook;
 import scanly.io.scanly_back.cardbook.domain.CardBookRepository;
@@ -48,6 +50,18 @@ public class CardBookRepositoryImpl implements CardBookRepository {
     public List<CardBook> findAllByMemberId(String memberId) {
         List<CardBookEntity> cardBookEntities = cardBookJpaRepository.findAllByMemberId(memberId);
         return cardBookEntities.stream().map(cardBookMapper::toDomain).toList();
+    }
+
+    /**
+     * 회원 아이디로 명함첩 목록 페이징 조회
+     * @param memberId 회원 아이디
+     * @param pageable 페이징 정보
+     * @return 페이징된 명함첩 목록
+     */
+    @Override
+    public Page<CardBook> findAllByMemberId(String memberId, Pageable pageable) {
+        Page<CardBookEntity> cardBookEntities = cardBookJpaRepository.findAllByMemberId(memberId, pageable);
+        return cardBookEntities.map(cardBookMapper::toDomain);
     }
 
     /**
