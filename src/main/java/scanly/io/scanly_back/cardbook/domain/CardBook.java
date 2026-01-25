@@ -49,6 +49,30 @@ public class CardBook extends BaseDomain {
         );
     }
 
+    /**
+     * 명함첩 그룹 수정
+     * @param groupId 그룹 아이디
+     */
+    public void updateGroup(String groupId) {
+        this.groupId = groupId;
+    }
+
+    /**
+     * 명함첩 메모 수정
+     * @param memo 메모
+     */
+    public void updateMemo(String memo) {
+        this.memo = memo;
+    }
+
+    /**
+     * 명함첩 즐겨찾기 수정
+     * @param favorite 즐겨찾기 여부
+     */
+    public void updateFavorite(boolean favorite) {
+        this.isFavorite = favorite;
+    }
+
     // getters
     public String getId() {
         return id;

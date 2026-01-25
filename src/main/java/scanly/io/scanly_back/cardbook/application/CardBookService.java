@@ -8,6 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 import scanly.io.scanly_back.card.domain.Card;
 import scanly.io.scanly_back.card.domain.CardRepository;
 import scanly.io.scanly_back.cardbook.application.dto.command.SaveCardBookCommand;
+import scanly.io.scanly_back.cardbook.application.dto.command.UpdateCardBookFavoriteCommand;
+import scanly.io.scanly_back.cardbook.application.dto.command.UpdateCardBookGroupCommand;
+import scanly.io.scanly_back.cardbook.application.dto.command.UpdateCardBookMemoCommand;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardBookInfo;
 import scanly.io.scanly_back.cardbook.domain.CardBook;
 import scanly.io.scanly_back.cardbook.domain.CardBookRepository;
@@ -118,10 +121,73 @@ public class CardBookService {
      * @return 조회된 명함첩
      */
     public CardBookInfo read(String memberId, String id) {
-        CardBook cardBook
-                = cardBookRepository.findByIdAndMemberId(id, memberId)
-                .orElseThrow(() -> new CustomException(ErrorCode.CARD_BOOK_NOT_FOUND));
+        CardBook cardBook = getByIdAndMemberId(id, memberId);
 
         return CardBookInfo.from(cardBook);
+    }
+
+    /**
+     * 명함첩 그룹 수정
+     * 1. 명함첩 조회
+     * 2. 명함첩 수정
+     * @param command 명함첩 정보
+     * @return 수정된 명함첩
+     */
+    public CardBookInfo updateGroup(UpdateCardBookGroupCommand command) {
+        // 1. 명함첩 조회
+        CardBook cardBook = getByIdAndMemberId(command.id(), command.memberId());
+
+        // 2. 명함첩 수정
+        cardBook.updateGroup(command.groupId());
+        CardBook updatedCardBook = cardBookRepository.update(cardBook);
+
+        return CardBookInfo.from(updatedCardBook);
+    }
+
+    /**
+     * 명함첩 아이디 및 회원 아이디로 명함첩 조회
+     * @param id 아이디
+     * @param memberId 회원 아이디
+     * @return 조회된 명함첩
+     */
+    private CardBook getByIdAndMemberId(String id, String memberId) {
+        return cardBookRepository.findByIdAndMemberId(id, memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CARD_BOOK_NOT_FOUND));
+    }
+
+    /**
+     * 명함첩 메모 수정
+     * 1. 명함첩 조회
+     * 2. 명함첩 수정
+     * @param command 명함첩 정보
+     * @return 수정된 명함첩
+     */
+    public CardBookInfo updateMemo(UpdateCardBookMemoCommand command) {
+        // 1. 명함첩 조회
+        CardBook cardBook = getByIdAndMemberId(command.id(), command.memberId());
+
+        // 2. 명함첩 수정
+        cardBook.updateMemo(command.memo());
+        CardBook updatedCardBook = cardBookRepository.update(cardBook);
+
+        return CardBookInfo.from(updatedCardBook);
+    }
+
+    /**
+     * 명함첩 즐겨찾기 수정
+     * 1. 명함첩 조회
+     * 2. 명함첩 수정
+     * @param command 명함첩 정보
+     * @return 수정된 명함첩
+     */
+    public CardBookInfo updateFavorite(UpdateCardBookFavoriteCommand command) {
+        // 1. 명함첩 조회
+        CardBook cardBook = getByIdAndMemberId(command.id(), command.memberId());
+
+        // 2. 명함첩 수정
+        cardBook.updateFavorite(command.favorite());
+        CardBook updatedCardBook = cardBookRepository.update(cardBook);
+
+        return CardBookInfo.from(updatedCardBook);
     }
 }

@@ -61,4 +61,16 @@ public class CardBookRepositoryImpl implements CardBookRepository {
         Optional<CardBookEntity> cardBookEntity = cardBookJpaRepository.findByIdAndMemberId(id, memberId);
         return cardBookEntity.map(cardBookMapper::toDomain);
     }
+
+    /**
+     * 명함첩 수정
+     * @param cardBook 수정할 명함첩 정보
+     * @return 수정된 명함첩
+     */
+    @Override
+    public CardBook update(CardBook cardBook) {
+        CardBookEntity cardBookEntity = cardBookMapper.toEntity(cardBook);
+        CardBookEntity updatedCardBookEntity = cardBookJpaRepository.save(cardBookEntity);
+        return cardBookMapper.toDomain(updatedCardBookEntity);
+    }
 }
