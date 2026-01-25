@@ -32,6 +32,17 @@ public class Notification extends BaseDomain {
     ) {
         return new Notification(id, memberId, type, title, body, data, isRead);
     }
+    public static Notification create(String memberId, NotificationType type, String title, String body, String data) {
+        return new Notification(
+                null,
+                memberId,
+                type,
+                title,
+                body,
+                data,
+                false
+        );
+    }
 
     // getters
 
