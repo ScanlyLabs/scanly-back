@@ -19,7 +19,7 @@ public class NotificationMapper {
 
         return NotificationEntity.of(
                 domain.getId(),
-                domain.getMemberId(),
+                domain.getReceiverId(),
                 domain.getType(),
                 domain.getTitle(),
                 domain.getBody(),
@@ -40,7 +40,7 @@ public class NotificationMapper {
 
         return Notification.of(
                 entity.getId(),
-                entity.getMemberId(),
+                entity.getReceiverId(),
                 entity.getType(),
                 entity.getTitle(),
                 entity.getBody(),
