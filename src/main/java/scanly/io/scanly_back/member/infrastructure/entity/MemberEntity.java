@@ -24,6 +24,9 @@ public class MemberEntity extends BaseEntity {
     @Column(name = "login_id", nullable = false, unique = true, updatable = false)
     private String loginId;                         // 로그인 아이디
 
+    @Column(name = "name", nullable = false, length = 20)
+    private String name;                            // 회원명
+
     @Column(name = "password", nullable = false, unique = true)
     private String password;                        // 비밀번호
 
@@ -38,9 +41,9 @@ public class MemberEntity extends BaseEntity {
     private LocalDateTime withdrawnAt;              // 탈퇴 요청일시
 
     public static MemberEntity of(
-            String id, String loginId, String password,
+            String id, String loginId, String name, String password,
             String email, MemberStatus status, LocalDateTime withdrawnAt
     ) {
-        return new MemberEntity(id, loginId, password, email, status, withdrawnAt);
+        return new MemberEntity(id, loginId, name, password, email, status, withdrawnAt);
     }
 }
