@@ -123,7 +123,7 @@ public class CardBookService {
                 receiverId,
                 NotificationType.CARD_EXCHANGE,
                 NotificationTemplate.CARD_EXCHANGE.getTitle(),
-                NotificationTemplate.CARD_EXCHANGE.formatBody("발신자명"),
+                NotificationTemplate.CARD_EXCHANGE.formatBody(member.getName()),
                 data
 
         );
