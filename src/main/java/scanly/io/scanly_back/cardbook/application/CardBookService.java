@@ -15,6 +15,7 @@ import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -97,5 +98,16 @@ public class CardBookService {
         } catch (JsonProcessingException e) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    /**
+     * 명함첩 목록 조회
+     * @param memberId 회원 아이디
+     * @return 조회된 명함첩 목록
+     */
+    public List<CardBookInfo> getAll(String memberId) {
+        List<CardBook> cardBooks = cardBookRepository.findAllByMemberId(memberId);
+
+        return cardBooks.stream().map(CardBookInfo::from).toList();
     }
 }

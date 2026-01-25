@@ -6,6 +6,8 @@ import scanly.io.scanly_back.cardbook.domain.CardBook;
 import scanly.io.scanly_back.cardbook.domain.CardBookRepository;
 import scanly.io.scanly_back.cardbook.infrastructure.entity.CardBookEntity;
 
+import java.util.List;
+
 @Repository
 @RequiredArgsConstructor
 public class CardBookRepositoryImpl implements CardBookRepository {
@@ -34,5 +36,16 @@ public class CardBookRepositoryImpl implements CardBookRepository {
     @Override
     public boolean existsByMemberIdAndCardId(String memberId, String cardId) {
         return cardBookJpaRepository.existsByMemberIdAndCardId(memberId, cardId);
+    }
+
+    /**
+     * 회원 아이디로 명함첩 목록 조회
+     * @param memberId 회원 아이디
+     * @return 조회된 명함첩 목록
+     */
+    @Override
+    public List<CardBook> findAllByMemberId(String memberId) {
+        List<CardBookEntity> cardBookEntities = cardBookJpaRepository.findAllByMemberId(memberId);
+        return cardBookEntities.stream().map(cardBookMapper::toDomain).toList();
     }
 }
