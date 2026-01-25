@@ -45,7 +45,9 @@ public class CardBookMapper {
                 entity.getProfileSnapshot(),
                 entity.getGroupId(),
                 entity.getMemo(),
-                entity.isFavorite()
+                entity.isFavorite(),
+                entity.getCreatedAt(),
+                entity.getUpdatedAt()
         );
     }
 }

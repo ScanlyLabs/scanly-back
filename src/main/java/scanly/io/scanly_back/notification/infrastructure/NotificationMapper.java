@@ -47,7 +47,9 @@ public class NotificationMapper {
                 entity.getTitle(),
                 entity.getBody(),
                 entity.getData(),
-                entity.isRead()
+                entity.isRead(),
+                entity.getCreatedAt(),
+                entity.getUpdatedAt()
         );
     }
 }

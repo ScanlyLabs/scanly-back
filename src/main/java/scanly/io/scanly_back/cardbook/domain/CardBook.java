@@ -2,6 +2,8 @@ package scanly.io.scanly_back.cardbook.domain;
 
 import scanly.io.scanly_back.common.domain.BaseDomain;
 
+import java.time.LocalDateTime;
+
 public class CardBook extends BaseDomain {
     private String id;
     private String memberId;             // 소유자 ID
@@ -14,8 +16,10 @@ public class CardBook extends BaseDomain {
     private CardBook(
             String id, String memberId, String cardId,
             String profileSnapshot, String groupId, String memo,
-            boolean isFavorite
+            boolean isFavorite,
+            LocalDateTime createdAt, LocalDateTime updatedAt
     ) {
+        super(createdAt, updatedAt);
         this.id = id;
         this.memberId = memberId;
         this.cardId = cardId;
@@ -28,12 +32,14 @@ public class CardBook extends BaseDomain {
     public static CardBook of(
             String id, String memberId, String cardId,
             String profileSnapshot, String groupId,
-            String memo, boolean isFavorite
+            String memo, boolean isFavorite,
+            LocalDateTime createdAt, LocalDateTime updatedAt
     ) {
         return new CardBook(
                 id, memberId, cardId,
                 profileSnapshot, groupId,
-                memo, isFavorite
+                memo, isFavorite,
+                createdAt, updatedAt
         );
     }
 
@@ -45,7 +51,9 @@ public class CardBook extends BaseDomain {
                 profileSnapshot,
                 groupId,
                 null,
-                false
+                false,
+                null,
+                null
         );
     }
 

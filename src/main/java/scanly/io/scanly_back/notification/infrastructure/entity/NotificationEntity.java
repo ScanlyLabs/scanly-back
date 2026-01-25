@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import scanly.io.scanly_back.common.entity.BaseEntity;
 import scanly.io.scanly_back.notification.domain.model.NotificationStatus;
 import scanly.io.scanly_back.notification.domain.model.NotificationType;
 
@@ -13,7 +14,7 @@ import scanly.io.scanly_back.notification.domain.model.NotificationType;
 @Table(name = "notification")
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class NotificationEntity {
+public class NotificationEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;

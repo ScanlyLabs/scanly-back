@@ -4,6 +4,8 @@ import scanly.io.scanly_back.common.domain.BaseDomain;
 import scanly.io.scanly_back.notification.domain.model.NotificationStatus;
 import scanly.io.scanly_back.notification.domain.model.NotificationType;
 
+import java.time.LocalDateTime;
+
 public class Notification extends BaseDomain {
     private String id;
     private String receiverId;            // 수신자 ID
@@ -16,8 +18,10 @@ public class Notification extends BaseDomain {
 
     private Notification(
             String id, String receiverId, NotificationStatus status, NotificationType type,
-            String title, String body, String data, boolean isRead
+            String title, String body, String data, boolean isRead,
+            LocalDateTime createdAt, LocalDateTime updatedAt
     ) {
+        super(createdAt, updatedAt);
         this.id = id;
         this.receiverId = receiverId;
         this.status = status;
@@ -30,7 +34,8 @@ public class Notification extends BaseDomain {
 
     public static Notification of(
             String id, String receiverId, NotificationStatus status, NotificationType type,
-            String title, String body, String data, boolean isRead
+            String title, String body, String data, boolean isRead,
+            LocalDateTime createdAt, LocalDateTime updatedAt
     ) {
         return new Notification(id, receiverId, status, type, title, body, data, isRead);
     }
@@ -43,7 +48,9 @@ public class Notification extends BaseDomain {
                 title,
                 body,
                 data,
-                false
+                false,
+                null,
+                null
         );
     }
 
