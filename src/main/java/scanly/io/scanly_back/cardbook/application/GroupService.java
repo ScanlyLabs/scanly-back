@@ -6,12 +6,17 @@ import org.springframework.transaction.annotation.Transactional;
 import scanly.io.scanly_back.cardbook.application.dto.command.CreateGroupCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.RenameGroupCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.ReorderGroupCommand;
+import scanly.io.scanly_back.cardbook.application.dto.info.DefaultGroupInfo;
 import scanly.io.scanly_back.cardbook.application.dto.info.GroupInfo;
+import scanly.io.scanly_back.cardbook.application.dto.info.GroupListInfo;
+import scanly.io.scanly_back.cardbook.application.dto.info.GroupWithCountInfo;
+import scanly.io.scanly_back.cardbook.domain.CardBookRepository;
 import scanly.io.scanly_back.cardbook.domain.Group;
 import scanly.io.scanly_back.cardbook.domain.GroupRepository;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,7 +26,10 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class GroupService {
 
+    private static final int RECENT_DAYS = 7;
+
     private final GroupRepository groupRepository;
+    private final CardBookRepository cardBookRepository;
 
 
     /**
@@ -45,16 +53,36 @@ public class GroupService {
     }
 
     /**
-     * 내 명함첩 그룹 목록 조회
+     * 내 명함첩 그룹 목록 조회 (개수 포함)
+     * 1. 기본 그룹 (전체, 즐겨찾기, 최근) 조회
+     * 2. 사용자 정의 그룹 조회
      * @param memberId 회원 아이디
-     * @return 조회된 그룹 목록
+     * @return 조회된 그룹 목록 (개수 포함)
      */
-    public List<GroupInfo> getAll(String memberId) {
-        List<Group> groups = groupRepository.findAllByMemberId(memberId);
+    public GroupListInfo getAll(String memberId) {
+        // 1. 기본 그룹
+        long totalCount = cardBookRepository.countByMemberId(memberId);
+        long favoriteCount = cardBookRepository.countByMemberIdAndFavorite(memberId);
+        long recentCount = cardBookRepository.countByMemberIdAndCreatedAtAfter(
+                memberId, LocalDateTime.now().minusDays(RECENT_DAYS)
+        );
 
-        return groups.stream()
-                .map(GroupInfo::from)
+        List<DefaultGroupInfo> defaultGroups = List.of(
+                DefaultGroupInfo.of("all", "전체", totalCount),
+                DefaultGroupInfo.of("favorite", "즐겨찾기", favoriteCount),
+                DefaultGroupInfo.of("recent", "최근", recentCount)
+        );
+
+        // 2. 사용자 정의 그룹
+        List<Group> groups = groupRepository.findAllByMemberId(memberId);
+        List<GroupWithCountInfo> customGroups = groups.stream()
+                .map(group -> {
+                    long count = cardBookRepository.countByMemberIdAndGroupId(memberId, group.getId());
+                    return GroupWithCountInfo.of(group, count);
+                })
                 .toList();
+
+        return GroupListInfo.of(defaultGroups, customGroups);
     }
 
     /**

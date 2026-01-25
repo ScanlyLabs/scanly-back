@@ -8,6 +8,7 @@ import scanly.io.scanly_back.cardbook.domain.CardBook;
 import scanly.io.scanly_back.cardbook.domain.CardBookRepository;
 import scanly.io.scanly_back.cardbook.infrastructure.entity.CardBookEntity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -95,5 +96,25 @@ public class CardBookRepositoryImpl implements CardBookRepository {
     @Override
     public void deleteById(String id) {
         cardBookJpaRepository.deleteById(id);
+    }
+
+    @Override
+    public long countByMemberId(String memberId) {
+        return cardBookJpaRepository.countByMemberId(memberId);
+    }
+
+    @Override
+    public long countByMemberIdAndFavorite(String memberId) {
+        return cardBookJpaRepository.countByMemberIdAndIsFavoriteTrue(memberId);
+    }
+
+    @Override
+    public long countByMemberIdAndCreatedAtAfter(String memberId, LocalDateTime after) {
+        return cardBookJpaRepository.countByMemberIdAndCreatedAtAfter(memberId, after);
+    }
+
+    @Override
+    public long countByMemberIdAndGroupId(String memberId, String groupId) {
+        return cardBookJpaRepository.countByMemberIdAndGroupId(memberId, groupId);
     }
 }

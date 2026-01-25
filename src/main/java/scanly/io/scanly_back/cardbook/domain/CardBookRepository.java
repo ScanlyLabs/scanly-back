@@ -3,6 +3,7 @@ package scanly.io.scanly_back.cardbook.domain;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,4 +22,12 @@ public interface CardBookRepository {
     CardBook update(CardBook cardBook);
 
     void deleteById(String id);
+
+    long countByMemberId(String memberId);
+
+    long countByMemberIdAndFavorite(String memberId);
+
+    long countByMemberIdAndCreatedAtAfter(String memberId, LocalDateTime after);
+
+    long countByMemberIdAndGroupId(String memberId, String groupId);
 }
