@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import scanly.io.scanly_back.cardbook.application.CardBookService;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardBookInfo;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.SaveCardBookRequest;
+import scanly.io.scanly_back.cardbook.presentation.dto.request.UpdateCardBookFavoriteRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.UpdateCardBookGroupRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.UpdateCardBookMemoRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.response.CardBookResponse;
@@ -86,6 +87,19 @@ public class CardBookController {
             @RequestBody UpdateCardBookMemoRequest request
     ) {
         CardBookInfo cardBookInfo = cardBookService.updateMemo(request.toCommand(memberId, id));
+
+        return ResponseEntity.ok(ApiResponse.success(CardBookResponse.from(cardBookInfo)));
+    }
+
+    @PostMapping("/{id}/favorite")
+    @Operation(summary = "명함첩 즐겨찾기 수정", description = "명함첩의 즐겨찾기를 수정합니다.")
+    public ResponseEntity<ApiResponse<CardBookResponse>> updateFavorite(
+            @AuthenticationPrincipal String memberId,
+            @Parameter(description = "명함첩 ID", required = true)
+            @PathVariable String id,
+            @RequestBody UpdateCardBookFavoriteRequest request
+    ) {
+        CardBookInfo cardBookInfo = cardBookService.updateFavorite(request.toCommand(memberId, id));
 
         return ResponseEntity.ok(ApiResponse.success(CardBookResponse.from(cardBookInfo)));
     }

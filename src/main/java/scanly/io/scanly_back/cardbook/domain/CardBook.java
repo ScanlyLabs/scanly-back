@@ -65,6 +65,14 @@ public class CardBook extends BaseDomain {
         this.memo = memo;
     }
 
+    /**
+     * 명함첩 즐겨찾기 수정
+     * @param favorite 즐겨찾기 여부
+     */
+    public void updateFavorite(boolean favorite) {
+        this.isFavorite = favorite;
+    }
+
     // getters
     public String getId() {
         return id;
