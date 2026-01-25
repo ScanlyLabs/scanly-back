@@ -84,7 +84,7 @@ public class CardBookController {
             @AuthenticationPrincipal String memberId,
             @Parameter(description = "명함첩 ID", required = true)
             @PathVariable String id,
-            @RequestBody UpdateCardBookMemoRequest request
+            @Valid @RequestBody UpdateCardBookMemoRequest request
     ) {
         CardBookInfo cardBookInfo = cardBookService.updateMemo(request.toCommand(memberId, id));
 
