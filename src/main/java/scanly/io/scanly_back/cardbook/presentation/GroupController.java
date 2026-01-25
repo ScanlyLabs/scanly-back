@@ -11,9 +11,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import scanly.io.scanly_back.cardbook.application.GroupService;
 import scanly.io.scanly_back.cardbook.application.dto.info.GroupInfo;
+import scanly.io.scanly_back.cardbook.application.dto.info.GroupListInfo;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.CreateGroupRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.RenameGroupRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.ReorderGroupRequest;
+import scanly.io.scanly_back.cardbook.presentation.dto.response.GroupListResponse;
 import scanly.io.scanly_back.cardbook.presentation.dto.response.GroupResponse;
 import scanly.io.scanly_back.common.response.ApiResponse;
 
@@ -42,15 +44,12 @@ public class GroupController {
 
     @GetMapping
     @Operation(summary = "명함첩 그룹 목록 조회", description = "명함첩 그룹 목록을 조회합니다.")
-    public ResponseEntity<ApiResponse<List<GroupResponse>>> getGroups(
+    public ResponseEntity<ApiResponse<GroupListResponse>> getGroups(
             @AuthenticationPrincipal String memberId
     ) {
-        List<GroupInfo> groupInfos = groupService.getAll(memberId);
-        List<GroupResponse> responses = groupInfos.stream()
-                .map(GroupResponse::from)
-                .toList();
+        GroupListInfo groupListInfo = groupService.getAll(memberId);
 
-        return ResponseEntity.ok(ApiResponse.success(responses));
+        return ResponseEntity.ok(ApiResponse.success(GroupListResponse.from(groupListInfo)));
     }
 
     @PostMapping("/{id}/rename")
