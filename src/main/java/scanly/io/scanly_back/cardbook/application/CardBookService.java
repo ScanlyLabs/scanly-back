@@ -73,7 +73,7 @@ public class CardBookService {
 
         // 중복 저장 검증
         if (cardBookRepository.existsByMemberIdAndCardId(memberId, cardId)) {
-            throw new CustomException(ErrorCode.CARDBOOK_ALREADY_EXISTS);
+            throw new CustomException(ErrorCode.CARD_BOOK_ALREADY_EXISTS);
         }
     }
 
@@ -105,9 +105,23 @@ public class CardBookService {
      * @param memberId 회원 아이디
      * @return 조회된 명함첩 목록
      */
-    public List<CardBookInfo> getAll(String memberId) {
+    public List<CardBookInfo> readAll(String memberId) {
         List<CardBook> cardBooks = cardBookRepository.findAllByMemberId(memberId);
 
         return cardBooks.stream().map(CardBookInfo::from).toList();
+    }
+
+    /**
+     * 명함첩 상세 조회
+     * @param memberId 회원 아이디
+     * @param id 명함첩 아이디
+     * @return 조회된 명함첩
+     */
+    public CardBookInfo read(String memberId, String id) {
+        CardBook cardBook
+                = cardBookRepository.findByIdAndMemberId(id, memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CARD_BOOK_NOT_FOUND));
+
+        return CardBookInfo.from(cardBook);
     }
 }

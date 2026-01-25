@@ -1,6 +1,7 @@
 package scanly.io.scanly_back.cardbook.presentation;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,13 +40,25 @@ public class CardBookController {
 
     @GetMapping
     @Operation(summary = "명함첩 목록 조회", description = "명함첩 목록을 조회합니다.")
-    public ResponseEntity<ApiResponse<List<CardBookResponse>>> getCardBookList(
+    public ResponseEntity<ApiResponse<List<CardBookResponse>>> readCardBookList(
             @AuthenticationPrincipal String memberId
     ) {
-        List<CardBookInfo> cardBookInfos = cardBookService.getAll(memberId);
+        List<CardBookInfo> cardBookInfos = cardBookService.readAll(memberId);
         List<CardBookResponse> cardBookResponses
                 = cardBookInfos.stream().map(CardBookResponse::from).toList();
 
         return ResponseEntity.ok(ApiResponse.success(cardBookResponses));
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "명함첩 상세 조회", description = "특정 명함첩을 조회합니다.")
+    public ResponseEntity<ApiResponse<CardBookResponse>> readCardBook(
+            @AuthenticationPrincipal String memberId,
+            @Parameter(description = "명함첩 ID", required = true)
+            @PathVariable String id
+    ) {
+        CardBookInfo cardBookInfo = cardBookService.read(memberId, id);
+
+        return ResponseEntity.ok(ApiResponse.success(CardBookResponse.from(cardBookInfo)));
     }
 }
