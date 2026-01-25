@@ -150,7 +150,6 @@ public class CardService {
         Card card = findByMemberId(command.memberId());
 
         card.update(
-                command.name(),
                 command.title(),
                 command.company(),
                 command.phone(),

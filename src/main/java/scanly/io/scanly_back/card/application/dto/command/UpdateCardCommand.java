@@ -4,7 +4,6 @@ import java.util.List;
 
 public record UpdateCardCommand(
         String memberId,
-        String name,
         String title,
         String company,
         String phone,
