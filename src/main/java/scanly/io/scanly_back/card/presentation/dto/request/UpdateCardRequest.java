@@ -11,9 +11,6 @@ import scanly.io.scanly_back.card.application.dto.command.UpdateCardCommand;
 import java.util.List;
 
 public record UpdateCardRequest(
-        @NotBlank(message = "이름은 필수입니다.")
-        @Size(min = 2, max = 30, message = "이름은 2-30자여야 합니다.")
-        String name,
 
         @NotBlank(message = "직함은 필수입니다.")
         @Size(min = 2, max = 50, message = "직함은 2-50자여야 합니다.")
@@ -56,7 +53,6 @@ public record UpdateCardRequest(
 
         return new UpdateCardCommand(
                 memberId,
-                name,
                 title,
                 company,
                 phone,
