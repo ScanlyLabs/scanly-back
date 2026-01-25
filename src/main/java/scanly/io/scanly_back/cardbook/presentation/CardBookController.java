@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import scanly.io.scanly_back.cardbook.application.CardBookService;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardBookInfo;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.SaveCardBookRequest;
+import scanly.io.scanly_back.cardbook.presentation.dto.request.UpdateCardBookGroupRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.response.CardBookResponse;
 import scanly.io.scanly_back.common.response.ApiResponse;
 
@@ -58,6 +59,19 @@ public class CardBookController {
             @PathVariable String id
     ) {
         CardBookInfo cardBookInfo = cardBookService.read(memberId, id);
+
+        return ResponseEntity.ok(ApiResponse.success(CardBookResponse.from(cardBookInfo)));
+    }
+
+    @PostMapping("/{id}/group")
+    @Operation(summary = "명함첩 그룹 수정", description = "명함첩의 소속 그룹을 수정합니다.")
+    public ResponseEntity<ApiResponse<CardBookResponse>> updateGroup(
+            @AuthenticationPrincipal String memberId,
+            @Parameter(description = "명함첩 ID", required = true)
+            @PathVariable String id,
+            @Valid @RequestBody UpdateCardBookGroupRequest request
+    ) {
+        CardBookInfo cardBookInfo = cardBookService.updateGroup(request.toCommand(memberId, id));
 
         return ResponseEntity.ok(ApiResponse.success(CardBookResponse.from(cardBookInfo)));
     }

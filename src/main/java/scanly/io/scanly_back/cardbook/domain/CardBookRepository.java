@@ -12,4 +12,6 @@ public interface CardBookRepository {
     List<CardBook> findAllByMemberId(String memberId);
 
     Optional<CardBook> findByIdAndMemberId(String id, String memberId);
+
+    CardBook update(CardBook cardBook);
 }
