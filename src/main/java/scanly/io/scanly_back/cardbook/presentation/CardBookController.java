@@ -105,4 +105,16 @@ public class CardBookController {
 
         return ResponseEntity.ok(ApiResponse.success(CardBookResponse.from(cardBookInfo)));
     }
+
+    @PostMapping("/{id}/delete")
+    @Operation(summary = "명함첩 삭제", description = "특정 명함첩을 삭제합니다.")
+    public ResponseEntity<ApiResponse<Void>> delete(
+            @AuthenticationPrincipal String memberId,
+            @Parameter(description = "명함첩 ID", required = true)
+            @PathVariable String id
+    ) {
+        cardBookService.delete(memberId, id);
+
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
 }

@@ -87,4 +87,13 @@ public class CardBookRepositoryImpl implements CardBookRepository {
         CardBookEntity updatedCardBookEntity = cardBookJpaRepository.save(cardBookEntity);
         return cardBookMapper.toDomain(updatedCardBookEntity);
     }
+
+    /**
+     * 명함첩 제거
+     * @param id 아이디
+     */
+    @Override
+    public void deleteById(String id) {
+        cardBookJpaRepository.deleteById(id);
+    }
 }

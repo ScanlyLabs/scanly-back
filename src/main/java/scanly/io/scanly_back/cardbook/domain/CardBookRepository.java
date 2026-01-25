@@ -19,4 +19,6 @@ public interface CardBookRepository {
     Optional<CardBook> findByIdAndMemberId(String id, String memberId);
 
     CardBook update(CardBook cardBook);
+
+    void deleteById(String id);
 }
