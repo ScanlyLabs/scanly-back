@@ -204,4 +204,14 @@ public class CardBookService {
 
         return CardBookInfo.from(updatedCardBook);
     }
+
+    /**
+     * 명함첩 삭제
+     * @param memberId 회원 아이디
+     * @param id 아이디
+     */
+    public void delete(String memberId, String id) {
+        CardBook cardBook = getByIdAndMemberId(id, memberId);
+        cardBookRepository.deleteById(cardBook.getId());
+    }
 }
