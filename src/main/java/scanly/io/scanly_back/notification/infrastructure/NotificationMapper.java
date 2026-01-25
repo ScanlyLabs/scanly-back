@@ -25,7 +25,9 @@ public class NotificationMapper {
                 domain.getTitle(),
                 domain.getBody(),
                 domain.getData(),
-                domain.isRead()
+                domain.isRead(),
+                domain.getRetryCount(),
+                domain.getFailReason()
         );
     }
 
@@ -48,6 +50,8 @@ public class NotificationMapper {
                 entity.getBody(),
                 entity.getData(),
                 entity.isRead(),
+                entity.getRetryCount(),
+                entity.getFailReason(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
         );

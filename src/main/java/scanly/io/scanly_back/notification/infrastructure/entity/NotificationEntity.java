@@ -42,10 +42,16 @@ public class NotificationEntity extends BaseEntity {
     @Column(name = "is_read")
     private boolean isRead;             // 읽음 여부
 
+    @Column(name = "retry_count", nullable = false)
+    private int retryCount;              // 재시도 횟수
+
+    @Column(name = "fail_reason")
+    private String failReason;              // 실패 원인
+
     public static NotificationEntity of(
             String id, String receiverId, NotificationStatus status, NotificationType type,
-            String title, String body, String data, boolean isRead
+            String title, String body, String data, boolean isRead, int retryCount, String failReason
     ) {
-        return new NotificationEntity(id, receiverId, status, type, title, body, data, isRead);
+        return new NotificationEntity(id, receiverId, status, type, title, body, data, isRead, retryCount, failReason);
     }
 }

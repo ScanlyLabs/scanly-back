@@ -15,10 +15,13 @@ public class Notification extends BaseDomain {
     private String body;                // 알림 내용
     private String data;                // 추가 데이터(딥링크용)
     private boolean isRead;             // 읽음 여부
+    private int retryCount;             // 재시도 횟수
+    private String failReason;              // 실패 원인
 
     private Notification(
             String id, String receiverId, NotificationStatus status, NotificationType type,
             String title, String body, String data, boolean isRead,
+            int retryCount, String failReason,
             LocalDateTime createdAt, LocalDateTime updatedAt
     ) {
         super(createdAt, updatedAt);
@@ -30,14 +33,22 @@ public class Notification extends BaseDomain {
         this.body = body;
         this.data = data;
         this.isRead = isRead;
+        this.retryCount = retryCount;
+        this.failReason = failReason;
     }
 
     public static Notification of(
             String id, String receiverId, NotificationStatus status, NotificationType type,
             String title, String body, String data, boolean isRead,
+            int retryCount, String failReason,
             LocalDateTime createdAt, LocalDateTime updatedAt
     ) {
-        return new Notification(id, receiverId, status, type, title, body, data, isRead);
+        return new Notification(
+                id, receiverId, status, type,
+                title, body, data, isRead,
+                retryCount, failReason,
+                createdAt, updatedAt
+        );
     }
     public static Notification create(String receiverId, NotificationType type, String title, String body, String data) {
         return new Notification(
@@ -49,6 +60,8 @@ public class Notification extends BaseDomain {
                 body,
                 data,
                 false,
+                0,
+                null,
                 null,
                 null
         );
@@ -86,5 +99,13 @@ public class Notification extends BaseDomain {
 
     public boolean isRead() {
         return isRead;
+    }
+
+    public int getRetryCount() {
+        return retryCount;
+    }
+
+    public String getFailReason() {
+        return failReason;
     }
 }
