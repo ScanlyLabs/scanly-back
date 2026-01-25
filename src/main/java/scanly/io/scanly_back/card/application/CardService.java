@@ -149,10 +149,20 @@ public class CardService {
     /**
      * 회원 아이디로 명함 조회
      * @param memberId 회원 아이디
-     * @return 조호된 명함
+     * @return 조회된 명함
      */
     private Card findByMemberId(String memberId) {
         return cardRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CARD_NOT_FOUND));
+    }
+
+    /**
+     * 아이디로 명함 조회
+     * @param id 명함 아이디
+     * @return 조회된 명함
+     */
+    public Card findById(String id) {
+        return cardRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.CARD_NOT_FOUND));
     }
 

@@ -5,12 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import scanly.io.scanly_back.card.application.CardService;
 import scanly.io.scanly_back.card.domain.Card;
-import scanly.io.scanly_back.card.domain.CardRepository;
+import scanly.io.scanly_back.cardbook.application.dto.command.CardExchangeCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.SaveCardBookCommand;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardBookInfo;
+import scanly.io.scanly_back.cardbook.application.dto.info.CardExchangeInfo;
 import scanly.io.scanly_back.cardbook.domain.CardBook;
 import scanly.io.scanly_back.cardbook.domain.CardBookRepository;
+import scanly.io.scanly_back.cardbook.domain.CardExchange;
+import scanly.io.scanly_back.cardbook.domain.CardExchangeRepository;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
 
@@ -23,7 +27,8 @@ import java.util.Map;
 public class CardBookService {
 
     private final CardBookRepository cardBookRepository;
-    private final CardRepository cardRepository;
+    private final CardExchangeRepository cardExchangeRepository;
+    private final CardService cardService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
@@ -41,8 +46,7 @@ public class CardBookService {
         String cardId = command.cardId();
 
         // 1. 명함 조회
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new CustomException(ErrorCode.CARD_NOT_FOUND));
+        Card card = cardService.findById(cardId);
 
         // 2. 유효성 검증
         validateCardBook(card.getMemberId(), memberId, cardId);
@@ -55,6 +59,30 @@ public class CardBookService {
         CardBook savedCardBook = cardBookRepository.save(cardBook);
 
         return CardBookInfo.from(savedCardBook);
+    }
+
+    /**
+     * 명함 교환 내역 저장
+     * 1. 명함 조회
+     * 2. 명함 교환 내역 저장
+     * 3. 알림 전송
+     * @param command 명함 교환 정보
+     * @return 저장된 명함교환 정보
+     */
+    @Transactional
+    public CardExchangeInfo cardExchange(CardExchangeCommand command) {
+        Card card = cardService.findById(command.cardId());
+
+        // 2. 명함 교환 내역 저장
+        CardExchange cardExchange = CardExchange.create(
+                command.senderId(),
+                card.getMemberId()
+        );
+        CardExchange savedCardExchange = cardExchangeRepository.save(cardExchange);
+
+        // 3. 알림 전송
+
+        return CardExchangeInfo.from(savedCardExchange);
     }
 
     /**

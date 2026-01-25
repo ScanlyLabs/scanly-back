@@ -19,6 +19,15 @@ public class CardExchange {
         return new CardExchange(id, senderId, receiverId, exchangedAt);
     }
 
+    public static CardExchange create(String senderId, String receiverId) {
+        return new CardExchange(
+                null,
+                senderId,
+                receiverId,
+                LocalDateTime.now()
+        );
+    }
+
 
     // getters
     public String getId() {
