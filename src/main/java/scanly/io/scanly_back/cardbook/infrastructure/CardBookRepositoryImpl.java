@@ -66,6 +66,19 @@ public class CardBookRepositoryImpl implements CardBookRepository {
     }
 
     /**
+     * 회원 아이디 및 그룹 아이디로 명함첩 목록 페이징 조회
+     * @param memberId 회원 아이디
+     * @param groupId 명함첩 그룹 아이디
+     * @param pageable 페이징 정보
+     * @return 페이징된 명함첩 목록
+     */
+    @Override
+    public Page<CardBook> findAllByMemberIdAndGroupId(String memberId, String groupId, Pageable pageable) {
+        Page<CardBookEntity> cardBookEntities = cardBookJpaRepository.findAllByMemberIdAndGroupId(memberId, groupId, pageable);
+        return cardBookEntities.map(cardBookMapper::toDomain);
+    }
+
+    /**
      * 명함첩 아이디 및 회원 아이디로 명함첩 조회
      * @param id 명함첩 아이디
      * @param memberId 회원 아이디

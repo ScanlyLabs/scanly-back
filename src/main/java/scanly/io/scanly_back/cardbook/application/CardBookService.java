@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import scanly.io.scanly_back.card.domain.Card;
 import scanly.io.scanly_back.card.domain.CardRepository;
 import scanly.io.scanly_back.cardbook.application.dto.command.SaveCardBookCommand;
@@ -119,13 +120,16 @@ public class CardBookService {
     /**
      * 명함첩 목록 페이징 조회
      * @param memberId 회원 아이디
+     * @param groupId 명함첩 그룹 아이디
      * @param pageable 페이징 정보
      * @return 페이징된 명함첩 목록
      */
-    public Page<CardBookInfo> readAll(String memberId, Pageable pageable) {
-        Page<CardBook> cardBooks = cardBookRepository.findAllByMemberId(memberId, pageable);
+    public Page<CardBookInfo> readAll(String memberId, String groupId, Pageable pageable) {
+        if (!StringUtils.hasText(groupId)) {
+            return cardBookRepository.findAllByMemberId(memberId, pageable).map(CardBookInfo::from);
+        }
 
-        return cardBooks.map(CardBookInfo::from);
+        return cardBookRepository.findAllByMemberIdAndGroupId(memberId, groupId, pageable).map(CardBookInfo::from);
     }
 
     /**

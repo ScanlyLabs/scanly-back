@@ -17,6 +17,8 @@ public interface CardBookRepository {
 
     Page<CardBook> findAllByMemberId(String memberId, Pageable pageable);
 
+    Page<CardBook> findAllByMemberIdAndGroupId(String memberId, String groupId, Pageable pageable);
+
     Optional<CardBook> findByIdAndMemberId(String id, String memberId);
 
     CardBook update(CardBook cardBook);

@@ -17,6 +17,8 @@ public interface CardBookJpaRepository extends JpaRepository<CardBookEntity, Str
 
     Page<CardBookEntity> findAllByMemberId(String memberId, Pageable pageable);
 
+    Page<CardBookEntity> findAllByMemberIdAndGroupId(String memberId, String groupId, Pageable pageable);
+
     Optional<CardBookEntity> findByIdAndMemberId(String id, String memberId);
 
     long countByMemberId(String memberId);

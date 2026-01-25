@@ -47,9 +47,11 @@ public class CardBookController {
     @Operation(summary = "명함첩 목록 조회", description = "명함첩 목록을 페이징하여 조회합니다.")
     public ResponseEntity<ApiResponse<PageResponse<CardBookResponse>>> readCardBookList(
             @AuthenticationPrincipal String memberId,
+            @Parameter(description = "그룹 ID (선택)")
+            @RequestParam(required = false) String groupId,
             @PageableDefault(size = 20) Pageable pageable
     ) {
-        Page<CardBookInfo> cardBookInfos = cardBookService.readAll(memberId, pageable);
+        Page<CardBookInfo> cardBookInfos = cardBookService.readAll(memberId, groupId, pageable);
         Page<CardBookResponse> cardBookResponses = cardBookInfos.map(CardBookResponse::from);
 
         return ResponseEntity.ok(ApiResponse.success(PageResponse.from(cardBookResponses)));
