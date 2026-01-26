@@ -7,6 +7,7 @@ import scanly.io.scanly_back.notification.domain.NotificationRepository;
 import scanly.io.scanly_back.notification.infrastructure.entity.NotificationEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -49,8 +50,34 @@ public class NotificationRepositoryImpl implements NotificationRepository {
         return notificationEntities.stream().map(notificationMapper::toDomain).toList();
     }
 
+    /**
+     * 안 읽은 알림 수 조회
+     * @param memberId 수신자 아이디
+     * @return
+     */
     @Override
     public int countByReceiverIdAndReadFalse(String memberId) {
         return notificationJpaRepository.countByReceiverIdAndReadFalse(memberId);
+    }
+
+    /**
+     * 알림 조회
+     * @param id 알림 아이디
+     * @param receiverId receiverId
+     * @return 조회된 알림
+     */
+    @Override
+    public Optional<Notification> findByIdAndReceiverId(String id, String receiverId) {
+        return notificationJpaRepository.findByIdAndReceiverId(id, receiverId).map(notificationMapper::toDomain);
+    }
+
+    /**
+     * 알림 읽음 처리
+     * @param notification 알림
+     */
+    @Override
+    public void read(Notification notification) {
+        NotificationEntity notificationEntity = notificationMapper.toEntity(notification);
+        notificationJpaRepository.save(notificationEntity);
     }
 }
