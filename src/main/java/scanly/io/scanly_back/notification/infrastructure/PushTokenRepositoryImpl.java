@@ -7,6 +7,8 @@ import scanly.io.scanly_back.notification.domain.PushTokenMapper;
 import scanly.io.scanly_back.notification.domain.PushTokenRepository;
 import scanly.io.scanly_back.notification.infrastructure.entity.PushTokenEntity;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class PushTokenRepositoryImpl implements PushTokenRepository {
@@ -24,5 +26,16 @@ public class PushTokenRepositoryImpl implements PushTokenRepository {
         PushTokenEntity pushTokenEntity = pushTokenMapper.toEntity(pushToken);
         PushTokenEntity savedPushTokenEntity = pushTokenJpaRepository.save(pushTokenEntity);
         return pushTokenMapper.toDomain(savedPushTokenEntity);
+    }
+
+    /**
+     * 회원 ID로 푸시 토큰 조회
+     * @param memberId 회원 ID
+     * @return 푸시 토큰
+     */
+    @Override
+    public Optional<PushToken> findByMemberId(String memberId) {
+        return pushTokenJpaRepository.findByMemberId(memberId)
+                .map(pushTokenMapper::toDomain);
     }
 }
