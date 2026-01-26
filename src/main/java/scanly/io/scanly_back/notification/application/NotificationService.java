@@ -9,12 +9,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
+import scanly.io.scanly_back.notification.application.dto.info.NotificationInfo;
 import scanly.io.scanly_back.notification.domain.Notification;
 import scanly.io.scanly_back.notification.domain.NotificationRepository;
 import scanly.io.scanly_back.notification.domain.PushToken;
 import scanly.io.scanly_back.notification.domain.model.NotificationStatus;
 import scanly.io.scanly_back.notification.domain.model.NotificationType;
 import scanly.io.scanly_back.notification.infrastructure.ExpoPushClient;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -89,5 +92,16 @@ public class NotificationService {
             log.error("Failed to add notification type to push data. type={}, rawData={}", type, data, e);
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    /**
+     * 알림 목록 조회
+     * @param memberId 회원 아이디
+     * @return 조회된 알림 목록
+     */
+    public List<NotificationInfo> getAll(String memberId) {
+        List<Notification> notifications = notificationRepository.findAllByReceiverId(memberId);
+
+        return notifications.stream().map(NotificationInfo::from).toList();
     }
 }
