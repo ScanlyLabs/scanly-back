@@ -30,6 +30,9 @@ public enum ErrorCode {
     // group
     GROUP_NOT_FOUND(HttpStatus.NOT_FOUND, "CBG001", "명함첩 그룹이 존재하지 않습니다."),
 
+    // push_token
+    PUSH_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "P001", "푸시 토큰이 존재하지 않습니다."),
+
     // common
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "C001", "입력값이 올바르지 않습니다."),
 

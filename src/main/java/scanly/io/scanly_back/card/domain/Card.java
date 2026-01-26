@@ -80,10 +80,9 @@ public class Card extends BaseDomain {
     /**
      * 명함 수정
      */
-    public void update(String name, String title, String company, String phone,
+    public void update(String title, String company, String phone,
                        String email, String bio, String profileImageUrl,
                        String portfolioUrl, String location) {
-        this.name = name;
         this.title = title;
         this.company = company;
         this.phone = phone;

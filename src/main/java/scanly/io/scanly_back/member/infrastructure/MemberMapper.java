@@ -20,6 +20,7 @@ public class MemberMapper {
         return MemberEntity.of(
                 member.getId(),
                 member.getLoginId(),
+                member.getName(),
                 member.getPassword(),
                 member.getEmail(),
                 member.getStatus(),
@@ -40,6 +41,7 @@ public class MemberMapper {
         return Member.of(
                 entity.getId(),
                 entity.getLoginId(),
+                entity.getName(),
                 entity.getPassword(),
                 entity.getEmail(),
                 entity.getStatus(),

@@ -32,8 +32,9 @@ public class CardService {
     /**
      * 명함 등록
      * 1. 중복 명함 확인(인당 명함 1개)
-     * 2. 명함 생성
-     * 3. QR 코드 생성 및 S3 업로드
+     * 2. 회원 조회
+     * 3. 명함 생성
+     * 4. QR 코드 생성 및 S3 업로드
      * @param command 명함 등록 정보
      * @return 신규 명함 정보
      */
@@ -44,10 +45,42 @@ public class CardService {
         // 1. 중복 명함 확인(인당 명함 1개)
         validateDuplicateCard(memberId);
 
-        // 2. 명함 생성
+        // 2. 회원 조회
+        Member member = memberService.findById(command.memberId());
+
+        // 3. 명함 생성
+        Card savedCard = registerCard(command, memberId, member.getName());
+
+        // 4. QR 코드 생성 및 S3 업로드
+        Card cardWithQr = generateQrCode(member.getLoginId(), savedCard);
+
+        return RegisterCardInfo.from(cardWithQr);
+    }
+
+    /**
+     * QR 코드 생성 및 S3 업로드
+     * @param loginId 회원 로그인 아이디
+     * @param card 수정할 명함
+     * @return 수정된 명함
+     */
+    private Card generateQrCode(String loginId, Card card) {
+        byte[] qrCodeBytes = qrCodeGenerator.generateQrCodeBytes(loginId);
+        String qrCodeUrl = s3Service.uploadBytes(qrCodeBytes, "qrcodes", "png", "image/png");
+        card.assignQrCode(qrCodeUrl);
+        return cardRepository.updateOnlyCard(card);
+    }
+
+    /**
+     * 명함 생성
+     * @param command 명함 정보
+     * @param memberId 회원 아이디
+     * @param name 회원명
+     * @return 저장된 명함
+     */
+    private Card registerCard(RegisterCardCommand command, String memberId, String name) {
         Card card = Card.create(
                 memberId,
-                command.name(),
+                name,
                 command.title(),
                 command.company(),
                 command.phone(),
@@ -57,19 +90,9 @@ public class CardService {
                 command.portfolioUrl(),
                 command.location()
         );
-
+        // 소셜 링크 추가
         addSocialLinks(command.socialLinks(), card);
-
-        Card savedCard = cardRepository.save(card);
-
-        // 3. QR 코드 생성 및 S3 업로드
-        Member member = memberService.findById(memberId);
-        byte[] qrCodeBytes = qrCodeGenerator.generateQrCodeBytes(member.getLoginId());
-        String qrCodeUrl = s3Service.uploadBytes(qrCodeBytes, "qrcodes", "png", "image/png");
-        savedCard.assignQrCode(qrCodeUrl);
-        Card cardWithQr = cardRepository.updateOnlyCard(savedCard);
-
-        return RegisterCardInfo.from(cardWithQr);
+        return cardRepository.save(card);
     }
 
     /**
@@ -127,7 +150,6 @@ public class CardService {
         Card card = findByMemberId(command.memberId());
 
         card.update(
-                command.name(),
                 command.title(),
                 command.company(),
                 command.phone(),

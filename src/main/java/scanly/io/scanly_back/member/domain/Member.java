@@ -8,29 +8,32 @@ public class Member extends BaseDomain {
 
     private String id;
     private String loginId;
+    private String name;
     private String password;
     private String email;
     private MemberStatus status;
     private LocalDateTime withdrawnAt;
 
     private Member(
-            String id, String loginId, String password,
-            String email, MemberStatus status,
+            String id, String loginId, String name,
+            String password, String email, MemberStatus status,
             LocalDateTime withdrawnAt, LocalDateTime createdAt, LocalDateTime updatedAt
     ) {
         super(createdAt, updatedAt);
         this.id = id;
         this.loginId = loginId;
+        this.name = name;
         this.password = password;
         this.email = email;
         this.status = status;
         this.withdrawnAt = withdrawnAt;
     }
 
-    public static Member signUP(String loginId, String password, String email) {
+    public static Member signUP(String loginId, String name, String password, String email) {
         return new Member(
                 null,
                 loginId,
+                name,
                 password,
                 email,
                 MemberStatus.ACTIVE,
@@ -41,13 +44,15 @@ public class Member extends BaseDomain {
     }
 
     public static Member of(
-            String id, String loginId, String password, String email,
+            String id, String loginId, String name,
+            String password, String email,
             MemberStatus status, LocalDateTime withdrawnAt,
             LocalDateTime createdAt, LocalDateTime updatedAt
     ) {
         return new Member(
                 id,
                 loginId,
+                name,
                 password,
                 email,
                 status,
@@ -64,6 +69,10 @@ public class Member extends BaseDomain {
 
     public String getLoginId() {
         return loginId;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getPassword() {
