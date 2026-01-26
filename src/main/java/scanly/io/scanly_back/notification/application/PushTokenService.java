@@ -18,19 +18,25 @@ public class PushTokenService {
     private final PushTokenRepository pushTokenRepository;
 
     /**
-     * 푸시 토큰 등록
+     * 푸시 토큰 등록 (upsert)
+     * 이미 등록된 토큰이 있으면 업데이트, 없으면 새로 생성
      * @param command 토큰 등록 정보
      * @return 등록된 푸시 토큰
      */
     @Transactional
     public PushTokenInfo register(RegisterPushTokenCommand command) {
-        PushToken pushToken = PushToken.create(
-                command.memberId(),
-                command.token(),
-                command.platform()
-        );
-        PushToken savedPushToken = pushTokenRepository.save(pushToken);
+        PushToken pushToken = pushTokenRepository.findByMemberId(command.memberId())
+                .map(existing -> {
+                    existing.update(command.token(), command.platform());
+                    return existing;
+                })
+                .orElseGet(() -> PushToken.create(
+                        command.memberId(),
+                        command.token(),
+                        command.platform()
+                ));
 
+        PushToken savedPushToken = pushTokenRepository.save(pushToken);
         return PushTokenInfo.from(savedPushToken);
     }
 

@@ -59,4 +59,9 @@ public class PushToken extends BaseDomain {
     public PushPlatform getPlatform() {
         return platform;
     }
+
+    public void update(String token, PushPlatform platform) {
+        this.token = token;
+        this.platform = platform;
+    }
 }
