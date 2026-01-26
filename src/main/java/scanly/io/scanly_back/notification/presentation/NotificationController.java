@@ -33,6 +33,15 @@ public class NotificationController {
                 = notificationInfos.stream().map(NotificationResponse::from).toList();
 
         return ResponseEntity.ok(ApiResponse.success(notificationResponses));
+    }
 
+    @GetMapping("/unread-count")
+    @Operation(summary = "안 읽은 알림 수 조회", description = "안 읽은 알림 수를 조회합니다.")
+    public ResponseEntity<ApiResponse<Integer>> getUnreadCount(
+            @AuthenticationPrincipal String memberId
+    ) {
+        int count = notificationService.getUnreadCount(memberId);
+
+        return ResponseEntity.ok(ApiResponse.success(count));
     }
 }

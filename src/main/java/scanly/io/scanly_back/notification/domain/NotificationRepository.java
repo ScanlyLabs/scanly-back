@@ -8,4 +8,6 @@ public interface NotificationRepository {
     Notification updateStatus(Notification notification);
 
     List<Notification> findAllByReceiverId(String memberId);
+
+    int countByReceiverIdAndReadFalse(String memberId);
 }
