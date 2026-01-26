@@ -104,4 +104,13 @@ public class NotificationService {
 
         return notifications.stream().map(NotificationInfo::from).toList();
     }
+
+    /**
+     * 안 읽은 알림 수 조회
+     * @param memberId 회원 아이디
+     * @return 안 읽음 알림 수
+     */
+    public int getUnreadCount(String memberId) {
+        return notificationRepository.countByReceiverIdAndReadFalse(memberId);
+    }
 }

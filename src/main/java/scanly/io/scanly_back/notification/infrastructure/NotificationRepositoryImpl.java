@@ -48,4 +48,9 @@ public class NotificationRepositoryImpl implements NotificationRepository {
         List<NotificationEntity> notificationEntities = notificationJpaRepository.findAllByReceiverId(memberId);
         return notificationEntities.stream().map(notificationMapper::toDomain).toList();
     }
+
+    @Override
+    public int countByReceiverIdAndReadFalse(String memberId) {
+        return notificationJpaRepository.countByReceiverIdAndReadFalse(memberId);
+    }
 }
