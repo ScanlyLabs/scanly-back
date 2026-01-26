@@ -24,4 +24,15 @@ public class NotificationRepositoryImpl implements NotificationRepository {
         NotificationEntity savedNotificationEntity = notificationJpaRepository.save(notificationEntity);
         return notificationMapper.toDomain(savedNotificationEntity);
     }
+
+    /**
+     * 알림 유형 수정
+     * @param notification 알림
+     */
+    @Override
+    public Notification updateStatus(Notification notification) {
+        NotificationEntity notificationEntity = notificationMapper.toEntity(notification);
+        NotificationEntity savedNotificationEntity = notificationJpaRepository.save(notificationEntity);
+        return notificationMapper.toDomain(savedNotificationEntity);
+    }
 }

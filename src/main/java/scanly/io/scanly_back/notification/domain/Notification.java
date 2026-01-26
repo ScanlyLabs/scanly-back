@@ -67,6 +67,14 @@ public class Notification extends BaseDomain {
         );
     }
 
+    /**
+     * 알림 전송 상태 변경
+     * @param notificationStatus 알림 상태
+     */
+    public void changeStatus(NotificationStatus notificationStatus) {
+        this.status = notificationStatus;
+    }
+
     // getters
 
     public String getId() {
