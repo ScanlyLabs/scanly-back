@@ -12,6 +12,14 @@ public record SignUpRequest(
         @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "로그인 아이디는 영문, 숫자, 언더스코어만 허용됩니다.")
         String loginId,
 
+        @NotBlank(message = "이름은 필수입니다.")
+        @Size(min = 2, max = 20, message = "이름은 2~20자여야 합니다.")
+        @Pattern(
+                regexp = "^[가-힣a-zA-Z]+$",
+                message = "이름은 한글 또는 영문만 입력할 수 있습니다."
+        )
+        String name,
+
         @NotBlank(message = "비밀번호는 필수입니다.")
         @Size(min = 8, message = "비밀번호는 최소 8자 이상이어야 합니다.")
         @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).+$", message = "비밀번호는 영문과 숫자를 포함해야 합니다.")
@@ -29,6 +37,7 @@ public record SignUpRequest(
     public SignUpCommand toCommand() {
         return new SignUpCommand(
                 loginId,
+                name,
                 password,
                 email
         );

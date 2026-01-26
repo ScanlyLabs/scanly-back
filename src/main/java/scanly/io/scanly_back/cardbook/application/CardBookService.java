@@ -3,34 +3,51 @@ package scanly.io.scanly_back.cardbook.application;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import scanly.io.scanly_back.card.application.CardService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import scanly.io.scanly_back.card.domain.Card;
-import scanly.io.scanly_back.card.domain.CardRepository;
+import scanly.io.scanly_back.cardbook.application.dto.command.CardExchangeCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.SaveCardBookCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.UpdateCardBookFavoriteCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.UpdateCardBookGroupCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.UpdateCardBookMemoCommand;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardBookInfo;
+import scanly.io.scanly_back.cardbook.application.dto.info.CardExchangeInfo;
 import scanly.io.scanly_back.cardbook.domain.CardBook;
 import scanly.io.scanly_back.cardbook.domain.CardBookRepository;
+import scanly.io.scanly_back.cardbook.domain.CardExchange;
+import scanly.io.scanly_back.cardbook.domain.CardExchangeRepository;
+import scanly.io.scanly_back.cardbook.domain.event.CardExchangedEvent;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
+import scanly.io.scanly_back.member.domain.Member;
+import scanly.io.scanly_back.member.domain.MemberRepository;
+import scanly.io.scanly_back.notification.domain.model.NotificationTemplate;
+import scanly.io.scanly_back.notification.domain.model.NotificationType;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CardBookService {
 
     private final CardBookRepository cardBookRepository;
-    private final CardRepository cardRepository;
+    private final CardExchangeRepository cardExchangeRepository;
+    private final CardService cardService;
+    private final MemberRepository memberRepository;
+    private final ApplicationEventPublisher eventPublisher;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
@@ -48,8 +65,7 @@ public class CardBookService {
         String cardId = command.cardId();
 
         // 1. 명함 조회
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new CustomException(ErrorCode.CARD_NOT_FOUND));
+        Card card = cardService.findById(cardId);
 
         // 2. 유효성 검증
         validateCardBook(card.getMemberId(), memberId, cardId);
@@ -81,6 +97,78 @@ public class CardBookService {
         if (cardBookRepository.existsByMemberIdAndCardId(memberId, cardId)) {
             throw new CustomException(ErrorCode.CARD_BOOK_ALREADY_EXISTS);
         }
+    }
+
+    /**
+     * 명함 교환 내역 저장
+     * 1. 명함 조회
+     * 2. 명함 교환 내역 저장
+     * 3. 명함 교환 이벤트 발행
+     * @param command 명함 교환 정보
+     * @return 저장된 명함교환 정보
+     */
+    @Transactional
+    public CardExchangeInfo cardExchange(CardExchangeCommand command) {
+        Card card = cardService.findById(command.cardId());
+
+        String senderId = command.senderId();
+        String receiverId = card.getMemberId();
+
+        // 2. 명함 교환 내역 저장
+        CardExchange savedCardExchange = saveCardExchange(senderId, receiverId);
+
+        // 3. 명함 교환 이벤트 발행
+        publishCardExchangedEvent(senderId, receiverId);
+
+        return CardExchangeInfo.from(savedCardExchange);
+    }
+
+    /**
+     * 명함 교환 이벤트 발행
+     * 1. 발신자 조회
+     * 2. 명함 교환 이벤트 발행
+     * @param senderId 발신자 아이디
+     * @param receiverId 수신자 아이디
+     */
+    private void publishCardExchangedEvent(String senderId, String receiverId) {
+        // 1. 발신자 조회
+        Member member = memberRepository.findById(senderId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        // 2. 명함 교환 이벤트 발행
+        String data;
+        try {
+            data = objectMapper.writeValueAsString(
+                    Map.of("senderLoginId", member.getLoginId())
+            );
+        } catch (JsonProcessingException e) {
+            log.error("Failed to publish CardExchangedEvent", e);
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
+
+        CardExchangedEvent cardExchangedEvent = CardExchangedEvent.of(
+                receiverId,
+                NotificationType.CARD_EXCHANGE,
+                NotificationTemplate.CARD_EXCHANGE.getTitle(),
+                NotificationTemplate.CARD_EXCHANGE.formatBody(member.getName()),
+                data
+
+        );
+        eventPublisher.publishEvent(cardExchangedEvent);
+    }
+
+    /**
+     * 명함 교환 내역 저장
+     * @param senderId 발신자 아이디
+     * @param receiverId 수신자 아이디
+     * @return 저장된 명함 교환 내역
+     */
+    private CardExchange saveCardExchange(String senderId, String receiverId) {
+        CardExchange cardExchange = CardExchange.create(
+                senderId,
+                receiverId
+        );
+        return cardExchangeRepository.save(cardExchange);
     }
 
     /**

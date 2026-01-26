@@ -14,11 +14,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import scanly.io.scanly_back.cardbook.application.CardBookService;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardBookInfo;
+import scanly.io.scanly_back.cardbook.application.dto.info.CardExchangeInfo;
+import scanly.io.scanly_back.cardbook.presentation.dto.request.CardExchangeRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.SaveCardBookRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.UpdateCardBookFavoriteRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.UpdateCardBookGroupRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.UpdateCardBookMemoRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.response.CardBookResponse;
+import scanly.io.scanly_back.cardbook.presentation.dto.response.CardExchangeResponse;
 import scanly.io.scanly_back.common.response.ApiResponse;
 import scanly.io.scanly_back.common.response.PageResponse;
 
@@ -43,6 +46,15 @@ public class CardBookController {
                 .body(ApiResponse.success(CardBookResponse.from(cardBookInfo)));
     }
 
+    @PostMapping("/exchange")
+    @Operation(summary = "명함 교환", description = "타인에게 내 명함을 전송합니다.")
+    public ResponseEntity<ApiResponse<CardExchangeResponse>> cardExchange(
+            @AuthenticationPrincipal String memberId,
+            @Valid @RequestBody CardExchangeRequest request
+    ) {
+        CardExchangeInfo cardExchangeInfo = cardBookService.cardExchange(request.toCommand(memberId));
+
+        return ResponseEntity.ok(ApiResponse.success(CardExchangeResponse.from(cardExchangeInfo)));
     @GetMapping
     @Operation(summary = "명함첩 목록 조회", description = "명함첩 목록을 페이징하여 조회합니다.")
     public ResponseEntity<ApiResponse<PageResponse<CardBookResponse>>> readCardBookList(
