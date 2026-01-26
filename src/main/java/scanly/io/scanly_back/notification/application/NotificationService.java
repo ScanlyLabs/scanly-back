@@ -96,21 +96,51 @@ public class NotificationService {
 
     /**
      * 알림 목록 조회
-     * @param memberId 회원 아이디
+     * @param receiverId 수신자 아이디
      * @return 조회된 알림 목록
      */
-    public List<NotificationInfo> getAll(String memberId) {
-        List<Notification> notifications = notificationRepository.findAllByReceiverId(memberId);
+    public List<NotificationInfo> getAll(String receiverId) {
+        List<Notification> notifications = notificationRepository.findAllByReceiverId(receiverId);
 
         return notifications.stream().map(NotificationInfo::from).toList();
     }
 
     /**
      * 안 읽은 알림 수 조회
-     * @param memberId 회원 아이디
-     * @return 안 읽음 알림 수
+     * @param receiverId 수신자 아이디
+     * @return 안 읽은 알림 수
      */
-    public int getUnreadCount(String memberId) {
-        return notificationRepository.countByReceiverIdAndReadFalse(memberId);
+    public int getUnreadCount(String receiverId) {
+        return notificationRepository.countByReceiverIdAndReadFalse(receiverId);
+    }
+
+    /**
+     * 알림 읽음 처리
+     * 1. 알림 조회
+     * 2. 알림 읽음 처리
+     * 3. 안 읽은 알림 수 조회
+     * @param receiverId 수신자 아이디
+     * @param id 알림 아이디
+     * @return 안 읽은 알림 수
+     */
+    public int read(String receiverId, String id) {
+        // 1. 알림 조회
+        Notification notification = getByIdAndReceiverId(id, receiverId);
+        // 2. 알림 읽음 처리
+        notification.read();
+        notificationRepository.read(notification);
+        // 3. 안 읽은 알림 수 조회
+        return notificationRepository.countByReceiverIdAndReadFalse(receiverId);
+    }
+
+    /**
+     * 수신자 아이디 및 알림 아이디로 알림 조회
+     * @param id 알림 아이디
+     * @param receiverId 수신자 아이디
+     * @return 조회된 알림
+     */
+    private Notification getByIdAndReceiverId(String id, String receiverId) {
+        return notificationRepository.findByIdAndReceiverId(id, receiverId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOTIFICATION_NOT_FOUND));
     }
 }

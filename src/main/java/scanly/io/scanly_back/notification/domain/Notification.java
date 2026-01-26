@@ -75,6 +75,13 @@ public class Notification extends BaseDomain {
         this.status = notificationStatus;
     }
 
+    /**
+     * 알림 읽음 처리
+     */
+    public void read() {
+        isRead = true;
+    }
+
     // getters
 
     public String getId() {
