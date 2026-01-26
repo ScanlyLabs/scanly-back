@@ -21,7 +21,7 @@ public class MemberEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "login_id", nullable = false, unique = true, updatable = false)
+    @Column(name = "login_id", nullable = false, unique = true, updatable = false, length = 20)
     private String loginId;                         // 로그인 아이디
 
     @Column(name = "name", nullable = false, length = 20)
