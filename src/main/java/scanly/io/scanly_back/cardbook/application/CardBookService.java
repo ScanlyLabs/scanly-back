@@ -10,8 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import scanly.io.scanly_back.card.application.CardService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import scanly.io.scanly_back.card.domain.Card;
 import scanly.io.scanly_back.cardbook.application.dto.command.CardExchangeCommand;

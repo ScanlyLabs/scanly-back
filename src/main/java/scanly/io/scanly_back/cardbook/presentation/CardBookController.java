@@ -55,6 +55,8 @@ public class CardBookController {
         CardExchangeInfo cardExchangeInfo = cardBookService.cardExchange(request.toCommand(memberId));
 
         return ResponseEntity.ok(ApiResponse.success(CardExchangeResponse.from(cardExchangeInfo)));
+    }
+
     @GetMapping
     @Operation(summary = "명함첩 목록 조회", description = "명함첩 목록을 페이징하여 조회합니다.")
     public ResponseEntity<ApiResponse<PageResponse<CardBookResponse>>> readCardBookList(

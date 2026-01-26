@@ -6,7 +6,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import scanly.io.scanly_back.notification.domain.model.NotificationType;
 
 @Slf4j
 @Component
