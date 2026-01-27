@@ -1,5 +1,6 @@
 package scanly.io.scanly_back.cardbook.domain;
 
+import scanly.io.scanly_back.cardbook.domain.model.ProfileSnapshot;
 import scanly.io.scanly_back.common.domain.BaseDomain;
 
 import java.time.LocalDateTime;
@@ -8,14 +9,14 @@ public class CardBook extends BaseDomain {
     private String id;
     private String memberId;             // 소유자 ID
     private String cardId;              // 원본 명함 ID
-    private String profileSnapshot;      // 저장 당시 명함 정보
+    private ProfileSnapshot profileSnapshot;      // 저장 당시 명함 정보
     private String groupId;             // 저장된 그룹 ID
     private String memo;                // 메모
     private boolean isFavorite;         // 즐겨찾기 여부
 
     private CardBook(
             String id, String memberId, String cardId,
-            String profileSnapshot, String groupId, String memo,
+            ProfileSnapshot profileSnapshot, String groupId, String memo,
             boolean isFavorite,
             LocalDateTime createdAt, LocalDateTime updatedAt
     ) {
@@ -31,7 +32,7 @@ public class CardBook extends BaseDomain {
 
     public static CardBook of(
             String id, String memberId, String cardId,
-            String profileSnapshot, String groupId,
+            ProfileSnapshot profileSnapshot, String groupId,
             String memo, boolean isFavorite,
             LocalDateTime createdAt, LocalDateTime updatedAt
     ) {
@@ -43,7 +44,7 @@ public class CardBook extends BaseDomain {
         );
     }
 
-    public static CardBook create(String memberId, String cardId, String profileSnapshot, String groupId) {
+    public static CardBook create(String memberId, String cardId, ProfileSnapshot profileSnapshot, String groupId) {
         return new CardBook(
                 null,
                 memberId,
@@ -91,7 +92,7 @@ public class CardBook extends BaseDomain {
     public String getCardId() {
         return cardId;
     }
-    public String getProfileSnapshot() {
+    public ProfileSnapshot getProfileSnapshot() {
         return profileSnapshot;
     }
     public String getGroupId() {
