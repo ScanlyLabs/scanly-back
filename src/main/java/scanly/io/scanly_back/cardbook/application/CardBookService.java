@@ -281,4 +281,14 @@ public class CardBookService {
         CardBook cardBook = getByIdAndMemberId(id, memberId);
         cardBookRepository.deleteById(cardBook.getId());
     }
+
+    /**
+     * 명함첩 존재 여부 확인
+     * @param memberId 회원 아이디
+     * @param cardId 명함 아이디
+     * @return 존재하면 true, 아니면 false
+     */
+    public boolean exists(String memberId, String cardId) {
+        return cardBookRepository.existsByMemberIdAndCardId(memberId, cardId);
+    }
 }
