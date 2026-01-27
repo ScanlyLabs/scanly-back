@@ -123,6 +123,7 @@ public class NotificationService {
      * @param id 알림 아이디
      * @return 안 읽은 알림 수
      */
+    @Transactional
     public int read(String receiverId, String id) {
         // 1. 알림 조회
         Notification notification = getByIdAndReceiverId(id, receiverId);
