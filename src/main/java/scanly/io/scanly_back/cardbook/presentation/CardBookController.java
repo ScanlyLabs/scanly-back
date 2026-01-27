@@ -133,4 +133,16 @@ public class CardBookController {
 
         return ResponseEntity.ok(ApiResponse.success(null));
     }
+
+    @GetMapping("/exists")
+    @Operation(summary = "명함첩 존재 여부 확인", description = "명함첩 존재 여부를 확인합니다.")
+    public ResponseEntity<ApiResponse<Boolean>> exists(
+            @AuthenticationPrincipal String memberId,
+            @Parameter(description = "명함 ID")
+            @RequestParam String cardId
+    ) {
+        boolean exists = cardBookService.exists(memberId, cardId);
+        return ResponseEntity.ok( ApiResponse.success(exists));
+    }
+
 }
