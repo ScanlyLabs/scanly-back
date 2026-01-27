@@ -43,7 +43,7 @@ public class NotificationEntity extends BaseEntity {
     private String data;                // 추가 데이터(딥링크용)
 
     @Column(name = "is_read")
-    private boolean isRead;             // 읽음 여부
+    private boolean read;             // 읽음 여부
 
     @Column(name = "retry_count", nullable = false)
     private int retryCount;              // 재시도 횟수
@@ -53,8 +53,8 @@ public class NotificationEntity extends BaseEntity {
 
     public static NotificationEntity of(
             String id, String receiverId, NotificationStatus status, NotificationType type,
-            String title, String body, String data, boolean isRead, int retryCount, String failReason
+            String title, String body, String data, boolean read, int retryCount, String failReason
     ) {
-        return new NotificationEntity(id, receiverId, status, type, title, body, data, isRead, retryCount, failReason);
+        return new NotificationEntity(id, receiverId, status, type, title, body, data, read, retryCount, failReason);
     }
 }

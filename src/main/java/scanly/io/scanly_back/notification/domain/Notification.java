@@ -14,13 +14,13 @@ public class Notification extends BaseDomain {
     private String title;               // 알림 제목
     private String body;                // 알림 내용
     private String data;                // 추가 데이터(딥링크용)
-    private boolean isRead;             // 읽음 여부
+    private boolean read;             // 읽음 여부
     private int retryCount;             // 재시도 횟수
     private String failReason;              // 실패 원인
 
     private Notification(
             String id, String receiverId, NotificationStatus status, NotificationType type,
-            String title, String body, String data, boolean isRead,
+            String title, String body, String data, boolean read,
             int retryCount, String failReason,
             LocalDateTime createdAt, LocalDateTime updatedAt
     ) {
@@ -32,20 +32,20 @@ public class Notification extends BaseDomain {
         this.title = title;
         this.body = body;
         this.data = data;
-        this.isRead = isRead;
+        this.read = read;
         this.retryCount = retryCount;
         this.failReason = failReason;
     }
 
     public static Notification of(
             String id, String receiverId, NotificationStatus status, NotificationType type,
-            String title, String body, String data, boolean isRead,
+            String title, String body, String data, boolean read,
             int retryCount, String failReason,
             LocalDateTime createdAt, LocalDateTime updatedAt
     ) {
         return new Notification(
                 id, receiverId, status, type,
-                title, body, data, isRead,
+                title, body, data, read,
                 retryCount, failReason,
                 createdAt, updatedAt
         );
@@ -79,7 +79,7 @@ public class Notification extends BaseDomain {
      * 알림 읽음 처리
      */
     public void read() {
-        isRead = true;
+        read = true;
     }
 
     // getters
@@ -113,7 +113,7 @@ public class Notification extends BaseDomain {
     }
 
     public boolean isRead() {
-        return isRead;
+        return read;
     }
 
     public int getRetryCount() {
