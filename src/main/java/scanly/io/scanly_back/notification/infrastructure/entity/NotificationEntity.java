@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import scanly.io.scanly_back.common.entity.BaseEntity;
 import scanly.io.scanly_back.notification.domain.model.NotificationStatus;
 import scanly.io.scanly_back.notification.domain.model.NotificationType;
@@ -36,7 +38,8 @@ public class NotificationEntity extends BaseEntity {
     @Column(name = "body", nullable = false, updatable = false)
     private String body;                // 알림 내용
 
-    @Column(name = "data", nullable = false, updatable = false, columnDefinition = "JSON")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "data", nullable = false, updatable = false)
     private String data;                // 추가 데이터(딥링크용)
 
     @Column(name = "is_read")
