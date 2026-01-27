@@ -1,13 +1,14 @@
 package scanly.io.scanly_back.cardbook.presentation.dto.response;
 
 import scanly.io.scanly_back.cardbook.application.dto.info.CardBookInfo;
+import scanly.io.scanly_back.cardbook.domain.model.ProfileSnapshot;
 
 import java.time.LocalDateTime;
 
 public record CardBookResponse(
         String id,
         String cardId,
-        String profileSnapshot,
+        ProfileSnapshot profileSnapshot,
         String groupId,
         String memo,
         boolean isFavorite,

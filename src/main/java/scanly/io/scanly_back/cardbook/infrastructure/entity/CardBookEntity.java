@@ -5,6 +5,9 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+import scanly.io.scanly_back.cardbook.domain.model.ProfileSnapshot;
 import scanly.io.scanly_back.common.entity.BaseEntity;
 
 @Getter
@@ -23,8 +26,9 @@ public class CardBookEntity extends BaseEntity {
     @Column(name = "card_id", nullable = false, updatable = false)
     private String cardId;              // 원본 명함 ID
 
-    @Column(name = "profile_snapshot", nullable = false, updatable = false, columnDefinition = "JSON")
-    private String profileSnapshot;      // 저장 당시 명함 정보 (JSON)
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "profile_snapshot", nullable = false, updatable = false)
+    private ProfileSnapshot profileSnapshot;      // 저장 당시 명함 정보
 
     @Column(name = "group_id")
     private String groupId;             // 저장된 그룹 ID
@@ -37,7 +41,7 @@ public class CardBookEntity extends BaseEntity {
 
     public static CardBookEntity of(
             String id, String memberId, String cardId,
-            String profileSnapshot, String groupId,
+            ProfileSnapshot profileSnapshot, String groupId,
             String memo, boolean isFavorite
     ) {
         return new CardBookEntity(

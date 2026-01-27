@@ -5,12 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import scanly.io.scanly_back.card.application.CardService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import scanly.io.scanly_back.card.application.CardService;
 import scanly.io.scanly_back.card.domain.Card;
 import scanly.io.scanly_back.cardbook.application.dto.command.CardExchangeCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.SaveCardBookCommand;
@@ -24,6 +24,7 @@ import scanly.io.scanly_back.cardbook.domain.CardBookRepository;
 import scanly.io.scanly_back.cardbook.domain.CardExchange;
 import scanly.io.scanly_back.cardbook.domain.CardExchangeRepository;
 import scanly.io.scanly_back.cardbook.domain.event.CardExchangedEvent;
+import scanly.io.scanly_back.cardbook.domain.model.ProfileSnapshot;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
 import scanly.io.scanly_back.member.domain.Member;
@@ -31,7 +32,6 @@ import scanly.io.scanly_back.member.domain.MemberRepository;
 import scanly.io.scanly_back.notification.domain.model.NotificationTemplate;
 import scanly.io.scanly_back.notification.domain.model.NotificationType;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,8 +68,8 @@ public class CardBookService {
         // 2. 유효성 검증
         validateCardBook(card.getMemberId(), memberId, cardId);
 
-        // 4. 스냅샷 생성
-        String profileSnapshot = createProfileSnapshot(card);
+        // 4. 스냅샷 생성(명함 정보를 스냅샷으로 변환)
+        ProfileSnapshot profileSnapshot = ProfileSnapshot.from(card);
 
         // 5. 명함첩에 저장
         CardBook cardBook = CardBook.create(memberId, cardId, profileSnapshot, command.groupId());
@@ -167,29 +167,6 @@ public class CardBookService {
                 receiverId
         );
         return cardExchangeRepository.save(cardExchange);
-    }
-
-    /**
-     * 명함 정보를 JSON 스냅샷으로 변환
-     * @param card 명함 정보
-     * @return JSON 문자열
-     */
-    private String createProfileSnapshot(Card card) {
-        try {
-            Map<String, Object> snapshot = new HashMap<>();
-            snapshot.put("name", card.getName());
-            snapshot.put("title", card.getTitle());
-            snapshot.put("company", card.getCompany());
-            snapshot.put("phone", card.getPhone());
-            snapshot.put("email", card.getEmail());
-            snapshot.put("bio", card.getBio());
-            snapshot.put("profileImageUrl", card.getProfileImageUrl());
-            snapshot.put("portfolioUrl", card.getPortfolioUrl());
-            snapshot.put("location", card.getLocation());
-            return objectMapper.writeValueAsString(snapshot);
-        } catch (JsonProcessingException e) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
-        }
     }
 
     /**
