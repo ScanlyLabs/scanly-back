@@ -8,8 +8,9 @@ Scanly는 QR 코드를 활용한 디지털 명함 서비스입니다. 한 번의
 ### 핵심 기능
 - **명함 생성/관리**: 디지털 명함 생성 및 QR 코드 자동 생성
 - **QR 스캔**: 상대방 QR 코드 스캔으로 명함 조회
-- **명함첩**: 저장한 명함을 그룹/태그로 분류 및 관리
-- **상호 교환**: 명함 저장 시 내 명함도 상대방에게 전송
+- **명함첩**: 저장한 명함을 그룹별로 분류 및 관리
+- **명함 교환**: 명함 저장 시 내 명함도 상대방에게 전송
+- **알림**: 명함 교환 알림 및 푸시 알림 지원
 
 ## Tech Stack
 | Category | Technology |
@@ -22,6 +23,7 @@ Scanly는 QR 코드를 활용한 디지털 명함 서비스입니다. 한 번의
 | Storage | AWS S3 |
 | Docs | Swagger (springdoc-openapi) |
 | Build | Gradle |
+| QR Code | ZXing |
 
 ## Architecture
 
@@ -42,27 +44,41 @@ src/main/java/scanly/io/scanly_back
 ├── common/
 │   ├── config/          # 설정 (Security, JPA, Redis, S3)
 │   ├── exception/       # 예외 처리 (ErrorCode, CustomException)
-│   ├── response/        # 공통 응답 (ApiResponse)
+│   ├── response/        # 공통 응답 (ApiResponse, PageResponse)
 │   ├── entity/          # 공통 엔티티 (BaseEntity)
-│   └── domain/          # 공통 도메인 (BaseDomain)
+│   ├── domain/          # 공통 도메인 (BaseDomain)
+│   ├── service/         # 공통 서비스
+│   └── util/            # 유틸리티
+│
+├── auth/
+│   ├── presentation/    # AuthController
+│   ├── application/     # AuthService
+│   ├── domain/          # Auth Domain
+│   └── infrastructure/  # JWT, Token 관련 구현체
 │
 ├── member/
-│   ├── presentation/    # MemberController, AuthController
-│   ├── application/     # MemberService, AuthService
-│   ├── domain/          # Member, MemberRepository
+│   ├── presentation/    # MemberController
+│   ├── application/     # MemberService
+│   ├── domain/          # Member
 │   └── infrastructure/  # MemberEntity, MemberRepositoryImpl
 │
 ├── card/
 │   ├── presentation/    # CardController
 │   ├── application/     # CardService
-│   ├── domain/          # Card, SocialLink, CardRepository
-│   └── infrastructure/  # CardEntity, SocialLinkEntity, CardRepositoryImpl
+│   ├── domain/          # Card, SocialLink
+│   └── infrastructure/  # CardEntity, SocialLinkEntity
 │
-└── cardbook/
-    ├── presentation/    # CardBookController, GroupController
-    ├── application/     # CardBookService, GroupService
-    ├── domain/          # CardBook, Group, Tag
-    └── infrastructure/  # CardBookEntity, GroupEntity, TagEntity
+├── cardbook/
+│   ├── presentation/    # CardBookController, GroupController
+│   ├── application/     # CardBookService, GroupService
+│   ├── domain/          # CardBook, Group
+│   └── infrastructure/  # CardBookEntity, GroupEntity
+│
+└── notification/
+    ├── presentation/    # NotificationController, PushTokenController
+    ├── application/     # NotificationService, PushTokenService
+    ├── domain/          # Notification, PushToken
+    └── infrastructure/  # NotificationEntity, PushTokenEntity
 ```
 
 ## API Endpoints
@@ -70,23 +86,36 @@ src/main/java/scanly/io/scanly_back
 ### 인증 (Auth)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/members/v1/signup` | 회원가입 |
 | POST | `/api/auth/v1/login` | 로그인 |
-| POST | `/api/auth/v1/refresh` | 토큰 갱신 |
 | POST | `/api/auth/v1/logout` | 로그아웃 |
+| POST | `/api/auth/v1/reissue` | 토큰 재발급 |
+
+### 회원 (Member)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/members/v1/sign-up` | 회원가입 |
 
 ### 명함 (Card)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/cards/v1` | 명함 생성 |
 | GET | `/api/cards/v1/me` | 내 명함 조회 |
-| POST | `/api/cards/v1/update` | 명함 수정 |
-| POST | `/api/cards/v1/delete` | 명함 삭제 |
+| GET | `/api/cards/v1/member/{loginId}` | 회원 명함 조회 |
+| POST | `/api/cards/v1/me/update` | 내 명함 수정 |
+| POST | `/api/cards/v1/me/delete` | 내 명함 삭제 |
 
 ### 명함첩 (CardBook)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/cardbooks/v1` | 명함 저장 |
+| POST | `/api/cardbooks/v1/exchange` | 명함 교환 |
+| GET | `/api/cardbooks/v1` | 명함첩 목록 조회 |
+| GET | `/api/cardbooks/v1/{id}` | 명함첩 상세 조회 |
+| GET | `/api/cardbooks/v1/exists` | 명함첩 존재 여부 확인 |
+| POST | `/api/cardbooks/v1/{id}/group` | 명함첩 그룹 수정 |
+| POST | `/api/cardbooks/v1/{id}/memo` | 명함첩 메모 수정 |
+| POST | `/api/cardbooks/v1/{id}/favorite` | 명함첩 즐겨찾기 수정 |
+| POST | `/api/cardbooks/v1/{id}/delete` | 명함첩 삭제 |
 
 ### 그룹 (Group)
 | Method | Endpoint | Description |
@@ -96,3 +125,15 @@ src/main/java/scanly/io/scanly_back
 | POST | `/api/groups/v1/{id}/rename` | 그룹명 수정 |
 | POST | `/api/groups/v1/reorder` | 그룹 순서 변경 |
 | POST | `/api/groups/v1/{id}/delete` | 그룹 삭제 |
+
+### 알림 (Notification)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/notifications/v1` | 알림 목록 조회 |
+| GET | `/api/notifications/v1/unread-count` | 안 읽은 알림 수 조회 |
+| POST | `/api/notifications/v1/{id}/read` | 알림 읽음 처리 |
+
+### 푸시 토큰 (PushToken)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/push-tokens/v1` | 푸시 토큰 등록 |
