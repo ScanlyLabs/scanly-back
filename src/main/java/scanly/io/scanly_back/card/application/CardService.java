@@ -28,6 +28,7 @@ public class CardService {
     private final MemberService memberService;
     private final QrCodeGenerator qrCodeGenerator;
     private final S3Service s3Service;
+    private final CardCacheService cardCacheService;
 
     /**
      * 명함 등록
@@ -120,28 +121,28 @@ public class CardService {
 
     /**
      * 내 명함 조회
-     * @param memberId 내 명함 아이디
+     * - 캐시 적용
+     * @param memberId 회원 아이디
      * @return 조회된 명함
      */
     public ReadCardInfo readMyCard(String memberId) {
-        Card card = findByMemberId(memberId);
-
-        return ReadCardInfo.from(card);
+        return cardCacheService.getCardByMemberId(memberId);
     }
 
     /**
-     * 로그인 ID로 명함 조회
+     * 로그인 ID로 명함 조회 (QR 스캔 시 사용)
+     * - 캐시 적용
      * @param loginId 로그인 아이디
      * @return 조회된 명함
      */
     public ReadCardInfo readCardByLoginId(String loginId) {
         Member member = memberService.findByLoginId(loginId);
-        Card card = findByMemberId(member.getId());
-
-        return ReadCardInfo.from(card);
+        return cardCacheService.getCardByMemberId(member.getId());
     }
+
     /**
      * 명함 수정
+     * - 캐시 무효화
      * @param command 수정할 명함 정보
      * @return 수정된 명함 정보
      */
@@ -164,6 +165,9 @@ public class CardService {
         addSocialLinks(command.socialLinks(), card);
 
         Card updatedCard = cardRepository.update(card);
+
+        // 캐시 무효화
+        cardCacheService.evictCache(command.memberId());
 
         return ReadCardInfo.from(updatedCard);
     }
@@ -203,5 +207,7 @@ public class CardService {
         s3Service.delete(card.getQrImageUrl());
         // 3. 명함 제거
         cardRepository.delete(card);
+        // 4. 캐시 무효화
+        cardCacheService.evictCache(memberId);
     }
 }
