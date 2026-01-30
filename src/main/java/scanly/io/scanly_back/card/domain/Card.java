@@ -1,6 +1,8 @@
 package scanly.io.scanly_back.card.domain;
 
 import scanly.io.scanly_back.common.domain.BaseDomain;
+import scanly.io.scanly_back.common.exception.CustomException;
+import scanly.io.scanly_back.common.exception.ErrorCode;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -107,7 +109,7 @@ public class Card extends BaseDomain {
      */
     public void addSocialLink(SocialLinkType type, String url) {
         if (this.socialLinks.size() >= 10) {
-            throw new IllegalStateException("소셜 링크는 최대 10개까지 추가할 수 있습니다.");
+            throw new CustomException(ErrorCode.CARD_SOCIAL_LINK_LIMIT_EXCEEDED);
         }
         int order = this.socialLinks.size();
         SocialLink socialLink = SocialLink.create(type, url, order);

@@ -22,6 +22,7 @@ public enum ErrorCode {
     // card
     CARD_ALREADY_EXISTS(HttpStatus.CONFLICT, "CD001", "명함이 이미 존재합니다."),
     CARD_NOT_FOUND(HttpStatus.NOT_FOUND, "CD002", "명함을 찾을 수 없습니다."),
+    CARD_SOCIAL_LINK_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "CD003",  "소셜 링크는 최대 10개까지 추가할 수 있습니다."),
 
     // card_book
     CARD_BOOK_ALREADY_EXISTS(HttpStatus.CONFLICT, "CB001", "이미 저장된 명함입니다."),
