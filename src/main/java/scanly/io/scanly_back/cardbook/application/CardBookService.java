@@ -27,6 +27,7 @@ import scanly.io.scanly_back.cardbook.domain.event.CardExchangedEvent;
 import scanly.io.scanly_back.cardbook.domain.model.ProfileSnapshot;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
+import scanly.io.scanly_back.common.ratelimit.RateLimiterService;
 import scanly.io.scanly_back.member.domain.Member;
 import scanly.io.scanly_back.member.domain.MemberRepository;
 import scanly.io.scanly_back.notification.domain.model.NotificationTemplate;
@@ -41,11 +42,14 @@ import java.util.Map;
 @Transactional(readOnly = true)
 public class CardBookService {
 
+    private static final int DAILY_EXCHANGE_LIMIT = 3;
+
     private final CardBookRepository cardBookRepository;
     private final CardExchangeRepository cardExchangeRepository;
     private final CardService cardService;
     private final MemberRepository memberRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final RateLimiterService rateLimiterService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
@@ -100,8 +104,9 @@ public class CardBookService {
     /**
      * 명함 교환 내역 저장
      * 1. 명함 조회
-     * 2. 명함 교환 내역 저장
-     * 3. 명함 교환 이벤트 발행
+     * 2. 일일 교환 제한 확인
+     * 3. 명함 교환 내역 저장
+     * 4. 명함 교환 이벤트 발행
      * @param command 명함 교환 정보
      * @return 저장된 명함교환 정보
      */
@@ -112,10 +117,15 @@ public class CardBookService {
         String senderId = command.senderId();
         String receiverId = card.getMemberId();
 
-        // 2. 명함 교환 내역 저장
+        // 2. 일일 교환 제한 확인 (동일 수신자에게 하루 3회 제한)
+        if (!rateLimiterService.isDailyExchangeAllowed(senderId, receiverId, DAILY_EXCHANGE_LIMIT)) {
+            throw new CustomException(ErrorCode.DAILY_EXCHANGE_LIMIT_EXCEEDED);
+        }
+
+        // 3. 명함 교환 내역 저장
         CardExchange savedCardExchange = saveCardExchange(senderId, receiverId);
 
-        // 3. 명함 교환 이벤트 발행
+        // 4. 명함 교환 이벤트 발행
         publishCardExchangedEvent(senderId, receiverId);
 
         return CardExchangeInfo.from(savedCardExchange);

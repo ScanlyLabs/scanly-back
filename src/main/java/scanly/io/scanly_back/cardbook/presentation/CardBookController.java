@@ -22,6 +22,7 @@ import scanly.io.scanly_back.cardbook.presentation.dto.request.UpdateCardBookGro
 import scanly.io.scanly_back.cardbook.presentation.dto.request.UpdateCardBookMemoRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.response.CardBookResponse;
 import scanly.io.scanly_back.cardbook.presentation.dto.response.CardExchangeResponse;
+import scanly.io.scanly_back.common.ratelimit.RateLimiter;
 import scanly.io.scanly_back.common.response.ApiResponse;
 import scanly.io.scanly_back.common.response.PageResponse;
 
@@ -48,6 +49,7 @@ public class CardBookController {
 
     @PostMapping("/exchange")
     @Operation(summary = "명함 교환", description = "타인에게 내 명함을 전송합니다.")
+    @RateLimiter(key = "cardExchange")
     public ResponseEntity<ApiResponse<CardExchangeResponse>> cardExchange(
             @AuthenticationPrincipal String memberId,
             @Valid @RequestBody CardExchangeRequest request
