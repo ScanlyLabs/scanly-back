@@ -18,6 +18,11 @@ Scanly는 QR 코드를 활용한 디지털 명함 서비스입니다. 한 번의
 - 명함 조회: Redis 캐싱 적용 (TTL 1시간)
 - 명함 수정/삭제 시 캐시 무효화
 
+### Rate Limiting
+- 명함 교환 API: 사용자별 분당 10회 제한
+- 동일 수신자 명함 교환: 발신자-수신자 쌍 하루 3회 제한 (자정 리셋)
+- Redis 기반 Fixed Window 알고리즘 적용
+- AOP 어노테이션(`@RateLimiter`) 기반으로 간편 적용 가능
 
 ## Tech Stack
 | Category | Technology |

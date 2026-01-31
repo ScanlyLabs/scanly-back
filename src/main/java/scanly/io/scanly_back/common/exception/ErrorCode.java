@@ -41,6 +41,10 @@ public enum ErrorCode {
     // common
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "C001", "입력값이 올바르지 않습니다."),
 
+    // rate limit
+    RATE_LIMIT_EXCEEDED(HttpStatus.TOO_MANY_REQUESTS, "RL001", "요청 횟수가 초과되었습니다. 잠시 후 다시 시도해주세요."),
+    DAILY_EXCHANGE_LIMIT_EXCEEDED(HttpStatus.TOO_MANY_REQUESTS, "RL002", "해당 사용자에게 오늘 보낼 수 있는 명함 교환 횟수를 초과했습니다."),
+
     // server
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SE001", "에상치 못한 에러가 발생했습니다.");
 
