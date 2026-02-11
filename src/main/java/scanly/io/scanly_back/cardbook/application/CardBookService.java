@@ -187,7 +187,7 @@ public class CardBookService {
     public List<CardBookInfo> readAll(String memberId) {
         List<CardBook> cardBooks = cardBookRepository.findAllByMemberId(memberId);
 
-        return cardBooks.stream().map(CardBookInfo::from).toList();
+        return enrichWithCardInfo(cardBooks);
     }
 
     /**
@@ -198,11 +198,34 @@ public class CardBookService {
      * @return 페이징된 명함첩 목록
      */
     public Page<CardBookInfo> readAll(String memberId, String groupId, Pageable pageable) {
+        Page<CardBook> cardBookPage;
         if (!StringUtils.hasText(groupId)) {
-            return cardBookRepository.findAllByMemberId(memberId, pageable).map(CardBookInfo::from);
+            cardBookPage = cardBookRepository.findAllByMemberId(memberId, pageable);
+        } else {
+            cardBookPage = cardBookRepository.findAllByMemberIdAndGroupId(memberId, groupId, pageable);
         }
 
-        return cardBookRepository.findAllByMemberIdAndGroupId(memberId, groupId, pageable).map(CardBookInfo::from);
+        List<CardBook> cardBooks = cardBookPage.getContent();
+        List<String> cardIds = cardBooks.stream().map(CardBook::getCardId).toList();
+        Map<String, Card> cardMap = cardService.findAllByIds(cardIds).stream()
+                .collect(java.util.stream.Collectors.toMap(Card::getId, card -> card));
+
+        return cardBookPage.map(cardBook -> CardBookInfo.from(cardBook, cardMap.get(cardBook.getCardId())));
+    }
+
+    /**
+     * 명함첩 목록에 Card 정보 추가
+     * @param cardBooks 명함첩 목록
+     * @return Card 정보가 포함된 명함첩 정보 목록
+     */
+    private List<CardBookInfo> enrichWithCardInfo(List<CardBook> cardBooks) {
+        List<String> cardIds = cardBooks.stream().map(CardBook::getCardId).toList();
+        Map<String, Card> cardMap = cardService.findAllByIds(cardIds).stream()
+                .collect(java.util.stream.Collectors.toMap(Card::getId, card -> card));
+
+        return cardBooks.stream()
+                .map(cardBook -> CardBookInfo.from(cardBook, cardMap.get(cardBook.getCardId())))
+                .toList();
     }
 
     /**

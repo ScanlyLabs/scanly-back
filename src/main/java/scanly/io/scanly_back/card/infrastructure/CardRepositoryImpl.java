@@ -126,6 +126,21 @@ public class CardRepositoryImpl implements CardRepository {
     }
 
     /**
+     * 명함 ID 목록으로 명함 조회 (SocialLink 제외)
+     * @param ids 명함 ID 목록
+     * @return 조회된 명함 목록
+     */
+    @Override
+    public List<Card> findAllByIds(List<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return cardJpaRepository.findAllByIdIn(ids).stream()
+                .map(cardEntity -> cardMapper.toDomain(cardEntity, List.of()))
+                .toList();
+    }
+
+    /**
      * 회원 아이디로 내 명함 제거
      * 1. 소셜 링크 제거
      * 2. 명함 제거
