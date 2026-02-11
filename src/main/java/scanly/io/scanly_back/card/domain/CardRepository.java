@@ -1,5 +1,6 @@
 package scanly.io.scanly_back.card.domain;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface CardRepository {
@@ -15,6 +16,8 @@ public interface CardRepository {
     Optional<Card> findById(String id);
 
     Optional<Card> findByMemberId(String memberId);
+
+    List<Card> findAllByIds(List<String> ids);
 
     void delete(Card card);
 }

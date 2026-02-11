@@ -8,6 +8,10 @@ import java.time.LocalDateTime;
 public record CardBookResponse(
         String id,
         String cardId,
+        String name,
+        String title,
+        String company,
+        String profileImageUrl,
         ProfileSnapshot profileSnapshot,
         String groupId,
         String memo,
@@ -18,6 +22,10 @@ public record CardBookResponse(
         return new CardBookResponse(
                 cardBookInfo.id(),
                 cardBookInfo.cardId(),
+                cardBookInfo.name(),
+                cardBookInfo.title(),
+                cardBookInfo.company(),
+                cardBookInfo.profileImageUrl(),
                 cardBookInfo.profileSnapshot(),
                 cardBookInfo.groupId(),
                 cardBookInfo.memo(),

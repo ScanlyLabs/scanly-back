@@ -193,6 +193,15 @@ public class CardService {
     }
 
     /**
+     * 명함 ID 목록으로 명함 조회
+     * @param ids 명함 ID 목록
+     * @return 조회된 명함 목록
+     */
+    public List<Card> findAllByIds(List<String> ids) {
+        return cardRepository.findAllByIds(ids);
+    }
+
+    /**
      * 내 명함 제거
      * 1. 명함 조회
      * 2. 명함 QR 이미지 제거
