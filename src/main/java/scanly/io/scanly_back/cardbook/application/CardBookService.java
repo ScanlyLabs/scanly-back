@@ -79,7 +79,7 @@ public class CardBookService {
         CardBook cardBook = CardBook.create(memberId, cardId, profileSnapshot, command.groupId());
         CardBook savedCardBook = cardBookRepository.save(cardBook);
 
-        return CardBookInfo.from(savedCardBook);
+        return CardBookInfo.from(savedCardBook, card);
     }
 
     /**
@@ -236,14 +236,16 @@ public class CardBookService {
      */
     public CardBookInfo read(String memberId, String id) {
         CardBook cardBook = getByIdAndMemberId(id, memberId);
+        Card card = findCardOrNull(cardBook.getCardId());
 
-        return CardBookInfo.from(cardBook);
+        return CardBookInfo.from(cardBook, card);
     }
 
     /**
      * 명함첩 그룹 수정
      * 1. 명함첩 조회
      * 2. 명함첩 수정
+     * 3. Card 조회 후 반환
      * @param command 명함첩 정보
      * @return 수정된 명함첩
      */
@@ -255,7 +257,9 @@ public class CardBookService {
         cardBook.updateGroup(command.groupId());
         CardBook updatedCardBook = cardBookRepository.update(cardBook);
 
-        return CardBookInfo.from(updatedCardBook);
+        // 3. Card 조회 후 반환
+        Card card = findCardOrNull(updatedCardBook.getCardId());
+        return CardBookInfo.from(updatedCardBook, card);
     }
 
     /**
@@ -270,9 +274,19 @@ public class CardBookService {
     }
 
     /**
+     * Card 조회 (없으면 null 반환)
+     * @param cardId 명함 아이디
+     * @return 조회된 명함 또는 null
+     */
+    private Card findCardOrNull(String cardId) {
+        return cardService.findByIdOrNull(cardId);
+    }
+
+    /**
      * 명함첩 메모 수정
      * 1. 명함첩 조회
      * 2. 명함첩 수정
+     * 3. Card 조회 후 반환
      * @param command 명함첩 정보
      * @return 수정된 명함첩
      */
@@ -284,13 +298,16 @@ public class CardBookService {
         cardBook.updateMemo(command.memo());
         CardBook updatedCardBook = cardBookRepository.update(cardBook);
 
-        return CardBookInfo.from(updatedCardBook);
+        // 3. Card 조회 후 반환
+        Card card = findCardOrNull(updatedCardBook.getCardId());
+        return CardBookInfo.from(updatedCardBook, card);
     }
 
     /**
      * 명함첩 즐겨찾기 수정
      * 1. 명함첩 조회
      * 2. 명함첩 수정
+     * 3. Card 조회 후 반환
      * @param command 명함첩 정보
      * @return 수정된 명함첩
      */
@@ -302,7 +319,9 @@ public class CardBookService {
         cardBook.updateFavorite(command.favorite());
         CardBook updatedCardBook = cardBookRepository.update(cardBook);
 
-        return CardBookInfo.from(updatedCardBook);
+        // 3. Card 조회 후 반환
+        Card card = findCardOrNull(updatedCardBook.getCardId());
+        return CardBookInfo.from(updatedCardBook, card);
     }
 
     /**

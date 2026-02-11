@@ -193,6 +193,15 @@ public class CardService {
     }
 
     /**
+     * 아이디로 명함 조회
+     * @param id 명함 아이디
+     * @return 조회된 명함, 없으면 null
+     */
+    public Card findByIdOrNull(String id) {
+        return cardRepository.findById(id).orElse(null);
+    }
+
+    /**
      * 명함 ID 목록으로 명함 조회
      * @param ids 명함 ID 목록
      * @return 조회된 명함 목록

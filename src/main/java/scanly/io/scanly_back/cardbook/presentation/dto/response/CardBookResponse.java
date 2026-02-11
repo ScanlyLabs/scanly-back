@@ -16,6 +16,7 @@ public record CardBookResponse(
         String groupId,
         String memo,
         boolean isFavorite,
+        boolean isCardDeleted,
         LocalDateTime createdAt
 ) {
     public static CardBookResponse from(CardBookInfo cardBookInfo) {
@@ -30,6 +31,7 @@ public record CardBookResponse(
                 cardBookInfo.groupId(),
                 cardBookInfo.memo(),
                 cardBookInfo.isFavorite(),
+                cardBookInfo.isCardDeleted(),
                 cardBookInfo.createdAt()
         );
     }
