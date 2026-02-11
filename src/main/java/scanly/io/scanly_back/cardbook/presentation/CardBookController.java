@@ -14,12 +14,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import scanly.io.scanly_back.cardbook.application.CardBookService;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardBookInfo;
+import scanly.io.scanly_back.cardbook.application.dto.info.CardBookPreviewInfo;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardExchangeInfo;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.CardExchangeRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.SaveCardBookRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.UpdateCardBookFavoriteRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.UpdateCardBookGroupRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.UpdateCardBookMemoRequest;
+import scanly.io.scanly_back.cardbook.presentation.dto.response.CardBookPreviewResponse;
 import scanly.io.scanly_back.cardbook.presentation.dto.response.CardBookResponse;
 import scanly.io.scanly_back.cardbook.presentation.dto.response.CardExchangeResponse;
 import scanly.io.scanly_back.common.ratelimit.RateLimiter;
@@ -61,16 +63,16 @@ public class CardBookController {
 
     @GetMapping
     @Operation(summary = "명함첩 목록 조회", description = "명함첩 목록을 페이징하여 조회합니다.")
-    public ResponseEntity<ApiResponse<PageResponse<CardBookResponse>>> readCardBookList(
+    public ResponseEntity<ApiResponse<PageResponse<CardBookPreviewResponse>>> readCardBookList(
             @AuthenticationPrincipal String memberId,
             @Parameter(description = "그룹 ID (선택)")
             @RequestParam(required = false) String groupId,
             @PageableDefault(size = 20) Pageable pageable
     ) {
-        Page<CardBookInfo> cardBookInfos = cardBookService.readAll(memberId, groupId, pageable);
-        Page<CardBookResponse> cardBookResponses = cardBookInfos.map(CardBookResponse::from);
+        Page<CardBookPreviewInfo> cardBookPreviewInfos = cardBookService.readAll(memberId, groupId, pageable);
+        Page<CardBookPreviewResponse> cardBookPreviewResponses = cardBookPreviewInfos.map(CardBookPreviewResponse::from);
 
-        return ResponseEntity.ok(ApiResponse.success(PageResponse.from(cardBookResponses)));
+        return ResponseEntity.ok(ApiResponse.success(PageResponse.from(cardBookPreviewResponses)));
     }
 
     @GetMapping("/{id}")

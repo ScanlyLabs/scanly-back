@@ -18,6 +18,7 @@ import scanly.io.scanly_back.cardbook.application.dto.command.UpdateCardBookFavo
 import scanly.io.scanly_back.cardbook.application.dto.command.UpdateCardBookGroupCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.UpdateCardBookMemoCommand;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardBookInfo;
+import scanly.io.scanly_back.cardbook.application.dto.info.CardBookPreviewInfo;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardExchangeInfo;
 import scanly.io.scanly_back.cardbook.domain.CardBook;
 import scanly.io.scanly_back.cardbook.domain.CardBookRepository;
@@ -184,7 +185,7 @@ public class CardBookService {
      * @param memberId 회원 아이디
      * @return 조회된 명함첩 목록
      */
-    public List<CardBookInfo> readAll(String memberId) {
+    public List<CardBookPreviewInfo> readAll(String memberId) {
         List<CardBook> cardBooks = cardBookRepository.findAllByMemberId(memberId);
 
         return enrichWithCardInfo(cardBooks);
@@ -197,7 +198,7 @@ public class CardBookService {
      * @param pageable 페이징 정보
      * @return 페이징된 명함첩 목록
      */
-    public Page<CardBookInfo> readAll(String memberId, String groupId, Pageable pageable) {
+    public Page<CardBookPreviewInfo> readAll(String memberId, String groupId, Pageable pageable) {
         Page<CardBook> cardBookPage;
         if (!StringUtils.hasText(groupId)) {
             cardBookPage = cardBookRepository.findAllByMemberId(memberId, pageable);
@@ -210,7 +211,7 @@ public class CardBookService {
         Map<String, Card> cardMap = cardService.findAllByIds(cardIds).stream()
                 .collect(java.util.stream.Collectors.toMap(Card::getId, card -> card));
 
-        return cardBookPage.map(cardBook -> CardBookInfo.from(cardBook, cardMap.get(cardBook.getCardId())));
+        return cardBookPage.map(cardBook -> CardBookPreviewInfo.from(cardBook, cardMap.get(cardBook.getCardId())));
     }
 
     /**
@@ -218,13 +219,13 @@ public class CardBookService {
      * @param cardBooks 명함첩 목록
      * @return Card 정보가 포함된 명함첩 정보 목록
      */
-    private List<CardBookInfo> enrichWithCardInfo(List<CardBook> cardBooks) {
+    private List<CardBookPreviewInfo> enrichWithCardInfo(List<CardBook> cardBooks) {
         List<String> cardIds = cardBooks.stream().map(CardBook::getCardId).toList();
         Map<String, Card> cardMap = cardService.findAllByIds(cardIds).stream()
                 .collect(java.util.stream.Collectors.toMap(Card::getId, card -> card));
 
         return cardBooks.stream()
-                .map(cardBook -> CardBookInfo.from(cardBook, cardMap.get(cardBook.getCardId())))
+                .map(cardBook -> CardBookPreviewInfo.from(cardBook, cardMap.get(cardBook.getCardId())))
                 .toList();
     }
 
