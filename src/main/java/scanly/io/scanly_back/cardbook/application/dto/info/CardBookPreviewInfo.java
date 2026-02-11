@@ -6,36 +6,31 @@ import scanly.io.scanly_back.cardbook.domain.model.ProfileSnapshot;
 
 import java.time.LocalDateTime;
 
-public record CardBookInfo(
+public record CardBookPreviewInfo(
         String id,
         String cardId,
         String name,
         String title,
         String company,
         String profileImageUrl,
-        ProfileSnapshot profileSnapshot,
         String groupId,
         String memo,
         boolean isFavorite,
-        boolean isCardDeleted,
         LocalDateTime createdAt
 ) {
-
-    public static CardBookInfo from(CardBook cardBook, Card card) {
+    public static CardBookPreviewInfo from(CardBook cardBook, Card card) {
         ProfileSnapshot snapshot = cardBook.getProfileSnapshot();
         boolean isDeleted = card == null;
-        return new CardBookInfo(
+        return new CardBookPreviewInfo(
                 cardBook.getId(),
                 cardBook.getCardId(),
                 isDeleted ? snapshot.name() : card.getName(),
                 isDeleted ? snapshot.title() : card.getTitle(),
                 isDeleted ? snapshot.company() : card.getCompany(),
                 isDeleted ? snapshot.profileImageUrl() : card.getProfileImageUrl(),
-                snapshot,
                 cardBook.getGroupId(),
                 cardBook.getMemo(),
                 cardBook.isFavorite(),
-                isDeleted,
                 cardBook.getCreatedAt()
         );
     }

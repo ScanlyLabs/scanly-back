@@ -18,6 +18,7 @@ import scanly.io.scanly_back.cardbook.application.dto.command.UpdateCardBookFavo
 import scanly.io.scanly_back.cardbook.application.dto.command.UpdateCardBookGroupCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.UpdateCardBookMemoCommand;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardBookInfo;
+import scanly.io.scanly_back.cardbook.application.dto.info.CardBookPreviewInfo;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardExchangeInfo;
 import scanly.io.scanly_back.cardbook.domain.CardBook;
 import scanly.io.scanly_back.cardbook.domain.CardBookRepository;
@@ -79,7 +80,7 @@ public class CardBookService {
         CardBook cardBook = CardBook.create(memberId, cardId, profileSnapshot, command.groupId());
         CardBook savedCardBook = cardBookRepository.save(cardBook);
 
-        return CardBookInfo.from(savedCardBook);
+        return CardBookInfo.from(savedCardBook, card);
     }
 
     /**
@@ -184,7 +185,7 @@ public class CardBookService {
      * @param memberId 회원 아이디
      * @return 조회된 명함첩 목록
      */
-    public List<CardBookInfo> readAll(String memberId) {
+    public List<CardBookPreviewInfo> readAll(String memberId) {
         List<CardBook> cardBooks = cardBookRepository.findAllByMemberId(memberId);
 
         return enrichWithCardInfo(cardBooks);
@@ -197,7 +198,7 @@ public class CardBookService {
      * @param pageable 페이징 정보
      * @return 페이징된 명함첩 목록
      */
-    public Page<CardBookInfo> readAll(String memberId, String groupId, Pageable pageable) {
+    public Page<CardBookPreviewInfo> readAll(String memberId, String groupId, Pageable pageable) {
         Page<CardBook> cardBookPage;
         if (!StringUtils.hasText(groupId)) {
             cardBookPage = cardBookRepository.findAllByMemberId(memberId, pageable);
@@ -210,7 +211,7 @@ public class CardBookService {
         Map<String, Card> cardMap = cardService.findAllByIds(cardIds).stream()
                 .collect(java.util.stream.Collectors.toMap(Card::getId, card -> card));
 
-        return cardBookPage.map(cardBook -> CardBookInfo.from(cardBook, cardMap.get(cardBook.getCardId())));
+        return cardBookPage.map(cardBook -> CardBookPreviewInfo.from(cardBook, cardMap.get(cardBook.getCardId())));
     }
 
     /**
@@ -218,13 +219,13 @@ public class CardBookService {
      * @param cardBooks 명함첩 목록
      * @return Card 정보가 포함된 명함첩 정보 목록
      */
-    private List<CardBookInfo> enrichWithCardInfo(List<CardBook> cardBooks) {
+    private List<CardBookPreviewInfo> enrichWithCardInfo(List<CardBook> cardBooks) {
         List<String> cardIds = cardBooks.stream().map(CardBook::getCardId).toList();
         Map<String, Card> cardMap = cardService.findAllByIds(cardIds).stream()
                 .collect(java.util.stream.Collectors.toMap(Card::getId, card -> card));
 
         return cardBooks.stream()
-                .map(cardBook -> CardBookInfo.from(cardBook, cardMap.get(cardBook.getCardId())))
+                .map(cardBook -> CardBookPreviewInfo.from(cardBook, cardMap.get(cardBook.getCardId())))
                 .toList();
     }
 
@@ -236,14 +237,16 @@ public class CardBookService {
      */
     public CardBookInfo read(String memberId, String id) {
         CardBook cardBook = getByIdAndMemberId(id, memberId);
+        Card card = findCardOrNull(cardBook.getCardId());
 
-        return CardBookInfo.from(cardBook);
+        return CardBookInfo.from(cardBook, card);
     }
 
     /**
      * 명함첩 그룹 수정
      * 1. 명함첩 조회
      * 2. 명함첩 수정
+     * 3. Card 조회 후 반환
      * @param command 명함첩 정보
      * @return 수정된 명함첩
      */
@@ -255,7 +258,9 @@ public class CardBookService {
         cardBook.updateGroup(command.groupId());
         CardBook updatedCardBook = cardBookRepository.update(cardBook);
 
-        return CardBookInfo.from(updatedCardBook);
+        // 3. Card 조회 후 반환
+        Card card = findCardOrNull(updatedCardBook.getCardId());
+        return CardBookInfo.from(updatedCardBook, card);
     }
 
     /**
@@ -270,9 +275,19 @@ public class CardBookService {
     }
 
     /**
+     * Card 조회 (없으면 null 반환)
+     * @param cardId 명함 아이디
+     * @return 조회된 명함 또는 null
+     */
+    private Card findCardOrNull(String cardId) {
+        return cardService.findByIdOrNull(cardId);
+    }
+
+    /**
      * 명함첩 메모 수정
      * 1. 명함첩 조회
      * 2. 명함첩 수정
+     * 3. Card 조회 후 반환
      * @param command 명함첩 정보
      * @return 수정된 명함첩
      */
@@ -284,13 +299,16 @@ public class CardBookService {
         cardBook.updateMemo(command.memo());
         CardBook updatedCardBook = cardBookRepository.update(cardBook);
 
-        return CardBookInfo.from(updatedCardBook);
+        // 3. Card 조회 후 반환
+        Card card = findCardOrNull(updatedCardBook.getCardId());
+        return CardBookInfo.from(updatedCardBook, card);
     }
 
     /**
      * 명함첩 즐겨찾기 수정
      * 1. 명함첩 조회
      * 2. 명함첩 수정
+     * 3. Card 조회 후 반환
      * @param command 명함첩 정보
      * @return 수정된 명함첩
      */
@@ -302,7 +320,9 @@ public class CardBookService {
         cardBook.updateFavorite(command.favorite());
         CardBook updatedCardBook = cardBookRepository.update(cardBook);
 
-        return CardBookInfo.from(updatedCardBook);
+        // 3. Card 조회 후 반환
+        Card card = findCardOrNull(updatedCardBook.getCardId());
+        return CardBookInfo.from(updatedCardBook, card);
     }
 
     /**
