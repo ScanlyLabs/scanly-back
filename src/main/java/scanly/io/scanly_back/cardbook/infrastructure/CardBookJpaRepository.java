@@ -13,6 +13,8 @@ public interface CardBookJpaRepository extends JpaRepository<CardBookEntity, Str
 
     boolean existsByMemberIdAndCardId(String memberId, String cardId);
 
+    boolean existsByIdAndMemberId(String id, String memberId);
+
     List<CardBookEntity> findAllByMemberId(String memberId);
 
     Page<CardBookEntity> findAllByMemberId(String memberId, Pageable pageable);
