@@ -251,6 +251,7 @@ public class CardBookService {
      * @param command 명함첩 정보
      * @return 수정된 명함첩
      */
+    @Transactional
     public CardBookInfo updateGroup(UpdateCardBookGroupCommand command) {
         // 1. 명함첩 조회
         CardBook cardBook = getByIdAndMemberId(command.id(), command.memberId());
