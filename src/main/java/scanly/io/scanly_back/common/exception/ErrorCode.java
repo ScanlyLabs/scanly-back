@@ -29,6 +29,9 @@ public enum ErrorCode {
     CANNOT_SAVE_OWN_CARD(HttpStatus.BAD_REQUEST, "CB002", "본인 명함은 저장할 수 없습니다."),
     CARD_BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "CB003", "명함첩을 찾을 수 없습니다."),
 
+    // tag
+    TAG_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "T001", "태그는 최대 10개까지 등록할 수 있습니다"),
+
     // group
     GROUP_NOT_FOUND(HttpStatus.NOT_FOUND, "CBG001", "명함첩 그룹이 존재하지 않습니다."),
 

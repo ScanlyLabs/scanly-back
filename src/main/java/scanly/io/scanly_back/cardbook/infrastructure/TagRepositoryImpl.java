@@ -23,4 +23,14 @@ public class TagRepositoryImpl implements TagRepository {
         TagEntity savedTagEntity = tagJpaRepository.save(tagEntity);
         return tagMapper.toDomain(savedTagEntity);
     }
+
+    /**
+     * 태그 개수 조회
+     * @param cardBookId 명함첩 아이디
+     * @return 조회된 수
+     */
+    @Override
+    public int countByCardBookId(String cardBookId) {
+        return tagJpaRepository.countByCardBookId(cardBookId);
+    }
 }
