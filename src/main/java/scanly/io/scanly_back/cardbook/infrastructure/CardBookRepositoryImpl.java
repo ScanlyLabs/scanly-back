@@ -32,6 +32,17 @@ public class CardBookRepositoryImpl implements CardBookRepository {
     }
 
     /**
+     * 이이디 및 회원 아이디로 유효성 체크
+     * @param id 아이디
+     * @param memberId 회원 아이디
+     * @return 존재하면 true, 아니면 false
+     */
+    @Override
+    public boolean existsByIdAndMemberId(String id, String memberId) {
+        return cardBookJpaRepository.existsByIdAndMemberId(id, memberId);
+    }
+
+    /**
      * 회원 아이디 및 명함 아이디로 유효성 체크
      * @param memberId 회원 아이디
      * @param cardId 명함 아이디

@@ -11,6 +11,8 @@ public interface CardBookRepository {
 
     CardBook save(CardBook cardBook);
 
+    boolean existsByIdAndMemberId(String id, String memberId);
+
     boolean existsByMemberIdAndCardId(String memberId, String cardId);
 
     List<CardBook> findAllByMemberId(String memberId);

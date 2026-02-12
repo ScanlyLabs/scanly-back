@@ -26,6 +26,16 @@ public class Tag extends BaseDomain {
         return new Tag(id, cardBookId, name, createdAt, updatedAt);
     }
 
+    public static Tag create(String cardBookId, String name) {
+        return new Tag(
+                null,
+                cardBookId,
+                name,
+                null,
+                null
+        );
+    }
+
 
     // getters
     public String getId() {
