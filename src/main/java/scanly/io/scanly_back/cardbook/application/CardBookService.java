@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import scanly.io.scanly_back.card.application.CardService;
 import scanly.io.scanly_back.card.domain.Card;
+import scanly.io.scanly_back.cardbook.application.dto.TagService;
 import scanly.io.scanly_back.cardbook.application.dto.command.CardExchangeCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.SaveCardBookCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.UpdateCardBookFavoriteCommand;
@@ -26,6 +27,7 @@ import scanly.io.scanly_back.cardbook.domain.CardExchange;
 import scanly.io.scanly_back.cardbook.domain.CardExchangeRepository;
 import scanly.io.scanly_back.cardbook.domain.event.CardExchangedEvent;
 import scanly.io.scanly_back.cardbook.domain.model.ProfileSnapshot;
+import scanly.io.scanly_back.cardbook.infrastructure.TagRepository;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
 import scanly.io.scanly_back.common.ratelimit.RateLimiterService;
@@ -47,6 +49,7 @@ public class CardBookService {
 
     private final CardBookRepository cardBookRepository;
     private final CardExchangeRepository cardExchangeRepository;
+    private final TagService tagService;
     private final CardService cardService;
     private final MemberRepository memberRepository;
     private final ApplicationEventPublisher eventPublisher;
@@ -327,11 +330,17 @@ public class CardBookService {
 
     /**
      * 명함첩 삭제
+     * 1. 태그 삭제
+     * 2. 명함첩 삭제
      * @param memberId 회원 아이디
      * @param id 아이디
      */
+    @Transactional
     public void delete(String memberId, String id) {
         CardBook cardBook = getByIdAndMemberId(id, memberId);
+        //1. 태그 삭제
+        tagService.deleteAllByCardBookId(cardBook.getId());
+        // 2. 명함첩 삭제
         cardBookRepository.deleteById(cardBook.getId());
     }
 

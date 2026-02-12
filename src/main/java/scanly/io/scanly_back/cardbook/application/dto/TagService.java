@@ -111,4 +111,13 @@ public class TagService {
         // 3. 삭제
         tagRepository.deleteById(tag.getId());
     }
+
+    /**
+     * 명함첩 아이디로 태그 삭제
+     * 상위 트랜잭션에 참여하기 때문에 @Transactional 생
+     * @param cardBookId 명함첩 아이
+     */
+    public void deleteAllByCardBookId(String cardBookId) {
+        tagRepository.deleteAllByCardBookId(cardBookId);
+    }
 }
