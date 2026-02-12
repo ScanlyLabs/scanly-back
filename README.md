@@ -130,9 +130,10 @@ src/main/java/scanly/io/scanly_back
 | POST | `/api/cardbooks/v1/{id}/delete` | 명함첩 삭제 |
 
 ### 태그 (Tag)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/tags/v1` | 태그 저장 |
+| Method | Endpoint                   | Description |
+|--------|----------------------------|-------------|
+| POST | `/api/tags/v1`             | 태그 저장       |
+| POST | `/api/tags/v1/{id}/update` | 태그 수정       |
 
 ### 그룹 (Group)
 | Method | Endpoint | Description |
