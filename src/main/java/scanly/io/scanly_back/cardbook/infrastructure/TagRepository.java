@@ -12,4 +12,6 @@ public interface TagRepository {
     int countByCardBookId(String cardBookId);
 
     Tag update(Tag tag);
+
+    void deleteById(String id);
 }

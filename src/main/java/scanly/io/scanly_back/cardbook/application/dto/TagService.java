@@ -94,4 +94,21 @@ public class TagService {
 
         return TagInfo.from(updatedTag);
     }
+
+    /**
+     * 태그 삭제
+     * @param memberId 회원 아이디
+     * @param id 아이디
+     */
+    @Transactional
+    public void delete(String memberId, String id) {
+        // 1. 태그 조회
+        Tag tag = getById(id);
+
+        // 2. 자신이 소유한 명함첩인지 확인
+        validateCardBookOwnership(tag.getCardBookId(), memberId);
+
+        // 3. 삭제
+        tagRepository.deleteById(tag.getId());
+    }
 }

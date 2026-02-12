@@ -134,6 +134,7 @@ src/main/java/scanly/io/scanly_back
 |--------|----------------------------|-------------|
 | POST | `/api/tags/v1`             | 태그 저장       |
 | POST | `/api/tags/v1/{id}/update` | 태그 수정       |
+| POST | `/api/tags/v1/{id}/delete` | 태그 삭제       |
 
 ### 그룹 (Group)
 | Method | Endpoint | Description |

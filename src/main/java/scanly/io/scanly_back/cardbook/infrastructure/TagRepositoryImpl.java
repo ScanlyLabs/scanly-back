@@ -57,4 +57,13 @@ public class TagRepositoryImpl implements TagRepository {
         TagEntity updatedTagEntity = tagJpaRepository.save(tagEntity);
         return tagMapper.toDomain(updatedTagEntity);
     }
+
+    /**
+     * 아이디로 태그 삭제
+     * @param id 아이디
+     */
+    @Override
+    public void deleteById(String id) {
+        tagJpaRepository.deleteById(id);
+    }
 }
