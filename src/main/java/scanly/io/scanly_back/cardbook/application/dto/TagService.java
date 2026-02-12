@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import scanly.io.scanly_back.cardbook.application.dto.command.RegisterTagCommand;
+import scanly.io.scanly_back.cardbook.application.dto.command.UpdateTagCommand;
 import scanly.io.scanly_back.cardbook.application.dto.info.TagInfo;
 import scanly.io.scanly_back.cardbook.domain.CardBookRepository;
 import scanly.io.scanly_back.cardbook.domain.Tag;
@@ -18,6 +19,14 @@ public class TagService {
 
     private final CardBookRepository cardBookRepository;
     private final TagRepository tagRepository;
+
+    /**
+     * 아이디로 태그 조회
+     * @return 조회된 태그
+     */
+    public Tag getById(String id) {
+        return tagRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.TAG_NOT_FOUND));
+    }
 
     /**
      * 태그 등록
@@ -61,5 +70,28 @@ public class TagService {
         if (!cardBookRepository.existsByIdAndMemberId(cardBookId, memberId)) {
             throw new CustomException(ErrorCode.CARD_BOOK_NOT_FOUND);
         }
+    }
+
+    /**
+     * 태그 수정
+     * 1. 태그 조회
+     * 2. 자신이 소유한 명함첩인지 확인
+     * 3. 태그 수정
+     * @param command 수정할 태그 정보
+     * @return 수정된 태그
+     */
+    @Transactional
+    public TagInfo update(UpdateTagCommand command) {
+        // 1. 태그 조회
+        Tag tag = getById(command.id());
+
+        // 2. 자신이 소유한 명함첩인지 확인
+        validateCardBookOwnership(tag.getCardBookId(), command.memberId());
+
+        // 3. 태그 수정
+        tag.changeName(command.name());
+        Tag updatedTag = tagRepository.update(tag);
+
+        return TagInfo.from(updatedTag);
     }
 }

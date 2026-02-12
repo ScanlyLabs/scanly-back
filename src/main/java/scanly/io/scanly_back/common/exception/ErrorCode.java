@@ -30,7 +30,8 @@ public enum ErrorCode {
     CARD_BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "CB003", "명함첩을 찾을 수 없습니다."),
 
     // tag
-    TAG_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "T001", "태그는 최대 10개까지 등록할 수 있습니다"),
+    TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "T001", "태그가 존재하지 않습니다."),
+    TAG_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "T002", "태그는 최대 10개까지 등록할 수 있습니다"),
 
     // group
     GROUP_NOT_FOUND(HttpStatus.NOT_FOUND, "CBG001", "명함첩 그룹이 존재하지 않습니다."),
