@@ -129,6 +129,11 @@ src/main/java/scanly/io/scanly_back
 | POST | `/api/cardbooks/v1/{id}/favorite` | 명함첩 즐겨찾기 수정 |
 | POST | `/api/cardbooks/v1/{id}/delete` | 명함첩 삭제 |
 
+### 태그 (Tag)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/tags/v1` | 태그 저장 |
+
 ### 그룹 (Group)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
