@@ -2,9 +2,11 @@ package scanly.io.scanly_back.cardbook.application.dto.info;
 
 import scanly.io.scanly_back.card.domain.Card;
 import scanly.io.scanly_back.cardbook.domain.CardBook;
+import scanly.io.scanly_back.cardbook.domain.Tag;
 import scanly.io.scanly_back.cardbook.domain.model.ProfileSnapshot;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record CardBookInfo(
         String id,
@@ -18,10 +20,11 @@ public record CardBookInfo(
         String memo,
         boolean isFavorite,
         boolean isCardDeleted,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        List<Tag> tagList
 ) {
 
-    public static CardBookInfo from(CardBook cardBook, Card card) {
+    public static CardBookInfo from(CardBook cardBook, Card card, List<Tag> tagList) {
         ProfileSnapshot snapshot = cardBook.getProfileSnapshot();
         boolean isDeleted = card == null;
         return new CardBookInfo(
@@ -36,7 +39,8 @@ public record CardBookInfo(
                 cardBook.getMemo(),
                 cardBook.isFavorite(),
                 isDeleted,
-                cardBook.getCreatedAt()
+                cardBook.getCreatedAt(),
+                tagList
         );
     }
 }

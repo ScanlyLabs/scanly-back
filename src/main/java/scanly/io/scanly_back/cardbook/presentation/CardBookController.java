@@ -16,6 +16,7 @@ import scanly.io.scanly_back.cardbook.application.CardBookService;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardBookInfo;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardBookPreviewInfo;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardExchangeInfo;
+import scanly.io.scanly_back.cardbook.application.dto.info.RegisterCardBookInfo;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.CardExchangeRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.SaveCardBookRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.UpdateCardBookFavoriteRequest;
@@ -43,11 +44,11 @@ public class CardBookController {
             @AuthenticationPrincipal String memberId,
             @Valid @RequestBody SaveCardBookRequest request
     ) {
-        CardBookInfo cardBookInfo = cardBookService.save(request.toCommand(memberId));
+        RegisterCardBookInfo registerCardBookInfo = cardBookService.save(request.toCommand(memberId));
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponse.success(RegisterCardBookResponse.from(cardBookInfo)));
+                .body(ApiResponse.success(RegisterCardBookResponse.from(registerCardBookInfo)));
     }
 
     @PostMapping("/exchange")
