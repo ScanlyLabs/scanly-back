@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import scanly.io.scanly_back.card.application.CardService;
 import scanly.io.scanly_back.card.domain.Card;
 import scanly.io.scanly_back.cardbook.application.dto.command.SaveCardBookCommand;
-import scanly.io.scanly_back.cardbook.application.dto.info.CardBookInfo;
+import scanly.io.scanly_back.cardbook.application.dto.info.RegisterCardBookInfo;
 import scanly.io.scanly_back.cardbook.domain.CardBook;
 import scanly.io.scanly_back.cardbook.domain.CardBookRepository;
 import scanly.io.scanly_back.common.exception.CustomException;
@@ -101,7 +101,7 @@ class CardBookServiceTest {
             given(cardBookRepository.save(any(CardBook.class))).willReturn(savedCardBook);
 
             // when
-            CardBookInfo result = cardBookService.save(command);
+            RegisterCardBookInfo result = cardBookService.save(command);
 
             // then
             assertThat(result).isNotNull();

@@ -12,6 +12,8 @@ import scanly.io.scanly_back.cardbook.infrastructure.TagRepository;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -26,6 +28,14 @@ public class TagService {
      */
     public Tag getById(String id) {
         return tagRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.TAG_NOT_FOUND));
+    }
+
+    /**
+     * 명함첩 아이디로 태그 목록 조회
+     * @return 조회된 태그 목록
+     */
+    public List<Tag> getAllByCardBookId(String cardBookId) {
+        return tagRepository.findAllByCardBookId(cardBookId);
     }
 
     /**
@@ -110,5 +120,14 @@ public class TagService {
 
         // 3. 삭제
         tagRepository.deleteById(tag.getId());
+    }
+
+    /**
+     * 명함첩 아이디로 태그 삭제
+     * 상위 트랜잭션에 참여하기 때문에 @Transactional 생
+     * @param cardBookId 명함첩 아이
+     */
+    public void deleteAllByCardBookId(String cardBookId) {
+        tagRepository.deleteAllByCardBookId(cardBookId);
     }
 }

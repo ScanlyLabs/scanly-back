@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import scanly.io.scanly_back.card.application.CardService;
 import scanly.io.scanly_back.card.domain.Card;
+import scanly.io.scanly_back.cardbook.application.dto.TagService;
 import scanly.io.scanly_back.cardbook.application.dto.command.CardExchangeCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.SaveCardBookCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.UpdateCardBookFavoriteCommand;
@@ -20,10 +21,8 @@ import scanly.io.scanly_back.cardbook.application.dto.command.UpdateCardBookMemo
 import scanly.io.scanly_back.cardbook.application.dto.info.CardBookInfo;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardBookPreviewInfo;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardExchangeInfo;
-import scanly.io.scanly_back.cardbook.domain.CardBook;
-import scanly.io.scanly_back.cardbook.domain.CardBookRepository;
-import scanly.io.scanly_back.cardbook.domain.CardExchange;
-import scanly.io.scanly_back.cardbook.domain.CardExchangeRepository;
+import scanly.io.scanly_back.cardbook.application.dto.info.RegisterCardBookInfo;
+import scanly.io.scanly_back.cardbook.domain.*;
 import scanly.io.scanly_back.cardbook.domain.event.CardExchangedEvent;
 import scanly.io.scanly_back.cardbook.domain.model.ProfileSnapshot;
 import scanly.io.scanly_back.common.exception.CustomException;
@@ -47,6 +46,7 @@ public class CardBookService {
 
     private final CardBookRepository cardBookRepository;
     private final CardExchangeRepository cardExchangeRepository;
+    private final TagService tagService;
     private final CardService cardService;
     private final MemberRepository memberRepository;
     private final ApplicationEventPublisher eventPublisher;
@@ -63,7 +63,7 @@ public class CardBookService {
      * @return 저장된 명함첩 정보
      */
     @Transactional
-    public CardBookInfo save(SaveCardBookCommand command) {
+    public RegisterCardBookInfo save(SaveCardBookCommand command) {
         String memberId = command.memberId();
         String cardId = command.cardId();
 
@@ -73,14 +73,14 @@ public class CardBookService {
         // 2. 유효성 검증
         validateCardBook(card.getMemberId(), memberId, cardId);
 
-        // 4. 스냅샷 생성(명함 정보를 스냅샷으로 변환)
+        // 3. 스냅샷 생성(명함 정보를 스냅샷으로 변환)
         ProfileSnapshot profileSnapshot = ProfileSnapshot.from(card);
 
-        // 5. 명함첩에 저장
+        // 4. 명함첩에 저장
         CardBook cardBook = CardBook.create(memberId, cardId, profileSnapshot, command.groupId());
         CardBook savedCardBook = cardBookRepository.save(cardBook);
 
-        return CardBookInfo.from(savedCardBook, card);
+        return RegisterCardBookInfo.from(savedCardBook, card);
     }
 
     /**
@@ -238,15 +238,16 @@ public class CardBookService {
     public CardBookInfo read(String memberId, String id) {
         CardBook cardBook = getByIdAndMemberId(id, memberId);
         Card card = findCardOrNull(cardBook.getCardId());
-
-        return CardBookInfo.from(cardBook, card);
+        List<Tag> tagList = tagService.getAllByCardBookId(cardBook.getId());
+        return CardBookInfo.from(cardBook, card, tagList);
     }
 
     /**
      * 명함첩 그룹 수정
      * 1. 명함첩 조회
      * 2. 명함첩 수정
-     * 3. Card 조회 후 반환
+     * 3. Card 조회
+     * 4. 태그 조회
      * @param command 명함첩 정보
      * @return 수정된 명함첩
      */
@@ -258,9 +259,13 @@ public class CardBookService {
         cardBook.updateGroup(command.groupId());
         CardBook updatedCardBook = cardBookRepository.update(cardBook);
 
-        // 3. Card 조회 후 반환
+        // 3. Card 조회
         Card card = findCardOrNull(updatedCardBook.getCardId());
-        return CardBookInfo.from(updatedCardBook, card);
+
+        // 4. 태그 조회
+        List<Tag> tagList = tagService.getAllByCardBookId(cardBook.getId());
+
+        return CardBookInfo.from(updatedCardBook, card, tagList);
     }
 
     /**
@@ -287,7 +292,8 @@ public class CardBookService {
      * 명함첩 메모 수정
      * 1. 명함첩 조회
      * 2. 명함첩 수정
-     * 3. Card 조회 후 반환
+     * 3. Card 조회
+     * 4. 태그 조회
      * @param command 명함첩 정보
      * @return 수정된 명함첩
      */
@@ -301,14 +307,19 @@ public class CardBookService {
 
         // 3. Card 조회 후 반환
         Card card = findCardOrNull(updatedCardBook.getCardId());
-        return CardBookInfo.from(updatedCardBook, card);
+
+        // 4. 태그 조회
+        List<Tag> tagList = tagService.getAllByCardBookId(cardBook.getId());
+
+        return CardBookInfo.from(updatedCardBook, card, tagList);
     }
 
     /**
      * 명함첩 즐겨찾기 수정
      * 1. 명함첩 조회
      * 2. 명함첩 수정
-     * 3. Card 조회 후 반환
+     * 3. Card 조회
+     * 4. 태그 조회
      * @param command 명함첩 정보
      * @return 수정된 명함첩
      */
@@ -320,18 +331,28 @@ public class CardBookService {
         cardBook.updateFavorite(command.favorite());
         CardBook updatedCardBook = cardBookRepository.update(cardBook);
 
-        // 3. Card 조회 후 반환
+        // 3. Card 조회
         Card card = findCardOrNull(updatedCardBook.getCardId());
-        return CardBookInfo.from(updatedCardBook, card);
+
+        // 4. 태그 조회
+        List<Tag> tagList = tagService.getAllByCardBookId(cardBook.getId());
+
+        return CardBookInfo.from(updatedCardBook, card, tagList);
     }
 
     /**
      * 명함첩 삭제
+     * 1. 태그 삭제
+     * 2. 명함첩 삭제
      * @param memberId 회원 아이디
      * @param id 아이디
      */
+    @Transactional
     public void delete(String memberId, String id) {
         CardBook cardBook = getByIdAndMemberId(id, memberId);
+        //1. 태그 삭제
+        tagService.deleteAllByCardBookId(cardBook.getId());
+        // 2. 명함첩 삭제
         cardBookRepository.deleteById(cardBook.getId());
     }
 

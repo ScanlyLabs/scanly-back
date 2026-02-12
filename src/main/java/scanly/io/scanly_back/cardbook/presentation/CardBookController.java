@@ -16,6 +16,7 @@ import scanly.io.scanly_back.cardbook.application.CardBookService;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardBookInfo;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardBookPreviewInfo;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardExchangeInfo;
+import scanly.io.scanly_back.cardbook.application.dto.info.RegisterCardBookInfo;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.CardExchangeRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.SaveCardBookRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.UpdateCardBookFavoriteRequest;
@@ -24,6 +25,7 @@ import scanly.io.scanly_back.cardbook.presentation.dto.request.UpdateCardBookMem
 import scanly.io.scanly_back.cardbook.presentation.dto.response.CardBookPreviewResponse;
 import scanly.io.scanly_back.cardbook.presentation.dto.response.CardBookResponse;
 import scanly.io.scanly_back.cardbook.presentation.dto.response.CardExchangeResponse;
+import scanly.io.scanly_back.cardbook.presentation.dto.response.RegisterCardBookResponse;
 import scanly.io.scanly_back.common.ratelimit.RateLimiter;
 import scanly.io.scanly_back.common.response.ApiResponse;
 import scanly.io.scanly_back.common.response.PageResponse;
@@ -38,15 +40,15 @@ public class CardBookController {
 
     @PostMapping
     @Operation(summary = "명함 저장", description = "타인의 명함을 내 명함첩에 저장합니다.")
-    public ResponseEntity<ApiResponse<CardBookResponse>> saveCardBook(
+    public ResponseEntity<ApiResponse<RegisterCardBookResponse>> saveCardBook(
             @AuthenticationPrincipal String memberId,
             @Valid @RequestBody SaveCardBookRequest request
     ) {
-        CardBookInfo cardBookInfo = cardBookService.save(request.toCommand(memberId));
+        RegisterCardBookInfo registerCardBookInfo = cardBookService.save(request.toCommand(memberId));
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponse.success(CardBookResponse.from(cardBookInfo)));
+                .body(ApiResponse.success(RegisterCardBookResponse.from(registerCardBookInfo)));
     }
 
     @PostMapping("/exchange")
