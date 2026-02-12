@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import scanly.io.scanly_back.cardbook.application.dto.TagService;
 import scanly.io.scanly_back.cardbook.application.dto.info.TagInfo;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.RegisterTagRequest;
-import scanly.io.scanly_back.cardbook.presentation.dto.response.RegisterTagResponse;
+import scanly.io.scanly_back.cardbook.presentation.dto.response.TagResponse;
 import scanly.io.scanly_back.common.response.ApiResponse;
 
 @RestController
@@ -27,7 +27,7 @@ public class TagController {
 
     @PostMapping
     @Operation(summary = "태그 저장", description = "명함첩 내 태그를 저장합니다.")
-    public ResponseEntity<ApiResponse<RegisterTagResponse>> registerTag(
+    public ResponseEntity<ApiResponse<TagResponse>> register(
             @AuthenticationPrincipal String memberId,
             @Valid @RequestBody RegisterTagRequest request
     ) {
@@ -35,6 +35,6 @@ public class TagController {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponse.success(RegisterTagResponse.from(tagInfo)));
+                .body(ApiResponse.success(TagResponse.from(tagInfo)));
     }
 }
