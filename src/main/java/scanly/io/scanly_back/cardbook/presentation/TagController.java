@@ -1,19 +1,18 @@
 package scanly.io.scanly_back.cardbook.presentation;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import scanly.io.scanly_back.cardbook.application.dto.TagService;
 import scanly.io.scanly_back.cardbook.application.dto.info.TagInfo;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.RegisterTagRequest;
+import scanly.io.scanly_back.cardbook.presentation.dto.request.UpdateTagRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.response.TagResponse;
 import scanly.io.scanly_back.common.response.ApiResponse;
 
@@ -36,5 +35,18 @@ public class TagController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success(TagResponse.from(tagInfo)));
+    }
+
+    @PostMapping("/{id}/update")
+    @Operation(summary = "태그 저장", description = "명함첩 내 태그를 저장합니다.")
+    public ResponseEntity<ApiResponse<TagResponse>> update(
+            @AuthenticationPrincipal String memberId,
+            @Parameter(description = "태그 ID", required = true)
+            @PathVariable String id,
+            @Valid @RequestBody UpdateTagRequest request
+    ) {
+        TagInfo tagInfo = tagService.update(request.toCommand(memberId, id));
+
+        return ResponseEntity.ok(ApiResponse.success(TagResponse.from(tagInfo)));
     }
 }

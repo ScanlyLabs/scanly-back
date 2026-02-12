@@ -36,6 +36,14 @@ public class Tag extends BaseDomain {
         );
     }
 
+    /**
+     * 태그명 수정
+     * @param name 수정할 태그명
+     */
+    public void changeName(String name) {
+        this.name = name;
+    }
+
 
     // getters
     public String getId() {
