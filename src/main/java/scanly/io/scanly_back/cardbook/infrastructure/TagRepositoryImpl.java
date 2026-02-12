@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import scanly.io.scanly_back.cardbook.domain.Tag;
 import scanly.io.scanly_back.cardbook.infrastructure.entity.TagEntity;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -22,6 +23,17 @@ public class TagRepositoryImpl implements TagRepository {
     @Override
     public Optional<Tag> findById(String id) {
         return tagJpaRepository.findById(id).map(tagMapper::toDomain);
+    }
+
+    /**
+     * 명함첩 아이디로 태그 목록 조회
+     * @param cardBookId 명함첩 아이디
+     * @return 조회된 태그 목록
+     */
+    @Override
+    public List<Tag> findAllByCardBookId(String cardBookId) {
+        List<TagEntity> tagEntities = tagJpaRepository.findAllByCardBookId(cardBookId);
+        return tagEntities.stream().map(tagMapper::toDomain).toList();
     }
 
     /**

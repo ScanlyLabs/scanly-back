@@ -12,6 +12,8 @@ import scanly.io.scanly_back.cardbook.infrastructure.TagRepository;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -26,6 +28,14 @@ public class TagService {
      */
     public Tag getById(String id) {
         return tagRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.TAG_NOT_FOUND));
+    }
+
+    /**
+     * 명함첩 아이디로 태그 목록 조회
+     * @return 조회된 태그 목록
+     */
+    public List<Tag> getAllByCardBookId(String cardBookId) {
+        return tagRepository.findAllByCardBookId(cardBookId);
     }
 
     /**
