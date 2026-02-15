@@ -5,7 +5,12 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import scanly.io.scanly_back.common.entity.BaseEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -39,6 +44,10 @@ public class CardEntity extends BaseEntity {
     @Column(name = "bio", length = 300)
     private String bio;                     // 자기소개
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "social_links", columnDefinition = "jsonb")
+    private List<SocialLinkData> socialLinks = new ArrayList<>();  // 소셜 링크 (JSONB)
+
     @Column(name = "profile_image_url")
     private String profileImageUrl;          // 프로필 사진 url
 
@@ -53,13 +62,13 @@ public class CardEntity extends BaseEntity {
 
     public static CardEntity of(
             String id, String memberId, String name, String title, String company,
-            String phone, String email, String bio, String profileImageUrl,
-            String portfolioUrl, String location, String qrImageUrl
+            String phone, String email, String bio, List<SocialLinkData> socialLinks,
+            String profileImageUrl, String portfolioUrl, String location, String qrImageUrl
     ) {
         return new CardEntity(
                 id, memberId, name, title, company,
-                phone, email, bio, profileImageUrl,
-                portfolioUrl, location, qrImageUrl
+                phone, email, bio, socialLinks != null ? socialLinks : new ArrayList<>(),
+                profileImageUrl, portfolioUrl, location, qrImageUrl
         );
     }
 }
