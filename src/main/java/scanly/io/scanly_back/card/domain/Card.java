@@ -111,8 +111,7 @@ public class Card extends BaseDomain {
         if (this.socialLinks.size() >= 10) {
             throw new CustomException(ErrorCode.CARD_SOCIAL_LINK_LIMIT_EXCEEDED);
         }
-        int order = this.socialLinks.size();
-        SocialLink socialLink = SocialLink.create(type, url, order);
+        SocialLink socialLink = SocialLink.create(type, url);
         this.socialLinks.add(socialLink);
     }
 

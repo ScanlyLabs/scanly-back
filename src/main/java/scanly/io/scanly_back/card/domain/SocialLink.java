@@ -1,33 +1,22 @@
 package scanly.io.scanly_back.card.domain;
 
-import scanly.io.scanly_back.common.domain.BaseDomain;
+public class SocialLink {
 
-import java.time.LocalDateTime;
-
-public class SocialLink extends BaseDomain {
-
-    private String id;
     private SocialLinkType type;
     private String url;
-    private int displayOrder;
 
-    private SocialLink(String id, SocialLinkType type, String url, int displayOrder,
-                       LocalDateTime createdAt, LocalDateTime updatedAt) {
-        super(createdAt, updatedAt);
-        this.id = id;
+    private SocialLink(SocialLinkType type, String url) {
         this.type = type;
         this.url = url;
-        this.displayOrder = displayOrder;
     }
 
-    public static SocialLink of(String id, SocialLinkType type, String url,
-                                int displayOrder, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        return new SocialLink(id, type, url, displayOrder, createdAt, updatedAt);
+    public static SocialLink of(SocialLinkType type, String url) {
+        return new SocialLink(type, url);
     }
 
-    public static SocialLink create(SocialLinkType type, String url, int displayOrder) {
+    public static SocialLink create(SocialLinkType type, String url) {
         validateUrl(url);
-        return new SocialLink(null, type, url, displayOrder, null, null);
+        return new SocialLink(type, url);
     }
 
     /**
@@ -44,19 +33,11 @@ public class SocialLink extends BaseDomain {
     }
 
     // Getters
-    public String getId() {
-        return id;
-    }
-
     public SocialLinkType getType() {
         return type;
     }
 
     public String getUrl() {
         return url;
-    }
-
-    public int getDisplayOrder() {
-        return displayOrder;
     }
 }

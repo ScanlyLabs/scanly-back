@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import scanly.io.scanly_back.card.domain.Card;
 import scanly.io.scanly_back.card.domain.SocialLink;
 import scanly.io.scanly_back.card.infrastructure.entity.CardEntity;
-import scanly.io.scanly_back.card.infrastructure.entity.SocialLinkEntity;
+import scanly.io.scanly_back.card.infrastructure.entity.SocialLinkData;
 
 import java.util.List;
 
@@ -21,6 +21,10 @@ public class CardMapper {
             return null;
         }
 
+        List<SocialLinkData> socialLinkDataList = domain.getSocialLinks().stream()
+                .map(this::toSocialLinkData)
+                .toList();
+
         return CardEntity.of(
                 domain.getId(),
                 domain.getMemberId(),
@@ -30,6 +34,7 @@ public class CardMapper {
                 domain.getPhone(),
                 domain.getEmail(),
                 domain.getBio(),
+                socialLinkDataList,
                 domain.getProfileImageUrl(),
                 domain.getPortfolioUrl(),
                 domain.getLocation(),
@@ -38,38 +43,17 @@ public class CardMapper {
     }
 
     /**
-     * SocialLink domain -> entity 객체 변환
-     * @param domain 도메인
-     * @param cardId 명함 ID
-     * @return 엔티티
-     */
-    public SocialLinkEntity socialLinkToEntity(SocialLink domain, String cardId) {
-        if (domain == null) {
-            return null;
-        }
-
-        return SocialLinkEntity.of(
-                domain.getId(),
-                cardId,
-                domain.getType(),
-                domain.getUrl(),
-                domain.getDisplayOrder()
-        );
-    }
-
-    /**
      * Card entity -> domain 객체 변환
      * @param entity 엔티티
-     * @param socialLinkEntities 소셜 링크 엔티티 목록
      * @return 도메인
      */
-    public Card toDomain(CardEntity entity, List<SocialLinkEntity> socialLinkEntities) {
+    public Card toDomain(CardEntity entity) {
         if (entity == null) {
             return null;
         }
 
-        List<SocialLink> socialLinks = socialLinkEntities.stream()
-                .map(this::socialLinkToDomain)
+        List<SocialLink> socialLinks = entity.getSocialLinks().stream()
+                .map(this::toSocialLinkDomain)
                 .toList();
 
         return Card.of(
@@ -92,46 +76,26 @@ public class CardMapper {
     }
 
     /**
-     * SocialLink entity -> domain 객체 변환
-     * @param entity 엔티티
-     * @return 도메인
+     * SocialLink domain -> JSONB 객체 변환
+     * @param domain 도메인
+     * @return JSONB 저장용 데이터
      */
-    public SocialLink socialLinkToDomain(SocialLinkEntity entity) {
-        if (entity == null) {
-            return null;
-        }
-
-        return SocialLink.of(
-                entity.getId(),
-                entity.getType(),
-                entity.getUrl(),
-                entity.getDisplayOrder(),
-                entity.getCreatedAt(),
-                entity.getUpdatedAt()
+    private SocialLinkData toSocialLinkData(SocialLink domain) {
+        return SocialLinkData.of(
+                domain.getType(),
+                domain.getUrl()
         );
     }
 
-
     /**
-     * SocialLink domain -> entity 객체 변환
-     * 삭제 후 재생성 패턴을 사용하므로 id는 null로 설정
-     * (id가 존재하면 JPA 가 UPDATE(merge)를 시도하여
-     * 삭제된 row에 대해 ObjectOptimisticLockingFailureException이 발생할 수 있음)
-     * @param domain 도메인
-     * @param cardId 명함 ID
-     * @return 신규 엔티티
+     * SocialLink JSONB -> domain 객체 변환
+     * @param data JSONB 데이터
+     * @return 도메인
      */
-    public SocialLinkEntity socialLinkToNewEntity(SocialLink domain, String cardId) {
-        if (domain == null) {
-            return null;
-        }
-
-        return SocialLinkEntity.of(
-                null,
-                cardId,
-                domain.getType(),
-                domain.getUrl(),
-                domain.getDisplayOrder()
+    private SocialLink toSocialLinkDomain(SocialLinkData data) {
+        return SocialLink.of(
+                data.type(),
+                data.url()
         );
     }
 }
