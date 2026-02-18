@@ -34,3 +34,13 @@ cloud:
       static: ${AWS_REGION}
     s3:
       bucket: ${AWS_S3_BUCKET}
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      redisCircuitBreaker:
+        slidingWindowSize: 10                                 # 최근 10번 호출 기준으로 계산
+        failureRateThreshold: 50                              # 실패율이 50% 이상이면 OPEN 상태로 전환
+        waitDurationInOpenState: 30s                          # OPEN 상태 30초 동안 유지
+        permittedNumberOfCallsInHalfOpenState: 3              # HALF_OPEN 상태에서 복구 테스트 3회 호출
+        automaticTransitionFromOpenToHalfOpenEnabled: true    # 자동으로 HALF_OPE 상태 전환 허용(30초 후)
