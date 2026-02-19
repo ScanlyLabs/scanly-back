@@ -44,3 +44,6 @@ resilience4j:
         waitDurationInOpenState: 30s                          # OPEN 상태 30초 동안 유지
         permittedNumberOfCallsInHalfOpenState: 3              # HALF_OPEN 상태에서 복구 테스트 3회 호출
         automaticTransitionFromOpenToHalfOpenEnabled: true    # 자동으로 HALF_OPE 상태 전환 허용(30초 후)
+        recordExceptions:
+          - org.springframework.data.redis.RedisConnectionFailureException
+          - io.lettuce.core.RedisConnectionException
