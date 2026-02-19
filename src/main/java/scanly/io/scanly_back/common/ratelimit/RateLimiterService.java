@@ -37,10 +37,7 @@ public class RateLimiterService {
         String redisKey = RATE_LIMIT_KEY_PREFIX + key;
         Duration windowDuration = Duration.of(window, timeUnit.toChronoUnit());
 
-        Long currentCount = redisTemplate.opsForValue().increment(redisKey);
-        if (currentCount == null) {
-            return false;
-        }
+        long currentCount = redisTemplate.opsForValue().increment(redisKey);
 
         // 첫 번째 요청인 경우 TTL 설정
         if (currentCount == 1) {
@@ -84,11 +81,7 @@ public class RateLimiterService {
         String today = LocalDate.now().toString();
         String redisKey = DAILY_LIMIT_KEY_PREFIX + "exchange:" + senderId + ":" + receiverId + ":" + today;
 
-        // Redis가 응답하지 않거나 오류 날 경우
-        Long currentCount = redisTemplate.opsForValue().increment(redisKey);
-        if (currentCount == null) {
-            return false;
-        }
+        long currentCount = redisTemplate.opsForValue().increment(redisKey);
 
         // 첫 번째 요청인 경우 다음날 자정까지 TTL 설정
         if (currentCount == 1) {
