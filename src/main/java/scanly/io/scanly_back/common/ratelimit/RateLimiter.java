@@ -15,9 +15,9 @@ import java.util.concurrent.TimeUnit;
 public @interface RateLimiter {
 
     /**
-     * Rate Limit 키 (기본값: 메서드명)
+     * Rate Limit 키 (필수)
      */
-    String key() default "";
+    String key();
 
     /**
      * 허용되는 최대 요청 횟수

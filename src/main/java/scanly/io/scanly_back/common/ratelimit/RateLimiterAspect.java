@@ -5,15 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
-
-import java.lang.reflect.Method;
 
 /**
  * Rate Limiter AOP Aspect
@@ -30,7 +26,7 @@ public class RateLimiterAspect {
     @Around("@annotation(rateLimiter)")
     public Object rateLimit(ProceedingJoinPoint joinPoint, RateLimiter rateLimiter) throws Throwable {
         // Rate Limit 키 생성
-        String key = resolveKey(joinPoint, rateLimiter);
+        String key = resolveKey(rateLimiter);
 
         // Rate Limit 호출
         boolean allowed = rateLimiterService.isAllowed(
@@ -52,15 +48,10 @@ public class RateLimiterAspect {
 
     /**
      * Rate Limit 키 생성
-     * 사용자 ID + 메서드명 또는 커스텀 키 조합
      */
-    private String resolveKey(ProceedingJoinPoint joinPoint, RateLimiter rateLimiter) {
+    private String resolveKey(RateLimiter rateLimiter) {
         String userId = getCurrentUserId();
-        String baseKey = StringUtils.hasText(rateLimiter.key())
-                ? rateLimiter.key()
-                : getMethodName(joinPoint);
-
-        return userId + ":" + baseKey;
+        return userId + ":" + rateLimiter.key();
     }
 
     /**
@@ -75,14 +66,5 @@ public class RateLimiterAspect {
             }
         }
         return "anonymous";
-    }
-
-    /**
-     * 메서드명 가져오기
-     */
-    private String getMethodName(ProceedingJoinPoint joinPoint) {
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        Method method = signature.getMethod();
-        return method.getDeclaringClass().getSimpleName() + "." + method.getName();
     }
 }
