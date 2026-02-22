@@ -8,8 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
 import scanly.io.scanly_back.member.application.dto.command.SignUpCommand;
+import scanly.io.scanly_back.member.application.dto.command.UpdateMemberCommand;
 import scanly.io.scanly_back.member.application.dto.info.ReadMemberInfo;
 import scanly.io.scanly_back.member.application.dto.info.SignUpInfo;
+import scanly.io.scanly_back.member.application.dto.info.UpdateMemberInfo;
 import scanly.io.scanly_back.member.domain.Member;
 import scanly.io.scanly_back.member.domain.MemberRepository;
 
@@ -50,6 +52,20 @@ public class MemberService {
     public ReadMemberInfo readMe(String memberId) {
         Member member = findById(memberId);
         return ReadMemberInfo.from(member);
+    }
+
+    /**
+     * 내 정보 수정
+     * @param memberId 회원 ID
+     * @param command 수정 정보
+     * @return 수정된 회원 정보
+     */
+    @Transactional
+    public UpdateMemberInfo updateMe(String memberId, UpdateMemberCommand command) {
+        Member member = findById(memberId);
+        member.updateInfo(command.name(), command.email());
+        Member updatedMember = memberRepository.update(member);
+        return UpdateMemberInfo.from(updatedMember);
     }
 
     /**
