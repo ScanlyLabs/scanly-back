@@ -6,14 +6,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 import scanly.io.scanly_back.common.response.ApiResponse;
 import scanly.io.scanly_back.member.application.MemberService;
+import scanly.io.scanly_back.member.application.dto.info.ReadMemberInfo;
 import scanly.io.scanly_back.member.application.dto.info.SignUpInfo;
 import scanly.io.scanly_back.member.persentaion.dto.request.SignUpRequest;
+import scanly.io.scanly_back.member.persentaion.dto.response.ReadMemberResponse;
 import scanly.io.scanly_back.member.persentaion.dto.response.SignUpResponse;
 
 @RestController
@@ -34,5 +34,16 @@ public class MemberController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success(SignUpResponse.from(signUpInfo)));
+    }
+
+    @GetMapping("/me")
+    @Operation(summary = "내 정보 조회", description = "현재 로그인한 회원의 정보를 조회합니다.")
+    public ResponseEntity<ApiResponse<ReadMemberResponse>> readMe(
+            @AuthenticationPrincipal String memberId
+    ) {
+        ReadMemberInfo readMemberInfo = memberService.readMe(memberId);
+
+        return ResponseEntity
+                .ok(ApiResponse.success(ReadMemberResponse.from(readMemberInfo)));
     }
 }
