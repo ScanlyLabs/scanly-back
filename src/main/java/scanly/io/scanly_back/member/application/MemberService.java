@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
 import scanly.io.scanly_back.member.application.dto.command.SignUpCommand;
+import scanly.io.scanly_back.member.application.dto.info.ReadMemberInfo;
 import scanly.io.scanly_back.member.application.dto.info.SignUpInfo;
 import scanly.io.scanly_back.member.domain.Member;
 import scanly.io.scanly_back.member.domain.MemberRepository;
@@ -39,6 +40,16 @@ public class MemberService {
     public Member findByLoginId(String loginId) {
         return memberRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    /**
+     * 내 정보 조회
+     * @param memberId 회원 ID
+     * @return 회원 정보
+     */
+    public ReadMemberInfo readMe(String memberId) {
+        Member member = findById(memberId);
+        return ReadMemberInfo.from(member);
     }
 
     /**
