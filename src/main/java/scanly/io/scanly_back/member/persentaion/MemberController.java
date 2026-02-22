@@ -12,9 +12,12 @@ import scanly.io.scanly_back.common.response.ApiResponse;
 import scanly.io.scanly_back.member.application.MemberService;
 import scanly.io.scanly_back.member.application.dto.info.ReadMemberInfo;
 import scanly.io.scanly_back.member.application.dto.info.SignUpInfo;
+import scanly.io.scanly_back.member.application.dto.info.UpdateMemberInfo;
 import scanly.io.scanly_back.member.persentaion.dto.request.SignUpRequest;
+import scanly.io.scanly_back.member.persentaion.dto.request.UpdateMemberRequest;
 import scanly.io.scanly_back.member.persentaion.dto.response.ReadMemberResponse;
 import scanly.io.scanly_back.member.persentaion.dto.response.SignUpResponse;
+import scanly.io.scanly_back.member.persentaion.dto.response.UpdateMemberResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -45,5 +48,17 @@ public class MemberController {
 
         return ResponseEntity
                 .ok(ApiResponse.success(ReadMemberResponse.from(readMemberInfo)));
+    }
+
+    @PostMapping("/me/update")
+    @Operation(summary = "내 정보 수정", description = "현재 로그인한 회원의 정보를 수정합니다.")
+    public ResponseEntity<ApiResponse<UpdateMemberResponse>> updateMe(
+            @AuthenticationPrincipal String memberId,
+            @Valid @RequestBody UpdateMemberRequest request
+    ) {
+        UpdateMemberInfo updateMemberInfo = memberService.updateMe(memberId, request.toCommand());
+
+        return ResponseEntity
+                .ok(ApiResponse.success(UpdateMemberResponse.from(updateMemberInfo)));
     }
 }

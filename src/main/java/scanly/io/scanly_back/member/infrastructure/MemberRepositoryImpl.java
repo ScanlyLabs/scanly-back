@@ -59,4 +59,17 @@ public class MemberRepositoryImpl implements MemberRepository {
         return memberJpaRepository.findByLoginId(loginId)
                 .map(memberMapper::toDomain);
     }
+
+    /**
+     * 내 정보 수정
+     * @param member 수정할 정보
+     * @return 수정된 정보
+     */
+    @Override
+    public Member update(Member member) {
+        MemberEntity memberEntity = memberMapper.toEntity(member);
+        MemberEntity updatedMemberEntity = memberJpaRepository.save(memberEntity);
+
+        return memberMapper.toDomain(updatedMemberEntity);
+    }
 }

@@ -62,6 +62,16 @@ public class Member extends BaseDomain {
         );
     }
 
+    /**
+     * 회원 정보 수정
+     * @param name 회원명
+     * @param email 이메일
+     */
+    public void updateInfo(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+
     // -- getters --
     public String getId() {
         return id;
