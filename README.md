@@ -116,9 +116,11 @@ src/main/java/scanly/io/scanly_back
 | POST | `/api/auth/v1/reissue` | 토큰 재발급 |
 
 ### 회원 (Member)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/members/v1/sign-up` | 회원가입 |
+| Method | Endpoint                    | Description |
+|--------|-----------------------------|-------------|
+| POST   | `/api/members/v1/sign-up`   | 회원가입        |
+| GET    | `/api/members/v1/me`        | 내 정보 조회     |
+| POST   | `/api/members/v1/me/update` | 내 정보 수정     |
 
 ### 명함 (Card)
 | Method | Endpoint | Description |
