@@ -34,4 +34,6 @@ public interface CardBookRepository {
     long countByMemberIdAndCreatedAtAfter(String memberId, LocalDateTime after);
 
     long countByMemberIdAndGroupId(String memberId, String groupId);
+
+    void clearCardId(String cardId);
 }

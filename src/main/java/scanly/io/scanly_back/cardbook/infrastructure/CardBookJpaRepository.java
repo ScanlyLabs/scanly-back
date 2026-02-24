@@ -3,6 +3,8 @@ package scanly.io.scanly_back.cardbook.infrastructure;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import scanly.io.scanly_back.cardbook.infrastructure.entity.CardBookEntity;
 
 import java.time.LocalDateTime;
@@ -30,4 +32,8 @@ public interface CardBookJpaRepository extends JpaRepository<CardBookEntity, Str
     long countByMemberIdAndCreatedAtAfter(String memberId, LocalDateTime after);
 
     long countByMemberIdAndGroupId(String memberId, String groupId);
+
+    @Modifying
+    @Query("UPDATE CardBookEntity c SET c.cardId = null WHERE c.cardId = :cardId")
+    void clearCardId(String cardId);
 }

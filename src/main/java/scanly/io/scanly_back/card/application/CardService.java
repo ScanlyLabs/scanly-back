@@ -10,6 +10,7 @@ import scanly.io.scanly_back.card.application.dto.command.SocialLinkCommand;
 import scanly.io.scanly_back.card.application.dto.command.UpdateCardCommand;
 import scanly.io.scanly_back.card.domain.Card;
 import scanly.io.scanly_back.card.domain.CardRepository;
+import scanly.io.scanly_back.cardbook.application.CardBookService;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
 import scanly.io.scanly_back.common.service.S3Service;
@@ -29,6 +30,7 @@ public class CardService {
     private final QrCodeGenerator qrCodeGenerator;
     private final S3Service s3Service;
     private final CardCacheService cardCacheService;
+    private final CardBookService cardBookService;
 
     /**
      * 명함 등록
@@ -193,15 +195,6 @@ public class CardService {
     }
 
     /**
-     * 아이디로 명함 조회
-     * @param id 명함 아이디
-     * @return 조회된 명함, 없으면 null
-     */
-    public Card findByIdOrNull(String id) {
-        return cardRepository.findById(id).orElse(null);
-    }
-
-    /**
      * 명함 ID 목록으로 명함 조회
      * @param ids 명함 ID 목록
      * @return 조회된 명함 목록
@@ -213,19 +206,23 @@ public class CardService {
     /**
      * 내 명함 제거
      * 1. 명함 조회
-     * 2. 명함 QR 이미지 제거
-     * 3. 명함 제거
+     * 2. 명함첩 내 cardId null 로 변경 (참조 먼저 끊기)
+     * 3. 명함 QR 이미지 제거
+     * 4. 명함 제거
+     * 5. 캐시 무효화
      * @param memberId 회원 아이디
      */
     @Transactional
     public void deleteMyCard(String memberId) {
         // 1. 명함 조회
         Card card = findByMemberId(memberId);
-        // 2. 명함 QR 이미지 제거
+        // 2. 명함첩 내 cardId null 로 변경 (참조 먼저 끊기)
+        cardBookService.clearCardId(card.getId());
+        // 3. 명함 QR 이미지 제거
         s3Service.delete(card.getQrImageUrl());
-        // 3. 명함 제거
+        // 4. 명함 제거
         cardRepository.delete(card);
-        // 4. 캐시 무효화
+        // 5. 캐시 무효화
         cardCacheService.evictCache(memberId);
     }
 }

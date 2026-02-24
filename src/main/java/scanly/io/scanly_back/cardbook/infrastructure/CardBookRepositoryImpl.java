@@ -141,4 +141,13 @@ public class CardBookRepositoryImpl implements CardBookRepository {
     public long countByMemberIdAndGroupId(String memberId, String groupId) {
         return cardBookJpaRepository.countByMemberIdAndGroupId(memberId, groupId);
     }
+
+    /**
+     * 명함 삭제 시 해당 명함을 참조하는 명함첩의 cardId를 null로 변경
+     * @param cardId 삭제할 명함 아이디
+     */
+    @Override
+    public void clearCardId(String cardId) {
+        cardBookJpaRepository.clearCardId(cardId);
+    }
 }
