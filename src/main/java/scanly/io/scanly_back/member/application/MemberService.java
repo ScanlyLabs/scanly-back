@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
+import scanly.io.scanly_back.member.application.dto.command.ChangePasswordCommand;
 import scanly.io.scanly_back.member.application.dto.command.SignUpCommand;
 import scanly.io.scanly_back.member.application.dto.command.UpdateMemberCommand;
 import scanly.io.scanly_back.member.application.dto.info.ReadMemberInfo;
@@ -87,6 +88,23 @@ public class MemberService {
         Member savedMember = memberRepository.save(member);
 
         return SignUpInfo.from(savedMember);
+    }
+
+    /**
+     * 비밀번호 변경
+     * @param memberId 회원 ID
+     * @param command 비밀번호 변경 정보
+     */
+    @Transactional
+    public void changePassword(String memberId, ChangePasswordCommand command) {
+        Member member = findById(memberId);
+
+        if (!passwordEncoder.matches(command.currentPassword(), member.getPassword())) {
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        member.changePassword(passwordEncoder.encode(command.newPassword()));
+        memberRepository.update(member);
     }
 
     /**

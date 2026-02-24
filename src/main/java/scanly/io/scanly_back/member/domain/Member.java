@@ -72,6 +72,14 @@ public class Member extends BaseDomain {
         this.email = email;
     }
 
+    /**
+     * 비밀번호 변경
+     * @param encodedPassword 인코딩된 새 비밀번호
+     */
+    public void changePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
+
     // -- getters --
     public String getId() {
         return id;
