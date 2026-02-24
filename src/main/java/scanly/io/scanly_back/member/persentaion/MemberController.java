@@ -13,6 +13,7 @@ import scanly.io.scanly_back.member.application.MemberService;
 import scanly.io.scanly_back.member.application.dto.info.ReadMemberInfo;
 import scanly.io.scanly_back.member.application.dto.info.SignUpInfo;
 import scanly.io.scanly_back.member.application.dto.info.UpdateMemberInfo;
+import scanly.io.scanly_back.member.persentaion.dto.request.ChangePasswordRequest;
 import scanly.io.scanly_back.member.persentaion.dto.request.SignUpRequest;
 import scanly.io.scanly_back.member.persentaion.dto.request.UpdateMemberRequest;
 import scanly.io.scanly_back.member.persentaion.dto.response.ReadMemberResponse;
@@ -60,5 +61,17 @@ public class MemberController {
 
         return ResponseEntity
                 .ok(ApiResponse.success(UpdateMemberResponse.from(updateMemberInfo)));
+    }
+
+    @PostMapping("/me/password")
+    @Operation(summary = "비밀번호 변경", description = "현재 로그인한 회원의 비밀번호를 변경합니다.")
+    public ResponseEntity<ApiResponse<Void>> changePassword(
+            @AuthenticationPrincipal String memberId,
+            @Valid @RequestBody ChangePasswordRequest request
+    ) {
+        memberService.changePassword(memberId, request.toCommand());
+
+        return ResponseEntity
+                .ok(ApiResponse.success(null));
     }
 }
