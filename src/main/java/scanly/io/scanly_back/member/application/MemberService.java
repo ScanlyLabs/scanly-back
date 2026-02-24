@@ -108,6 +108,15 @@ public class MemberService {
     }
 
     /**
+     * 로그인 아이디 사용 가능 여부 확인
+     * @param loginId 로그인 아이디
+     * @return 사용 가능 여부
+     */
+    public boolean checkLoginIdAvailable(String loginId) {
+        return !memberRepository.existsByLoginId(loginId);
+    }
+
+    /**
      * 로그인 아이디 중복 검사
      * @param loginId 로그인 아이디
      */

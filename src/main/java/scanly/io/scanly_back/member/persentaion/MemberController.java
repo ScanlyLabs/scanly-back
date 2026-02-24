@@ -16,6 +16,7 @@ import scanly.io.scanly_back.member.application.dto.info.UpdateMemberInfo;
 import scanly.io.scanly_back.member.persentaion.dto.request.ChangePasswordRequest;
 import scanly.io.scanly_back.member.persentaion.dto.request.SignUpRequest;
 import scanly.io.scanly_back.member.persentaion.dto.request.UpdateMemberRequest;
+import scanly.io.scanly_back.member.persentaion.dto.response.CheckLoginIdResponse;
 import scanly.io.scanly_back.member.persentaion.dto.response.ReadMemberResponse;
 import scanly.io.scanly_back.member.persentaion.dto.response.SignUpResponse;
 import scanly.io.scanly_back.member.persentaion.dto.response.UpdateMemberResponse;
@@ -27,6 +28,17 @@ import scanly.io.scanly_back.member.persentaion.dto.response.UpdateMemberRespons
 public class MemberController {
 
     private final MemberService memberService;
+
+    @GetMapping("/check-login-id/{loginId}")
+    @Operation(summary = "로그인 아이디 중복 체크", description = "로그인 아이디 사용 가능 여부를 확인합니다.")
+    public ResponseEntity<ApiResponse<CheckLoginIdResponse>> checkLoginId(
+            @PathVariable String loginId
+    ) {
+        boolean available = memberService.checkLoginIdAvailable(loginId);
+
+        return ResponseEntity
+                .ok(ApiResponse.success(CheckLoginIdResponse.of(loginId, available)));
+    }
 
     @PostMapping("/sign-up")
     @Operation(summary = "회원 가입", description = "회원가입을 진행합니다.")

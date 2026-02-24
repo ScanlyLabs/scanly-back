@@ -60,10 +60,10 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/v1/login",
                                 "/api/auth/v1/reissue",
-                                "/api/members/v1/sign-up"
+                                "/api/members/v1/sign-up",
+                                "/api/members/v1/check-login-id/*", // 아이디 중복 체크
+                                "/api/cards/v1/member/*"       // 공개 명함 조회 (QR 스캔용)
                         ).permitAll()
-                        // 공개 명함 조회 (QR 스캔용)
-                        .requestMatchers(HttpMethod.GET, "/api/cards/v1/member/**").permitAll()
                         // 그 외 모든 요청은 인증 필요
                         .anyRequest().authenticated()
                 )
