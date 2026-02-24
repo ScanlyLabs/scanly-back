@@ -10,8 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import scanly.io.scanly_back.card.application.CardService;
 import scanly.io.scanly_back.card.domain.Card;
+import scanly.io.scanly_back.card.domain.CardRepository;
 import scanly.io.scanly_back.cardbook.application.dto.TagService;
 import scanly.io.scanly_back.cardbook.application.dto.command.CardExchangeCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.SaveCardBookCommand;
@@ -47,7 +47,7 @@ public class CardBookService {
     private final CardBookRepository cardBookRepository;
     private final CardExchangeRepository cardExchangeRepository;
     private final TagService tagService;
-    private final CardService cardService;
+    private final CardRepository cardRepository;
     private final MemberRepository memberRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final RateLimiterService rateLimiterService;
@@ -68,7 +68,8 @@ public class CardBookService {
         String cardId = command.cardId();
 
         // 1. 명함 조회
-        Card card = cardService.findById(cardId);
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CARD_NOT_FOUND));
 
         // 2. 유효성 검증
         validateCardBook(card.getMemberId(), memberId, cardId);
@@ -113,7 +114,8 @@ public class CardBookService {
      */
     @Transactional
     public CardExchangeInfo cardExchange(CardExchangeCommand command) {
-        Card card = cardService.findById(command.cardId());
+        Card card = cardRepository.findById(command.cardId())
+                .orElseThrow(() -> new CustomException(ErrorCode.CARD_NOT_FOUND));
 
         String senderId = command.senderId();
         String receiverId = card.getMemberId();
@@ -208,7 +210,7 @@ public class CardBookService {
 
         List<CardBook> cardBooks = cardBookPage.getContent();
         List<String> cardIds = cardBooks.stream().map(CardBook::getCardId).toList();
-        Map<String, Card> cardMap = cardService.findAllByIds(cardIds).stream()
+        Map<String, Card> cardMap = cardRepository.findAllByIds(cardIds).stream()
                 .collect(java.util.stream.Collectors.toMap(Card::getId, card -> card));
 
         return cardBookPage.map(cardBook -> CardBookPreviewInfo.from(cardBook, cardMap.get(cardBook.getCardId())));
@@ -221,7 +223,7 @@ public class CardBookService {
      */
     private List<CardBookPreviewInfo> enrichWithCardInfo(List<CardBook> cardBooks) {
         List<String> cardIds = cardBooks.stream().map(CardBook::getCardId).toList();
-        Map<String, Card> cardMap = cardService.findAllByIds(cardIds).stream()
+        Map<String, Card> cardMap = cardRepository.findAllByIds(cardIds).stream()
                 .collect(java.util.stream.Collectors.toMap(Card::getId, card -> card));
 
         return cardBooks.stream()
@@ -286,7 +288,7 @@ public class CardBookService {
      * @return 조회된 명함 또는 null
      */
     private Card findCardOrNull(String cardId) {
-        return cardService.findByIdOrNull(cardId);
+        return cardRepository.findById(cardId).orElse(null);
     }
 
     /**
