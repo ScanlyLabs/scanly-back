@@ -32,9 +32,9 @@ Scanly는 QR 코드를 활용한 디지털 명함 서비스입니다. 한 번의
 
 #### Rate Limiting (Circuit Breaker)
 - Resilience4j 서킷브레이커 적용
-- 장애 감지: 최근 10회 호출 중 실패율 50% 초과 시 OPEN
+- 장애 감지: 최근 10회 호출 중 실패율 50% 이상 시 OPEN
 - OPEN 상태: 30초간 Redis 호출 없이 즉시 fallback 실행
-- 복구 테스트: 30초 후 HALF_OPEN → 3회 성공 시 CLOSED 복귀
+- 복구 테스트: 30초 후 HALF_OPEN → 3회 중 2회 이상 성공 시 CLOSED 복귀
 - Redis 장애 시 fallback → 요청 허용 (가용성 우선) 
 
 ## Tech Stack
