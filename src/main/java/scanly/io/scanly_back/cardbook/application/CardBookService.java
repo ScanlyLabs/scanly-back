@@ -68,8 +68,7 @@ public class CardBookService {
         String cardId = command.cardId();
 
         // 1. 명함 조회
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new CustomException(ErrorCode.CARD_NOT_FOUND));
+        Card card = getCard(cardId);
 
         // 2. 유효성 검증
         validateCardBook(card.getMemberId(), memberId, cardId);
@@ -82,6 +81,16 @@ public class CardBookService {
         CardBook savedCardBook = cardBookRepository.save(cardBook);
 
         return RegisterCardBookInfo.from(savedCardBook, card);
+    }
+
+    /**
+     * 명함 조회
+     * @param cardId 명함 아이디
+     * @return 조회된 명함
+     */
+    private Card getCard(String cardId) {
+        return cardRepository.findById(cardId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CARD_NOT_FOUND));
     }
 
     /**
@@ -114,8 +123,7 @@ public class CardBookService {
      */
     @Transactional
     public CardExchangeInfo cardExchange(CardExchangeCommand command) {
-        Card card = cardRepository.findById(command.cardId())
-                .orElseThrow(() -> new CustomException(ErrorCode.CARD_NOT_FOUND));
+        Card card = getCard(command.cardId());
 
         String senderId = command.senderId();
         String receiverId = card.getMemberId();
@@ -210,10 +218,19 @@ public class CardBookService {
 
         List<CardBook> cardBooks = cardBookPage.getContent();
         List<String> cardIds = cardBooks.stream().map(CardBook::getCardId).toList();
-        Map<String, Card> cardMap = cardRepository.findAllByIds(cardIds).stream()
-                .collect(java.util.stream.Collectors.toMap(Card::getId, card -> card));
+        Map<String, Card> cardMap = getCardMap(cardIds);
 
-        return cardBookPage.map(cardBook -> CardBookPreviewInfo.from(cardBook, cardMap.get(cardBook.getCardId())));
+        return cardBookPage.map(cardBook -> CardBookPreviewInfo.from(cardBook, cardMap.getOrDefault(cardBook.getCardId(), null)));
+    }
+
+    /**
+     * 명함 아이디 목록으로 Card Map 조회
+     * @param cardIds 명함 아이디 목록
+     * @return 명함 아이디를 key로 갖는 Card Map (삭제된 명함은 미포함)
+     */
+    private Map<String, Card> getCardMap(List<String> cardIds) {
+        return cardRepository.findAllByIds(cardIds).stream()
+                .collect(java.util.stream.Collectors.toMap(Card::getId, card -> card));
     }
 
     /**
@@ -223,11 +240,10 @@ public class CardBookService {
      */
     private List<CardBookPreviewInfo> enrichWithCardInfo(List<CardBook> cardBooks) {
         List<String> cardIds = cardBooks.stream().map(CardBook::getCardId).toList();
-        Map<String, Card> cardMap = cardRepository.findAllByIds(cardIds).stream()
-                .collect(java.util.stream.Collectors.toMap(Card::getId, card -> card));
+        Map<String, Card> cardMap = getCardMap(cardIds);
 
         return cardBooks.stream()
-                .map(cardBook -> CardBookPreviewInfo.from(cardBook, cardMap.get(cardBook.getCardId())))
+                .map(cardBook -> CardBookPreviewInfo.from(cardBook, cardMap.getOrDefault(cardBook.getCardId(), null)))
                 .toList();
     }
 
