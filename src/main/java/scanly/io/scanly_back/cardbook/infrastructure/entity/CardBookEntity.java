@@ -23,7 +23,7 @@ public class CardBookEntity extends BaseEntity {
     @Column(name = "member_id", nullable = false, updatable = false)
     private String memberId;             // 소유자 ID
 
-    @Column(name = "card_id", nullable = false, updatable = false)
+    @Column(name = "card_id", updatable = false) // 명함이 삭제되더라도 명함첩은 존재
     private String cardId;              // 원본 명함 ID
 
     @JdbcTypeCode(SqlTypes.JSON)
