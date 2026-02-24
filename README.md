@@ -19,23 +19,22 @@ Scanly는 QR 코드를 활용한 디지털 명함 서비스입니다. 한 번의
 - 명함 수정/삭제 시 캐시 무효화
 
 ### Rate Limiting
-- 명함 교환 API: 사용자별 분당 10회 제한
-- 동일 수신자 명함 교환: 발신자-수신자 쌍 하루 3회 제한 (자정 리셋)
+| 적용 대상 | 전략 |
+|----------|------------|
+| 명함 교환 API | 사용자별 분당 10회 제한 |
+| 동일 수신자 교환 | 발신자 - 수신자 쌍 하루 3회 제한 (자정 리셋) |
 - Redis 기반 Fixed Window 알고리즘 적용
-- AOP 어노테이션(`@RateLimiter`) 기반으로 간편 적용 가능
-
+- AOP 어노테이션(`@RateLimiter`) 기반으로 적용
+  
 ### Redis 장애 대응
-
-#### 명함 조회 캐시
-- Spring CacheErrorHandler 적용
-- Redis 장애 시 캐시를 건너뛰고 DB 직접 조회
-
-#### Rate Limiting (Circuit Breaker)
-- Resilience4j 서킷브레이커 적용
-- 장애 감지: 최근 10회 호출 중 실패율 50% 이상 시 OPEN
-- OPEN 상태: 30초간 Redis 호출 없이 즉시 fallback 실행
-- 복구 테스트: 30초 후 HALF_OPEN → 3회 중 2회 이상 성공 시 CLOSED 복귀
-- Redis 장애 시 fallback → 요청 허용 (가용성 우선) 
+| 적용 대상 | 장애 대응 전략 | 동작 방식 |
+|----------|------------|------------|
+| 명함 조회 캐시 | Spring CacheErrorHandler | Redis 장애 시 캐시 스킵 -> DB 직접 조회 |
+| 동일 수신자 교환 | Resilience4j Circuit Breaker | Redis 장애 시 fallback → 요청 허용 (가용성 우선) |
+-  Rate Limiting (Circuit Breaker)
+      - 장애 감지: 최근 10회 호출 중 실패율 50% 이상 시 OPEN
+      - OPEN 상태: 30초간 Redis 호출 없이 즉시 fallback 실행
+      - 복구 테스트: 30초 후 HALF_OPEN → 3회 중 2회 이상 성공 시 CLOSED 복귀 
 
 ## Tech Stack
 | Category | Technology |
