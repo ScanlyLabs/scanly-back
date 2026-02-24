@@ -121,6 +121,7 @@ src/main/java/scanly/io/scanly_back
 | POST   | `/api/members/v1/sign-up`   | 회원가입        |
 | GET    | `/api/members/v1/me`        | 내 정보 조회     |
 | POST   | `/api/members/v1/me/update` | 내 정보 수정     |
+| POST   | `/api/members/v1/me/password` | 비밀번호 변경     |
 
 ### 명함 (Card)
 | Method | Endpoint | Description |
