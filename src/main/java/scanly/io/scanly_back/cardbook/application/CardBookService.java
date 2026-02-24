@@ -304,7 +304,7 @@ public class CardBookService {
      * @return 조회된 명함 또는 null
      */
     private Card findCardOrNull(String cardId) {
-        return cardRepository.findById(cardId).orElse(null);
+        return cardId != null ? getCard(cardId) : null;
     }
 
     /**
@@ -383,5 +383,14 @@ public class CardBookService {
      */
     public boolean exists(String memberId, String cardId) {
         return cardBookRepository.existsByMemberIdAndCardId(memberId, cardId);
+    }
+
+    /**
+     * 명함 삭제 시 해당 명함을 참조하는 명함첩의 cardId를 null로 변경
+     * @param cardId 삭제할 명함 ID
+     */
+    @Transactional
+    public void clearCardId(String cardId) {
+        cardBookRepository.clearCardId(cardId);
     }
 }
