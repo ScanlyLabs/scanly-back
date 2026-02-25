@@ -86,4 +86,15 @@ public class MemberController {
         return ResponseEntity
                 .ok(ApiResponse.success(null));
     }
+
+    @PostMapping("/me/withdrawal")
+    @Operation(summary = "회원 탈퇴", description = "현재 로그인한 회원의 탈퇴를 진행합니다.")
+    public ResponseEntity<ApiResponse<Void>> withdrawal(
+            @AuthenticationPrincipal String memberId
+    ) {
+        memberService.withdrawal(memberId);
+
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
 }

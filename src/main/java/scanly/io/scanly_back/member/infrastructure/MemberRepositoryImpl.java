@@ -72,4 +72,13 @@ public class MemberRepositoryImpl implements MemberRepository {
 
         return memberMapper.toDomain(updatedMemberEntity);
     }
+
+    /**
+     * 회원 삭제
+     * @param id 회원 아이디
+     */
+    @Override
+    public void deleteById(String id) {
+        memberJpaRepository.deleteById(id);
+    }
 }

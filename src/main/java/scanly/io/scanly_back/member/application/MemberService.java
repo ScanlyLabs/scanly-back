@@ -5,8 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import scanly.io.scanly_back.auth.domain.RefreshTokenRepository;
+import scanly.io.scanly_back.card.application.CardService;
+import scanly.io.scanly_back.cardbook.application.CardBookService;
+import scanly.io.scanly_back.cardbook.application.GroupService;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
+import scanly.io.scanly_back.notification.application.NotificationService;
+import scanly.io.scanly_back.notification.application.PushTokenService;
 import scanly.io.scanly_back.member.application.dto.command.ChangePasswordCommand;
 import scanly.io.scanly_back.member.application.dto.command.SignUpCommand;
 import scanly.io.scanly_back.member.application.dto.command.UpdateMemberCommand;
@@ -24,6 +30,12 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CardBookService cardBookService;
+    private final CardService cardService;
+    private final GroupService groupService;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final NotificationService notificationService;
+    private final PushTokenService pushTokenService;
 
     /**
      * 회원 ID로 회원 조회
@@ -124,5 +136,43 @@ public class MemberService {
         if (memberRepository.existsByLoginId(loginId)) {
             throw new CustomException(ErrorCode.DUPLICATE_LOGIN_ID);
         }
+    }
+
+    /**
+     * 회원 탈퇴
+     * 1. RefreshToken 삭제
+     * 2. 알림 삭제
+     * 3. 푸시 토큰 삭제
+     * 4. 내 명함 삭제 (명함첩 참조 해제, QR 이미지 삭제 포함)
+     * 5. 내 명함첩 및 태그 삭제
+     * 6. 내 명함첩 그룹 삭제
+     * 7. 회원 삭제
+     * @param memberId 탈퇴할 회원 아이디
+     */
+    @Transactional
+    public void withdrawal(String memberId) {
+        // 회원 존재 여부 확인
+        findById(memberId);
+
+        // 1. RefreshToken 삭제
+        refreshTokenRepository.deleteByMemberId(memberId);
+
+        // 2. 알림 삭제
+        notificationService.deleteAllByReceiverId(memberId);
+
+        // 3. 푸시 토큰 삭제
+        pushTokenService.deleteByMemberId(memberId);
+
+        // 4. 내 명함 삭제 (명함첩 참조 해제, QR 이미지 삭제 포함)
+        cardService.deleteByMemberIdIfExists(memberId);
+
+        // 5. 내 명함첩 및 태그 삭제
+        cardBookService.deleteAllByMemberId(memberId);
+
+        // 6. 내 명함첩 그룹 삭제
+        groupService.deleteAllByMemberId(memberId);
+
+        // 7. 회원 삭제
+        memberRepository.deleteById(memberId);
     }
 }
