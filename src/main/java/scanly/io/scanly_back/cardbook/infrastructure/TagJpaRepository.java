@@ -10,5 +10,7 @@ public interface TagJpaRepository extends JpaRepository<TagEntity, String> {
 
     void deleteAllByCardBookId(String cardBookId);
 
+    void deleteAllByCardBookIdIn(List<String> cardBookIds);
+
     List<TagEntity> findAllByCardBookId(String cardBookId);
 }

@@ -393,4 +393,26 @@ public class CardBookService {
     public void clearCardId(String cardId) {
         cardBookRepository.clearCardId(cardId);
     }
+
+    /**
+     * 회원 탈퇴 시 명함첩 및 태그 일괄 삭제
+     * 1. 명함첩 목록 조회
+     * 2. 태그 일괄 삭제
+     * 3. 명함첩 일괄 삭제
+     * @param memberId 회원 아이디
+     */
+    @Transactional
+    public void deleteAllByMemberId(String memberId) {
+        // 1. 명함첩 목록 조회
+        List<CardBook> cardBooks = cardBookRepository.findAllByMemberId(memberId);
+
+        // 2. 태그 일괄 삭제
+        List<String> cardBookIds = cardBooks.stream().map(CardBook::getId).toList();
+        if (!cardBookIds.isEmpty()) {
+            tagService.deleteAllByCardBookIdIn(cardBookIds);
+        }
+
+        // 3. 명함첩 일괄 삭제
+        cardBookRepository.deleteAllByMemberId(memberId);
+    }
 }

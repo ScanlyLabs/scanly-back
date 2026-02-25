@@ -36,4 +36,6 @@ public interface CardBookRepository {
     long countByMemberIdAndGroupId(String memberId, String groupId);
 
     void clearCardId(String cardId);
+
+    void deleteAllByMemberId(String memberId);
 }

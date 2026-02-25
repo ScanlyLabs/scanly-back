@@ -124,10 +124,19 @@ public class TagService {
 
     /**
      * 명함첩 아이디로 태그 삭제
-     * 상위 트랜잭션에 참여하기 때문에 @Transactional 생
-     * @param cardBookId 명함첩 아이
+     * 상위 트랜잭션에 참여하기 때문에 @Transactional 생략
+     * @param cardBookId 명함첩 아이디
      */
     public void deleteAllByCardBookId(String cardBookId) {
         tagRepository.deleteAllByCardBookId(cardBookId);
+    }
+
+    /**
+     * 명함첩 아이디 목록으로 태그 일괄 삭제
+     * 상위 트랜잭션에 참여하기 때문에 @Transactional 생략
+     * @param cardBookIds 명함첩 아이디 목록
+     */
+    public void deleteAllByCardBookIdIn(List<String> cardBookIds) {
+        tagRepository.deleteAllByCardBookIdIn(cardBookIds);
     }
 }
