@@ -49,4 +49,13 @@ public class PushTokenService {
         return pushTokenRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PUSH_TOKEN_NOT_FOUND));
     }
+
+    /**
+     * 회원 아이디로 푸시 토큰 삭제
+     * @param memberId 회원 아이디
+     */
+    @Transactional
+    public void deleteByMemberId(String memberId) {
+        pushTokenRepository.deleteByMemberId(memberId);
+    }
 }

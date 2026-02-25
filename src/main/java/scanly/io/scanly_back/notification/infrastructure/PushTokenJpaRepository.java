@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface PushTokenJpaRepository extends JpaRepository<PushTokenEntity, String> {
     Optional<PushTokenEntity> findByMemberId(String memberId);
+
+    void deleteByMemberId(String memberId);
 }

@@ -38,4 +38,13 @@ public class PushTokenRepositoryImpl implements PushTokenRepository {
         return pushTokenJpaRepository.findByMemberId(memberId)
                 .map(pushTokenMapper::toDomain);
     }
+
+    /**
+     * 회원 아이디로 푸시 토큰 삭제
+     * @param memberId 회원 아이디
+     */
+    @Override
+    public void deleteByMemberId(String memberId) {
+        pushTokenJpaRepository.deleteByMemberId(memberId);
+    }
 }

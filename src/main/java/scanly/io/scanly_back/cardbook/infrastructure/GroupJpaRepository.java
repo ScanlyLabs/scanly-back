@@ -10,4 +10,5 @@ public interface GroupJpaRepository extends JpaRepository<GroupEntity, String> {
     long countByMemberId(String memberId);
     Optional<GroupEntity> findByIdAndMemberId(String id, String memberId);
     List<GroupEntity> findAllByMemberId(String memberId);
+    void deleteAllByMemberId(String memberId);
 }

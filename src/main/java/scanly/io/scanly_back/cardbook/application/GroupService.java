@@ -185,4 +185,13 @@ public class GroupService {
         findByIdAndMemberId(id, memberId);
         groupRepository.deleteById(id);
     }
+
+    /**
+     * 회원 탈퇴 시 명함첩 그룹 일괄 삭제
+     * @param memberId 회원 아이디
+     */
+    @Transactional
+    public void deleteAllByMemberId(String memberId) {
+        groupRepository.deleteAllByMemberId(memberId);
+    }
 }

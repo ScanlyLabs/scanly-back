@@ -150,4 +150,13 @@ public class CardBookRepositoryImpl implements CardBookRepository {
     public void clearCardId(String cardId) {
         cardBookJpaRepository.clearCardId(cardId);
     }
+
+    /**
+     * 회원 아이디로 명함첩 일괄 삭제
+     * @param memberId 회원 아이디
+     */
+    @Override
+    public void deleteAllByMemberId(String memberId) {
+        cardBookJpaRepository.deleteAllByMemberId(memberId);
+    }
 }

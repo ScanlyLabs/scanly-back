@@ -87,4 +87,13 @@ public class TagRepositoryImpl implements TagRepository {
     public void deleteAllByCardBookId(String cardBookId) {
         tagJpaRepository.deleteAllByCardBookId(cardBookId);
     }
+
+    /**
+     * 명함첩 아이디 목록으로 태그 일괄 삭제
+     * @param cardBookIds 명함첩 아이디 목록
+     */
+    @Override
+    public void deleteAllByCardBookIdIn(List<String> cardBookIds) {
+        tagJpaRepository.deleteAllByCardBookIdIn(cardBookIds);
+    }
 }

@@ -36,4 +36,6 @@ public interface CardBookJpaRepository extends JpaRepository<CardBookEntity, Str
     @Modifying
     @Query("UPDATE CardBookEntity c SET c.cardId = null WHERE c.cardId = :cardId")
     void clearCardId(String cardId);
+
+    void deleteAllByMemberId(String memberId);
 }

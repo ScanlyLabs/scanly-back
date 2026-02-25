@@ -15,4 +15,6 @@ public interface NotificationRepository {
     Optional<Notification> findByIdAndReceiverId(String id, String receiverId);
 
     void read(Notification notification);
+
+    void deleteAllByReceiverId(String receiverId);
 }

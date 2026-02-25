@@ -19,4 +19,6 @@ public interface TagRepository {
     void deleteById(String id);
 
     void deleteAllByCardBookId(String cardBookId);
+
+    void deleteAllByCardBookIdIn(List<String> cardBookIds);
 }
