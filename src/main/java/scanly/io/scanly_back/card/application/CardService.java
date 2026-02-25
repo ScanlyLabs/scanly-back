@@ -15,8 +15,8 @@ import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
 import scanly.io.scanly_back.common.service.S3Service;
 import scanly.io.scanly_back.common.util.QrCodeGenerator;
-import scanly.io.scanly_back.member.application.MemberService;
 import scanly.io.scanly_back.member.domain.Member;
+import scanly.io.scanly_back.member.domain.MemberRepository;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ import java.util.List;
 public class CardService {
 
     private final CardRepository cardRepository;
-    private final MemberService memberService;
+    private final MemberRepository memberRepository;
     private final QrCodeGenerator qrCodeGenerator;
     private final S3Service s3Service;
     private final CardCacheService cardCacheService;
@@ -49,7 +49,8 @@ public class CardService {
         validateDuplicateCard(memberId);
 
         // 2. 회원 조회
-        Member member = memberService.findById(command.memberId());
+        Member member = memberRepository.findById(command.memberId())
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         // 3. 명함 생성
         Card savedCard = registerCard(command, memberId, member.getName());
@@ -138,7 +139,8 @@ public class CardService {
      * @return 조회된 명함
      */
     public ReadCardInfo readCardByLoginId(String loginId) {
-        Member member = memberService.findByLoginId(loginId);
+        Member member = memberRepository.findById(loginId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         return cardCacheService.getCardByMemberId(member.getId());
     }
 
