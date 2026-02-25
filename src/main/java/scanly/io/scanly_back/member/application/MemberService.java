@@ -172,7 +172,7 @@ public class MemberService {
         // 6. 내 명함첩 그룹 삭제
         groupService.deleteAllByMemberId(memberId);
 
-        // 7. 회원 탈퇴
+        // 7. 회원 탈퇴 -> 기존 URL이 다른 사람의 프로필로 연결되는 문제 방지
         member.withdrawal();
         memberRepository.withdrawal(member);
     }
