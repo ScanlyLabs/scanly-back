@@ -116,13 +116,14 @@ src/main/java/scanly/io/scanly_back
 | POST | `/api/auth/v1/reissue` | 토큰 재발급 |
 
 ### 회원 (Member)
-| Method | Endpoint                    | Description |
-|--------|-----------------------------|-------------|
-| POST   | `/api/members/v1/sign-up`   | 회원가입        |
-| GET    | `/api/members/v1/me`        | 내 정보 조회     |
-| POST   | `/api/members/v1/me/update` | 내 정보 수정     |
-| POST   | `/api/members/v1/me/password` | 비밀번호 변경     |
-| GET   | `/api/members/v1/me/check-login-id/{loginId}` | 로그인 아이디 중복 체크(사용 가능 여부)     |
+| Method | Endpoint                                     | Description             |
+|--------|----------------------------------------------|-------------------------|
+| POST   | `/api/members/v1/sign-up`                    | 회원가입                    |
+| GET    | `/api/members/v1/me`                         | 내 정보 조회                 |
+| POST   | `/api/members/v1/me/update`                  | 내 정보 수정                 |
+| POST   | `/api/members/v1/me/password`                | 비밀번호 변경                 |
+| GET   | `/api/members/v1/me/check-login-id/{loginId}` | 로그인 아이디 중복 체크(사용 가능 여부) |
+| GET   | `/api/members/v1/me/withdrawal`                        | 회원 탈퇴                   |
 
 ### 명함 (Card)
 | Method | Endpoint | Description |
