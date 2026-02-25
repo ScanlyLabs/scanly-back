@@ -227,4 +227,22 @@ public class CardService {
         // 5. 캐시 무효화
         cardCacheService.evictCache(memberId);
     }
+
+    /**
+     * 회원 탈퇴 시 명함 삭제 (명함이 없으면 무시)
+     * @param memberId 회원 아이디
+     */
+    @Transactional
+    public void deleteByMemberIdIfExists(String memberId) {
+        cardRepository.findByMemberId(memberId).ifPresent(card -> {
+            // 명함첩 내 cardId null 로 변경 (참조 먼저 끊기)
+            cardBookService.clearCardId(card.getId());
+            // 명함 QR 이미지 제거
+            s3Service.delete(card.getQrImageUrl());
+            // 명함 제거
+            cardRepository.delete(card);
+            // 캐시 무효화
+            cardCacheService.evictCache(memberId);
+        });
+    }
 }
