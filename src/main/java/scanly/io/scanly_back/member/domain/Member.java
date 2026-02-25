@@ -80,6 +80,14 @@ public class Member extends BaseDomain {
         this.password = encodedPassword;
     }
 
+    /**
+     * 회원 탈퇴
+     */
+    public void withdrawal() {
+        this.status = MemberStatus.WITHDRAWN;
+        this.withdrawnAt = LocalDateTime.now();
+    }
+
     // -- getters --
     public String getId() {
         return id;

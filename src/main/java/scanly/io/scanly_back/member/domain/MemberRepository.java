@@ -14,4 +14,6 @@ public interface MemberRepository {
     Member update(Member member);
 
     void deleteById(String id);
+
+    void withdrawal(Member member);
 }

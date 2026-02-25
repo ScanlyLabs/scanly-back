@@ -146,13 +146,13 @@ public class MemberService {
      * 4. 내 명함 삭제 (명함첩 참조 해제, QR 이미지 삭제 포함)
      * 5. 내 명함첩 및 태그 삭제
      * 6. 내 명함첩 그룹 삭제
-     * 7. 회원 삭제
+     * 7. 회원 탈퇴
      * @param memberId 탈퇴할 회원 아이디
      */
     @Transactional
     public void withdrawal(String memberId) {
         // 회원 존재 여부 확인
-        findById(memberId);
+        Member member = findById(memberId);
 
         // 1. RefreshToken 삭제
         refreshTokenRepository.deleteByMemberId(memberId);
@@ -172,7 +172,8 @@ public class MemberService {
         // 6. 내 명함첩 그룹 삭제
         groupService.deleteAllByMemberId(memberId);
 
-        // 7. 회원 삭제
-        memberRepository.deleteById(memberId);
+        // 7. 회원 탈퇴
+        member.withdrawal();
+        memberRepository.withdrawal(member);
     }
 }

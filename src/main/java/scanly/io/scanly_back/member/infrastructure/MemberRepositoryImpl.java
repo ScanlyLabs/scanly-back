@@ -81,4 +81,14 @@ public class MemberRepositoryImpl implements MemberRepository {
     public void deleteById(String id) {
         memberJpaRepository.deleteById(id);
     }
+
+    /**
+     * 회원 탈퇴
+     * @param member 탈퇴할 회원 정보
+     */
+    @Override
+    public void withdrawal(Member member) {
+        MemberEntity memberEntity = memberMapper.toEntity(member);
+        memberJpaRepository.save(memberEntity);
+    }
 }
