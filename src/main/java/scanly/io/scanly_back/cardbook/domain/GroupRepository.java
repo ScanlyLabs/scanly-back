@@ -21,4 +21,6 @@ public interface GroupRepository {
     Group rename(Group group);
 
     void deleteById(String id);
+
+    void deleteAllByMemberId(String memberId);
 }
