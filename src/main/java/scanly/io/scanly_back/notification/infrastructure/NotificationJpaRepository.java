@@ -12,4 +12,6 @@ public interface NotificationJpaRepository extends JpaRepository<NotificationEnt
     int countByReceiverIdAndReadFalse(String receiverId);
 
     Optional<NotificationEntity> findByIdAndReceiverId(String id, String receiverId);
+
+    void deleteAllByReceiverId(String receiverId);
 }

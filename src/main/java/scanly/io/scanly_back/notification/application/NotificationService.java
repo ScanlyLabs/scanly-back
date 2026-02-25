@@ -144,4 +144,13 @@ public class NotificationService {
         return notificationRepository.findByIdAndReceiverId(id, receiverId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOTIFICATION_NOT_FOUND));
     }
+
+    /**
+     * 수신자 아이디로 알림 일괄 삭제
+     * @param receiverId 수신자 아이디
+     */
+    @Transactional
+    public void deleteAllByReceiverId(String receiverId) {
+        notificationRepository.deleteAllByReceiverId(receiverId);
+    }
 }

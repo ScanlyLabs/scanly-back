@@ -80,4 +80,13 @@ public class NotificationRepositoryImpl implements NotificationRepository {
         NotificationEntity notificationEntity = notificationMapper.toEntity(notification);
         notificationJpaRepository.save(notificationEntity);
     }
+
+    /**
+     * 수신자 아이디로 알림 일괄 삭제
+     * @param receiverId 수신자 아이디
+     */
+    @Override
+    public void deleteAllByReceiverId(String receiverId) {
+        notificationJpaRepository.deleteAllByReceiverId(receiverId);
+    }
 }
