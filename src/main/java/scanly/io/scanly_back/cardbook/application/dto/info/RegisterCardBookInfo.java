@@ -17,24 +17,21 @@ public record RegisterCardBookInfo(
         String groupId,
         String memo,
         boolean isFavorite,
-        boolean isCardDeleted,
         LocalDateTime createdAt
 ) {
-    public static RegisterCardBookInfo from(CardBook cardBook, Card card) {
+    public static RegisterCardBookInfo from(CardBook cardBook) {
         ProfileSnapshot snapshot = cardBook.getProfileSnapshot();
-        boolean isDeleted = card == null;
         return new RegisterCardBookInfo(
                 cardBook.getId(),
                 cardBook.getCardId(),
-                isDeleted ? snapshot.name() : card.getName(),
-                isDeleted ? snapshot.title() : card.getTitle(),
-                isDeleted ? snapshot.company() : card.getCompany(),
-                isDeleted ? snapshot.profileImageUrl() : card.getProfileImageUrl(),
+                snapshot.name(),
+                snapshot.title(),
+                snapshot.company(),
+                snapshot.profileImageUrl(),
                 snapshot,
                 cardBook.getGroupId(),
                 cardBook.getMemo(),
                 cardBook.isFavorite(),
-                isDeleted,
                 cardBook.getCreatedAt()
         );
     }

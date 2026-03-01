@@ -18,16 +18,15 @@ public record CardBookPreviewInfo(
         boolean isFavorite,
         LocalDateTime createdAt
 ) {
-    public static CardBookPreviewInfo from(CardBook cardBook, Card card) {
+    public static CardBookPreviewInfo from(CardBook cardBook) {
         ProfileSnapshot snapshot = cardBook.getProfileSnapshot();
-        boolean isDeleted = card == null;
         return new CardBookPreviewInfo(
                 cardBook.getId(),
                 cardBook.getCardId(),
-                isDeleted ? snapshot.name() : card.getName(),
-                isDeleted ? snapshot.title() : card.getTitle(),
-                isDeleted ? snapshot.company() : card.getCompany(),
-                isDeleted ? snapshot.profileImageUrl() : card.getProfileImageUrl(),
+                snapshot.name(),
+                snapshot.title(),
+                snapshot.company(),
+                snapshot.profileImageUrl(),
                 cardBook.getGroupId(),
                 cardBook.getMemo(),
                 cardBook.isFavorite(),

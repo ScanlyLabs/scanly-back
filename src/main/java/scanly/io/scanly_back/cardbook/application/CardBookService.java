@@ -80,7 +80,7 @@ public class CardBookService {
         CardBook cardBook = CardBook.create(memberId, cardId, profileSnapshot, command.groupId());
         CardBook savedCardBook = cardBookRepository.save(cardBook);
 
-        return RegisterCardBookInfo.from(savedCardBook, card);
+        return RegisterCardBookInfo.from(savedCardBook);
     }
 
     /**
@@ -216,21 +216,7 @@ public class CardBookService {
             cardBookPage = cardBookRepository.findAllByMemberIdAndGroupId(memberId, groupId, pageable);
         }
 
-        List<CardBook> cardBooks = cardBookPage.getContent();
-        List<String> cardIds = cardBooks.stream().map(CardBook::getCardId).toList();
-        Map<String, Card> cardMap = getCardMap(cardIds);
-
-        return cardBookPage.map(cardBook -> CardBookPreviewInfo.from(cardBook, cardMap.getOrDefault(cardBook.getCardId(), null)));
-    }
-
-    /**
-     * 명함 아이디 목록으로 Card Map 조회
-     * @param cardIds 명함 아이디 목록
-     * @return 명함 아이디를 key로 갖는 Card Map (삭제된 명함은 미포함)
-     */
-    private Map<String, Card> getCardMap(List<String> cardIds) {
-        return cardRepository.findAllByIds(cardIds).stream()
-                .collect(java.util.stream.Collectors.toMap(Card::getId, card -> card));
+        return cardBookPage.map(CardBookPreviewInfo::from);
     }
 
     /**
@@ -239,11 +225,8 @@ public class CardBookService {
      * @return Card 정보가 포함된 명함첩 정보 목록
      */
     private List<CardBookPreviewInfo> enrichWithCardInfo(List<CardBook> cardBooks) {
-        List<String> cardIds = cardBooks.stream().map(CardBook::getCardId).toList();
-        Map<String, Card> cardMap = getCardMap(cardIds);
-
         return cardBooks.stream()
-                .map(cardBook -> CardBookPreviewInfo.from(cardBook, cardMap.getOrDefault(cardBook.getCardId(), null)))
+                .map(CardBookPreviewInfo::from)
                 .toList();
     }
 
@@ -255,17 +238,15 @@ public class CardBookService {
      */
     public CardBookInfo read(String memberId, String id) {
         CardBook cardBook = getByIdAndMemberId(id, memberId);
-        Card card = findCardOrNull(cardBook.getCardId());
         List<Tag> tagList = tagService.getAllByCardBookId(cardBook.getId());
-        return CardBookInfo.from(cardBook, card, tagList);
+        return CardBookInfo.from(cardBook, tagList);
     }
 
     /**
      * 명함첩 그룹 수정
      * 1. 명함첩 조회
      * 2. 명함첩 수정
-     * 3. Card 조회
-     * 4. 태그 조회
+     * 3. 태그 조회
      * @param command 명함첩 정보
      * @return 수정된 명함첩
      */
@@ -278,13 +259,10 @@ public class CardBookService {
         cardBook.updateGroup(command.groupId());
         CardBook updatedCardBook = cardBookRepository.update(cardBook);
 
-        // 3. Card 조회
-        Card card = findCardOrNull(updatedCardBook.getCardId());
-
-        // 4. 태그 조회
+        // 3. 태그 조회
         List<Tag> tagList = tagService.getAllByCardBookId(cardBook.getId());
 
-        return CardBookInfo.from(updatedCardBook, card, tagList);
+        return CardBookInfo.from(updatedCardBook, tagList);
     }
 
     /**
@@ -299,20 +277,10 @@ public class CardBookService {
     }
 
     /**
-     * Card 조회 (없으면 null 반환)
-     * @param cardId 명함 아이디
-     * @return 조회된 명함 또는 null
-     */
-    private Card findCardOrNull(String cardId) {
-        return cardId != null ? getCard(cardId) : null;
-    }
-
-    /**
      * 명함첩 메모 수정
      * 1. 명함첩 조회
      * 2. 명함첩 수정
-     * 3. Card 조회
-     * 4. 태그 조회
+     * 3. 태그 조회
      * @param command 명함첩 정보
      * @return 수정된 명함첩
      */
@@ -324,21 +292,17 @@ public class CardBookService {
         cardBook.updateMemo(command.memo());
         CardBook updatedCardBook = cardBookRepository.update(cardBook);
 
-        // 3. Card 조회 후 반환
-        Card card = findCardOrNull(updatedCardBook.getCardId());
-
-        // 4. 태그 조회
+        // 3. 태그 조회
         List<Tag> tagList = tagService.getAllByCardBookId(cardBook.getId());
 
-        return CardBookInfo.from(updatedCardBook, card, tagList);
+        return CardBookInfo.from(updatedCardBook, tagList);
     }
 
     /**
      * 명함첩 즐겨찾기 수정
      * 1. 명함첩 조회
      * 2. 명함첩 수정
-     * 3. Card 조회
-     * 4. 태그 조회
+     * 3. 태그 조회
      * @param command 명함첩 정보
      * @return 수정된 명함첩
      */
@@ -350,13 +314,10 @@ public class CardBookService {
         cardBook.updateFavorite(command.favorite());
         CardBook updatedCardBook = cardBookRepository.update(cardBook);
 
-        // 3. Card 조회
-        Card card = findCardOrNull(updatedCardBook.getCardId());
-
-        // 4. 태그 조회
+        // 3. 태그 조회
         List<Tag> tagList = tagService.getAllByCardBookId(cardBook.getId());
 
-        return CardBookInfo.from(updatedCardBook, card, tagList);
+        return CardBookInfo.from(updatedCardBook, tagList);
     }
 
     /**
