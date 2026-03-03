@@ -153,4 +153,16 @@ public class CardBookController {
         return ResponseEntity.ok( ApiResponse.success(exists));
     }
 
+    @PostMapping("/{id}/refresh-snapshot")
+    @Operation(summary = "프로필 스냅샷 최신화", description = "저장된 명함의 프로필 스냅샷을 원본 명함의 최신 정보로 갱신합니다.")
+    public ResponseEntity<ApiResponse<Void>> refreshSnapshot(
+            @AuthenticationPrincipal String memberId,
+            @Parameter(description = "명함첩 ID", required = true)
+            @PathVariable String id
+    ) {
+        cardBookService.refreshSnapshot(memberId, id);
+
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
 }

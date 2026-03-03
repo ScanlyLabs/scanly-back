@@ -347,6 +347,36 @@ public class CardBookService {
     }
 
     /**
+     * 프로필 스냅샷 최신화
+     * 1. 명함첩 조회
+     * 2. 원본 명함 존재 여부 확인
+     * 3. 원본 명함 조회
+     * 4. 스냅샷 갱신
+     * @param memberId 회원 아이디
+     * @param id 명함첩 아이디
+     */
+    @Transactional
+    public void refreshSnapshot(String memberId, String id) {
+        // 1. 명함첩 조회
+        CardBook cardBook = getByIdAndMemberId(id, memberId);
+
+        // 2. 원본 명함 존재 여부 확인
+        String cardId = cardBook.getCardId();
+        if (!StringUtils.hasText(cardId)) {
+            throw new CustomException(ErrorCode.ORIGINAL_CARD_DELETED);
+        }
+
+        // 3. 원본 명함 조회
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ORIGINAL_CARD_DELETED));
+
+        // 4. 스냅샷 갱신
+        ProfileSnapshot newSnapshot = ProfileSnapshot.from(card);
+        cardBook.refreshSnapshot(newSnapshot);
+        cardBookRepository.update(cardBook);
+    }
+
+    /**
      * 명함 삭제 시 해당 명함을 참조하는 명함첩의 cardId를 null로 변경
      * @param cardId 삭제할 명함 아이디
      */

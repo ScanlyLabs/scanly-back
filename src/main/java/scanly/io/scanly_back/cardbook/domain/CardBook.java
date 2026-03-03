@@ -82,6 +82,14 @@ public class CardBook extends BaseDomain {
         this.isFavorite = favorite;
     }
 
+    /**
+     * 프로필 스냅샷 최신화
+     * @param profileSnapshot 최신 프로필 스냅샷
+     */
+    public void refreshSnapshot(ProfileSnapshot profileSnapshot) {
+        this.profileSnapshot = profileSnapshot;
+    }
+
     // getters
     public String getId() {
         return id;
