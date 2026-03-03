@@ -145,6 +145,7 @@ src/main/java/scanly/io/scanly_back
 | POST | `/api/cardbooks/v1/{id}/memo` | 명함첩 메모 수정 |
 | POST | `/api/cardbooks/v1/{id}/favorite` | 명함첩 즐겨찾기 수정 |
 | POST | `/api/cardbooks/v1/{id}/delete` | 명함첩 삭제 |
+| POST | `/api/cardbooks/v1/{id}/refresh-snapshot` | 프로필 스냅샷 최신화 |
 
 ### 태그 (Tag)
 | Method | Endpoint                   | Description |
