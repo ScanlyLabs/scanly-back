@@ -53,6 +53,31 @@ class CardBookTest {
         assertThat(cardBook.isFavorite()).isEqualTo(true);
     }
 
+    @Test
+    @DisplayName("프로필 스냅샷을 최신화한다.")
+    void refreshSnapshot() {
+        // given
+        CardBook cardBook = defaultCardBook();
+        ProfileSnapshot newProfileSnapshot = ProfileSnapshot.from(Card.create(
+                UUID.randomUUID().toString(), "테스트", "개발자2", "스캔리2",
+                "01012345678", "test2@naver.com", null, null, null, null
+        ));
+
+        // when
+        cardBook.refreshSnapshot(newProfileSnapshot);
+
+        // then
+        assertThat(cardBook.getProfileSnapshot())
+                .extracting("name", "title", "company", "phone", "email")
+                .contains(
+                        newProfileSnapshot.name(),
+                        newProfileSnapshot.title(),
+                        newProfileSnapshot.company(),
+                        newProfileSnapshot.phone(),
+                        newProfileSnapshot.email()
+                );
+    }
+
     private static CardBook defaultCardBook() {
         return CardBook.create(
                 UUID.randomUUID().toString(),

@@ -1,10 +1,12 @@
 package scanly.io.scanly_back.cardbook.domain;
 
+import lombok.Getter;
 import scanly.io.scanly_back.cardbook.domain.model.ProfileSnapshot;
 import scanly.io.scanly_back.common.domain.BaseDomain;
 
 import java.time.LocalDateTime;
 
+@Getter
 public class CardBook extends BaseDomain {
     private String id;
     private String memberId;             // 소유자 ID
@@ -88,28 +90,5 @@ public class CardBook extends BaseDomain {
      */
     public void refreshSnapshot(ProfileSnapshot profileSnapshot) {
         this.profileSnapshot = profileSnapshot;
-    }
-
-    // getters
-    public String getId() {
-        return id;
-    }
-    public String getMemberId() {
-        return memberId;
-    }
-    public String getCardId() {
-        return cardId;
-    }
-    public ProfileSnapshot getProfileSnapshot() {
-        return profileSnapshot;
-    }
-    public String getGroupId() {
-        return groupId;
-    }
-    public String getMemo() {
-        return memo;
-    }
-    public boolean isFavorite() {
-        return isFavorite;
     }
 }
