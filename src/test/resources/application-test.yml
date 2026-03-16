@@ -1,0 +1,42 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;INIT=RUNSCRIPT FROM 'classpath:schema.sql'
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+app:
+  base-url: http://localhost:8080
+
+jwt:
+  secret: test-jwt-secret-key-must-be-at-least-32-characters-long
+  access-token:
+    expiration: 1800000
+  refresh-token:
+    expiration: 604800000
+
+cloud:
+  aws:
+    credentials:
+      access-key: test-access-key
+      secret-key: test-secret-key
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: test-bucket
+
+logging:
+  level:
+    scanly.io.scanly_back: DEBUG
+    org.hibernate.SQL: DEBUG
