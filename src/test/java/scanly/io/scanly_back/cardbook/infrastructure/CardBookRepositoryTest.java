@@ -301,6 +301,7 @@ class CardBookRepositoryTest extends IntegrationJpaTestSupport {
     void update() {
         // given
         CardBook cardBook = createCardBook();
+        cardBookRepository.save(cardBook);
         String groupId = UUID.randomUUID().toString();
         cardBook.updateGroup(groupId);
 
