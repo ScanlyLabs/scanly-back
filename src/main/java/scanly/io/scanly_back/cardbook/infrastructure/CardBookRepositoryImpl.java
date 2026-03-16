@@ -61,6 +61,16 @@ public class CardBookRepositoryImpl implements CardBookRepository {
     }
 
     /**
+     * 명함첩 목록 전체 조회
+     * @return 조회된 명함첩 목록
+     */
+    @Override
+    public List<CardBook> findAll() {
+        List<CardBookEntity> cardBookEntities = cardBookJpaRepository.findAll();
+        return cardBookEntities.stream().map(cardBookMapper::toDomain).toList();
+    }
+
+    /**
      * 회원 아이디로 명함첩 목록 조회
      * @param memberId 회원 아이디
      * @return 조회된 명함첩 목록

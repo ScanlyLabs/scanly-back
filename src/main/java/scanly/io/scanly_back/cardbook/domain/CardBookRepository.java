@@ -17,6 +17,8 @@ public interface CardBookRepository {
 
     boolean existsByMemberIdAndCardId(String memberId, String cardId);
 
+    List<CardBook> findAll();
+
     List<CardBook> findAllByMemberId(String memberId);
 
     Page<CardBook> findAllByMemberId(String memberId, Pageable pageable);

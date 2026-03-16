@@ -33,7 +33,7 @@ public interface CardBookJpaRepository extends JpaRepository<CardBookEntity, Str
 
     long countByMemberIdAndGroupId(String memberId, String groupId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE CardBookEntity c SET c.cardId = null WHERE c.cardId = :cardId")
     void clearCardId(String cardId);
 
