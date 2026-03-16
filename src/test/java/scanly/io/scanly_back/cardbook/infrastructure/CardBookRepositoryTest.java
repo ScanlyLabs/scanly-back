@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 @Import({CardBookRepositoryImpl.class, CardBookMapper.class})
 @DisplayName("CardBookRepository 테스트")
@@ -33,11 +34,9 @@ class CardBookRepositoryTest extends IntegrationJpaTestSupport {
 
         // when
         CardBook savedCardBook = cardBookRepository.save(cardBook);
-        Optional<CardBook> newCardBook = cardBookRepository.findByIdAndMemberId(savedCardBook.getId(), savedCardBook.getMemberId());
 
         // then
-        assertThat(newCardBook).isPresent();
-        assertThat(newCardBook.get())
+        assertThat(savedCardBook)
                 .extracting("memberId", "cardId", "groupId", "memo", "isFavorite")
                 .contains(
                         cardBook.getMemberId(),
@@ -54,6 +53,26 @@ class CardBookRepositoryTest extends IntegrationJpaTestSupport {
                         profileSnapshot.company(),
                         profileSnapshot.phone(),
                         profileSnapshot.email()
+                );
+    }
+
+    @Test
+    @DisplayName("명함첩 목록을 저장한다.")
+    void saveAll() {
+        // given
+        CardBook cardBook1 = createCardBook();
+        CardBook cardBook2 = createCardBook();
+        List<CardBook> cardBooks = List.of(cardBook1, cardBook2);
+
+        // when
+        List<CardBook> savedCardBook = cardBookRepository.saveAll(cardBooks);
+
+        // then
+        assertThat(savedCardBook)
+                .extracting("memberId", "cardId")
+                .containsExactlyInAnyOrder(
+                        tuple(cardBook1.getMemberId(), cardBook1.getCardId()),
+                        tuple(cardBook2.getMemberId(), cardBook2.getCardId())
                 );
     }
 
@@ -161,6 +180,24 @@ class CardBookRepositoryTest extends IntegrationJpaTestSupport {
         assertThat(exist).isFalse();
     }
 
+    @Test
+    @DisplayName("회원 아이디로 명함첩 목록을 조회한다.")
+    void findAllByMemberId() {
+        // given
+        String memberId = UUID.randomUUID().toString();
+        CardBook cardBook1 = createCardBookWithMemberId(memberId);
+        CardBook cardBook2 = createCardBookWithMemberId(memberId);
+        CardBook cardBook3 = createCardBookWithMemberId(memberId);
+        cardBookRepository.save(cardBook1);
+        cardBookRepository.save(cardBook2);
+        cardBookRepository.save(cardBook3);
+
+        // when
+        List<CardBook> cardBooks = cardBookRepository.findAllByMemberId(memberId);
+
+        // then
+        assertThat(cardBooks).hasSize(3);
+    }
 
     private CardBook createCardBook() {
         return CardBook.create(

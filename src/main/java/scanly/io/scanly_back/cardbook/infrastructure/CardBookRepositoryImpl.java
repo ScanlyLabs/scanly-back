@@ -31,6 +31,13 @@ public class CardBookRepositoryImpl implements CardBookRepository {
         return cardBookMapper.toDomain(savedEntity);
     }
 
+    @Override
+    public List<CardBook> saveAll(List<CardBook> cardBooks) {
+        List<CardBookEntity> entities = cardBooks.stream().map(cardBookMapper::toEntity).toList();
+        List<CardBookEntity> savedEntities = cardBookJpaRepository.saveAll(entities);
+        return savedEntities.stream().map(cardBookMapper::toDomain).toList();
+    }
+
     /**
      * 이이디 및 회원 아이디로 유효성 체크
      * @param id 아이디
