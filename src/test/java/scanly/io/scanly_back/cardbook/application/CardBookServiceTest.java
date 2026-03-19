@@ -5,23 +5,36 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import scanly.io.scanly_back.IntegrationTestSupport;
 import scanly.io.scanly_back.card.domain.Card;
 import scanly.io.scanly_back.card.domain.CardRepository;
 import scanly.io.scanly_back.card.infrastructure.CardJpaRepository;
+import scanly.io.scanly_back.cardbook.application.dto.command.CardExchangeCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.SaveCardBookCommand;
+import scanly.io.scanly_back.cardbook.application.dto.info.CardExchangeInfo;
 import scanly.io.scanly_back.cardbook.application.dto.info.RegisterCardBookInfo;
 import scanly.io.scanly_back.cardbook.domain.CardBook;
 import scanly.io.scanly_back.cardbook.domain.CardBookRepository;
+import scanly.io.scanly_back.cardbook.domain.event.CardExchangedEvent;
 import scanly.io.scanly_back.cardbook.domain.model.ProfileSnapshot;
 import scanly.io.scanly_back.cardbook.infrastructure.CardBookJpaRepository;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
+import scanly.io.scanly_back.common.ratelimit.RateLimiterService;
+import scanly.io.scanly_back.member.domain.Member;
+import scanly.io.scanly_back.member.domain.MemberRepository;
+import scanly.io.scanly_back.member.infrastructure.MemberJpaRepository;
+import scanly.io.scanly_back.notification.application.CardExchangeNotificationListener;
 
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 @DisplayName("CardBookService 테스트")
 class CardBookServiceTest extends IntegrationTestSupport {
@@ -41,15 +54,29 @@ class CardBookServiceTest extends IntegrationTestSupport {
     @Autowired
     private CardBookJpaRepository cardBookJpaRepository;
 
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @Autowired
+    private MemberJpaRepository memberJpaRepository;
+
+    @MockitoBean
+    private RateLimiterService rateLimiterService;
+
+    @MockitoBean
+    private CardExchangeNotificationListener cardExchangeNotificationListener;
+
     @AfterEach
     void after() {
         cardJpaRepository.deleteAllInBatch();
         cardBookJpaRepository.deleteAllInBatch();
+        memberJpaRepository.deleteAllInBatch();
     }
 
     @Nested
-    @DisplayName("save - 명함 저장 검증")
+    @DisplayName("명함 저장 검증")
     class Save {
+
         @Test
         @DisplayName("[Happy] 명함을 저장한다.")
         void save() {
@@ -136,6 +163,100 @@ class CardBookServiceTest extends IntegrationTestSupport {
                     .extracting("errorCode")
                     .isEqualTo(ErrorCode.CARD_BOOK_ALREADY_EXISTS);
         }
+    }
+
+    @Nested
+    @DisplayName("명함 교환 검증")
+    class Exchange {
+        @Test
+        @DisplayName("[Happy] 명함을 교환한다.")
+        void cardExchange() {
+            // given
+            Member member = crateMember();
+            Member sender = memberRepository.save(member);
+            Card card = createCard();
+            Card savedCard = cardRepository.save(card);
+
+            CardExchangeCommand command = new CardExchangeCommand(sender.getId(), savedCard.getId());
+
+            given(rateLimiterService.isDailyExchangeAllowed(any(), any(), anyInt()))
+                    .willReturn(true);
+
+            // when
+            CardExchangeInfo info = cardBookService.cardExchange(command);
+
+            // then
+            assertThat(info)
+                    .extracting("senderId", "receiverId")
+                    .contains(sender.getId(), savedCard.getMemberId());
+
+            verify(cardExchangeNotificationListener).handle(any(CardExchangedEvent.class));
+        }
+
+        @Test
+        @DisplayName("[Bad] 존재하지 않는 명함으로 교환 시도 시 실패한다.")
+        void cardNotFound() {
+            // given
+            Member member = crateMember();
+            Member sender = memberRepository.save(member);
+
+            CardExchangeCommand command = new CardExchangeCommand(sender.getId(), "card-test");
+
+            // when & then
+            assertThatThrownBy(() -> cardBookService.cardExchange(command))
+                    .isInstanceOf(CustomException.class)
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.CARD_NOT_FOUND);
+        }
+
+        @Test
+        @DisplayName("[Bad] 일일 명함 교환 제한 초과 시 실패한다.")
+        void dailyLimit() {
+            // given
+            Member member = crateMember();
+            Member sender = memberRepository.save(member);
+            Card card = createCard();
+            Card savedCard = cardRepository.save(card);
+
+            CardExchangeCommand command = new CardExchangeCommand(sender.getId(), savedCard.getId());
+
+            given(rateLimiterService.isDailyExchangeAllowed(any(), any(), anyInt()))
+                    .willReturn(false);
+
+            // when & then
+            assertThatThrownBy(() -> cardBookService.cardExchange(command))
+                    .isInstanceOf(CustomException.class)
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.DAILY_EXCHANGE_LIMIT_EXCEEDED);
+        }
+
+        @Test
+        @DisplayName("[Bad] 존재하지 않는 발신자로 교환 시도 시 실패한다.")
+        void senderNotFound() {
+            // given
+            Card card = createCard();
+            Card savedCard = cardRepository.save(card);
+
+            CardExchangeCommand command = new CardExchangeCommand("sender-test", savedCard.getId());
+
+            given(rateLimiterService.isDailyExchangeAllowed(any(), any(), anyInt()))
+                    .willReturn(false);
+
+            // when & then
+            assertThatThrownBy(() -> cardBookService.cardExchange(command))
+                    .isInstanceOf(CustomException.class)
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.DAILY_EXCHANGE_LIMIT_EXCEEDED);
+        }
+    }
+
+    private Member crateMember() {
+        return Member.signUP(
+                "test",
+                "test",
+                "test1234",
+                "test@test.com"
+        );
     }
 
     private CardBook createCardBookWithMemberIdAndCard(String memberId, Card card) {
