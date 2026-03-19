@@ -5,6 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import scanly.io.scanly_back.IntegrationTestSupport;
 import scanly.io.scanly_back.card.domain.Card;
@@ -12,13 +14,18 @@ import scanly.io.scanly_back.card.domain.CardRepository;
 import scanly.io.scanly_back.card.infrastructure.CardJpaRepository;
 import scanly.io.scanly_back.cardbook.application.dto.command.CardExchangeCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.SaveCardBookCommand;
+import scanly.io.scanly_back.cardbook.application.dto.info.CardBookInfo;
+import scanly.io.scanly_back.cardbook.application.dto.info.CardBookPreviewInfo;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardExchangeInfo;
 import scanly.io.scanly_back.cardbook.application.dto.info.RegisterCardBookInfo;
 import scanly.io.scanly_back.cardbook.domain.CardBook;
 import scanly.io.scanly_back.cardbook.domain.CardBookRepository;
+import scanly.io.scanly_back.cardbook.domain.Tag;
 import scanly.io.scanly_back.cardbook.domain.event.CardExchangedEvent;
 import scanly.io.scanly_back.cardbook.domain.model.ProfileSnapshot;
 import scanly.io.scanly_back.cardbook.infrastructure.CardBookJpaRepository;
+import scanly.io.scanly_back.cardbook.infrastructure.TagJpaRepository;
+import scanly.io.scanly_back.cardbook.infrastructure.TagRepository;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
 import scanly.io.scanly_back.common.ratelimit.RateLimiterService;
@@ -27,10 +34,12 @@ import scanly.io.scanly_back.member.domain.MemberRepository;
 import scanly.io.scanly_back.member.infrastructure.MemberJpaRepository;
 import scanly.io.scanly_back.notification.application.CardExchangeNotificationListener;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.groups.Tuple.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
@@ -60,6 +69,12 @@ class CardBookServiceTest extends IntegrationTestSupport {
     @Autowired
     private MemberJpaRepository memberJpaRepository;
 
+    @Autowired
+    private TagRepository tagRepository;
+
+    @Autowired
+    private TagJpaRepository tagJpaRepository;
+
     @MockitoBean
     private RateLimiterService rateLimiterService;
 
@@ -68,13 +83,14 @@ class CardBookServiceTest extends IntegrationTestSupport {
 
     @AfterEach
     void after() {
+        tagJpaRepository.deleteAllInBatch();
         cardJpaRepository.deleteAllInBatch();
         cardBookJpaRepository.deleteAllInBatch();
         memberJpaRepository.deleteAllInBatch();
     }
 
     @Nested
-    @DisplayName("명함 저장 검증")
+    @DisplayName("명함첩 저장 검증")
     class Save {
 
         @Test
@@ -250,6 +266,102 @@ class CardBookServiceTest extends IntegrationTestSupport {
         }
     }
 
+    @Nested
+    @DisplayName("명함첩 조회 검증")
+    class Read {
+
+        @Test
+        @DisplayName("[Happy] 회원아이디, 명함첩 그룹 아이디, 페이징 정보로 명함첩 목록을 조회한다.")
+        void readAll() {
+            // given
+            String memberId = UUID.randomUUID().toString();
+            CardBook cardBook1 = createCardBookWithMemberIdAndCard(memberId, createCard());
+            CardBook cardBook2 = createCardBookWithMemberIdAndCard(memberId, createCard());
+            List<CardBook> cardBooks = cardBookRepository.saveAll(List.of(cardBook1, cardBook2));
+            Pageable pageable = Pageable.ofSize(5);
+
+            // when
+            Page<CardBookPreviewInfo> infos = cardBookService.readAll(memberId, null, pageable);
+
+            // then
+            assertThat(infos).hasSize(2);
+            CardBook first = cardBooks.getFirst();
+            CardBook last = cardBooks.getLast();
+            assertThat(infos.getContent())
+                    .extracting(
+                            "id", "cardId", "name", "title", "company",
+                            "profileImageUrl", "groupId", "memo", "isFavorite", "createdAt"
+                    )
+                    .containsExactlyInAnyOrder(
+                            tuple(
+                                    first.getId(), first.getCardId(), first.getProfileSnapshot().name(), first.getProfileSnapshot().title(), first.getProfileSnapshot().company(),
+                                    first.getProfileSnapshot().profileImageUrl(), first.getGroupId(), first.getMemo(), first.isFavorite(), first.getCreatedAt()
+                            ),
+                            tuple(
+                                    last.getId(), last.getCardId(), last.getProfileSnapshot().name(), last.getProfileSnapshot().title(), last.getProfileSnapshot().company(),
+                                    last.getProfileSnapshot().profileImageUrl(), last.getGroupId(), last.getMemo(), last.isFavorite(), last.getCreatedAt()
+                            )
+                    );
+        }
+
+        @Test
+        @DisplayName("[Happy] 명함첩 상세 조회")
+        void read() {
+            // given
+            String memberId = UUID.randomUUID().toString();
+            CardBook cardBook = createCardBookWithMemberIdAndCard(memberId, createCard());
+            CardBook savedCardBook = cardBookRepository.save(cardBook);
+            Tag tag = createTag(savedCardBook.getId());
+            Tag savedTag = tagRepository.save(tag);
+
+            // when
+            CardBookInfo info = cardBookService.read(memberId, savedCardBook.getId());
+
+            // then
+            assertThat(info)
+                    .extracting(
+                            "id", "cardId", "name", "title", "company",
+                            "profileImageUrl", "groupId", "memo", "isFavorite", "createdAt"
+                    ).contains(
+                            savedCardBook.getId(), savedCardBook.getCardId(), savedCardBook.getProfileSnapshot().name(), savedCardBook.getProfileSnapshot().title(), savedCardBook.getProfileSnapshot().company(),
+                            savedCardBook.getProfileSnapshot().profileImageUrl(), savedCardBook.getGroupId(), savedCardBook.getMemo(), savedCardBook.isFavorite(), savedCardBook.getCreatedAt()
+                    );
+            assertThat(info.tagList())
+                    .extracting("id", "cardBookId", "name")
+                    .containsExactlyInAnyOrder(
+                            tuple(savedTag.getId(), savedTag.getCardBookId(), savedTag.getName())
+                    );
+        }
+
+        @Test
+        @DisplayName("[Happy] 명함첩이 존재하면 true를 리턴한다.")
+        void existsTrue() {
+            // given
+            String memberId = UUID.randomUUID().toString();
+            CardBook cardBook = createCardBookWithMemberIdAndCard(memberId, createCard());
+            CardBook savedCardBook = cardBookRepository.save(cardBook);
+
+            // when
+            boolean result = cardBookService.exists(memberId, savedCardBook.getCardId());
+
+            // then
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        @DisplayName("[Happy] 명함첩이 존재하지 않으면 false를 리턴한다.")
+        void existsFalse() {
+            // given
+            String memberId = UUID.randomUUID().toString();
+
+            // when
+            boolean result = cardBookService.exists(memberId, "card-id");
+
+            // then
+            assertThat(result).isFalse();
+        }
+    }
+
     private Member crateMember() {
         return Member.signUP(
                 "test",
@@ -295,6 +407,13 @@ class CardBookServiceTest extends IntegrationTestSupport {
                 null,
                 null,
                 null
+        );
+    }
+
+    private Tag createTag(String cardBookId) {
+        return Tag.create(
+                cardBookId,
+                "태그명"
         );
     }
 }
