@@ -20,10 +20,7 @@ import scanly.io.scanly_back.cardbook.application.dto.info.RegisterCardBookInfo;
 import scanly.io.scanly_back.cardbook.domain.*;
 import scanly.io.scanly_back.cardbook.domain.event.CardExchangedEvent;
 import scanly.io.scanly_back.cardbook.domain.model.ProfileSnapshot;
-import scanly.io.scanly_back.cardbook.infrastructure.CardBookJpaRepository;
-import scanly.io.scanly_back.cardbook.infrastructure.GroupJpaRepository;
-import scanly.io.scanly_back.cardbook.infrastructure.TagJpaRepository;
-import scanly.io.scanly_back.cardbook.infrastructure.TagRepository;
+import scanly.io.scanly_back.cardbook.infrastructure.*;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
 import scanly.io.scanly_back.common.ratelimit.RateLimiterService;
@@ -533,6 +530,52 @@ class CardBookServiceTest extends IntegrationTestSupport {
 
             // then
             List<CardBook> cardBooks = cardBookJpaRepository.findAllByCardId(cardId);
+            assertThat(cardBooks).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("명함첩 삭제 검증")
+    class Delete {
+
+        @Test
+        @DisplayName("[Happy] 명함첩을 삭제한다.")
+        void delete() {
+            // given
+            String memberId = UUID.randomUUID().toString();
+            CardBook cardBook = createCardBookWithMemberIdAndCard(memberId, createCard());
+            CardBook savedCardBook = cardBookRepository.save(cardBook);
+            String cardBookId = savedCardBook.getId();
+            Tag tag = createTag(cardBookId);
+            tagRepository.save(tag);
+
+            // when
+            cardBookService.delete(memberId, cardBookId);
+
+            // then
+            Optional<CardBook> foundCardBook = cardBookRepository.findByIdAndMemberId(cardBookId, memberId);
+            List<Tag> tagList = tagRepository.findAllByCardBookId(cardBookId);
+
+            assertThat(foundCardBook).isNotPresent();
+            assertThat(tagList).isEmpty();
+        }
+
+        @Test
+        @DisplayName("")
+        void deleteAllByMemberId() {
+            // given
+            String memberId = UUID.randomUUID().toString();
+            CardBook cardBook = createCardBookWithMemberIdAndCard(memberId, createCard());
+            CardBook savedCardBook = cardBookRepository.save(cardBook);
+            String cardBookId = savedCardBook.getId();
+            Tag tag = createTag(cardBookId);
+            tagRepository.save(tag);
+
+            // when
+            cardBookService.deleteAllByMemberId(memberId);
+
+            // then
+            List<CardBook> cardBooks = cardBookRepository.findAllByMemberId(memberId);
             assertThat(cardBooks).isEmpty();
         }
     }
