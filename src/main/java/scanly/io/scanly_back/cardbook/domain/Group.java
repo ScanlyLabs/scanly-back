@@ -1,9 +1,11 @@
 package scanly.io.scanly_back.cardbook.domain;
 
+import lombok.Getter;
 import scanly.io.scanly_back.common.domain.BaseDomain;
 
 import java.time.LocalDateTime;
 
+@Getter
 public class Group extends BaseDomain {
 
     private String id;
@@ -54,22 +56,5 @@ public class Group extends BaseDomain {
      */
     public void reorder(int sortOrder) {
         this.sortOrder = sortOrder;
-    }
-
-    // getters
-    public String getId() {
-        return id;
-    }
-
-    public String getMemberId() {
-        return memberId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getSortOrder() {
-        return sortOrder;
     }
 }
