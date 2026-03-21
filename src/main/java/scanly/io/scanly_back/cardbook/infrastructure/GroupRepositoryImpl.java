@@ -17,6 +17,16 @@ public class GroupRepositoryImpl implements GroupRepository {
     private final GroupMapper groupMapper;
 
     /**
+     * 그룹 이이디로 유효성 체크
+     * @param id 아이디
+     * @return 존재하면 true, 아니면 false
+     */
+    @Override
+    public boolean existsById(String id) {
+        return groupJpaRepository.existsById(id);
+    }
+
+    /**
      * 명함첩 그룹 조회
      * @param id 명함첩 그룹 아이디
      * @return 조회된 명함첩 그룹
