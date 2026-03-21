@@ -1,4 +1,4 @@
-package scanly.io.scanly_back.cardbook.infrastructure;
+package scanly.io.scanly_back.cardbook.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,9 +8,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import scanly.io.scanly_back.IntegrationJpaTestSupport;
 import scanly.io.scanly_back.card.domain.Card;
-import scanly.io.scanly_back.cardbook.domain.CardBook;
-import scanly.io.scanly_back.cardbook.domain.CardBookRepository;
 import scanly.io.scanly_back.cardbook.domain.model.ProfileSnapshot;
+import scanly.io.scanly_back.cardbook.infrastructure.CardBookMapper;
+import scanly.io.scanly_back.cardbook.infrastructure.CardBookRepositoryImpl;
 
 import java.time.LocalDateTime;
 import java.util.List;
