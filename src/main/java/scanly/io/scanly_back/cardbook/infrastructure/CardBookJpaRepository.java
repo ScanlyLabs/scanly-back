@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import scanly.io.scanly_back.cardbook.domain.CardBook;
 import scanly.io.scanly_back.cardbook.infrastructure.entity.CardBookEntity;
 
 import java.time.LocalDateTime;
@@ -38,4 +39,6 @@ public interface CardBookJpaRepository extends JpaRepository<CardBookEntity, Str
     void clearCardId(String cardId);
 
     void deleteAllByMemberId(String memberId);
+
+    List<CardBook> findAllByCardId(String cardId);
 }

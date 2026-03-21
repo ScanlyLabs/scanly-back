@@ -12,9 +12,7 @@ import scanly.io.scanly_back.IntegrationTestSupport;
 import scanly.io.scanly_back.card.domain.Card;
 import scanly.io.scanly_back.card.domain.CardRepository;
 import scanly.io.scanly_back.card.infrastructure.CardJpaRepository;
-import scanly.io.scanly_back.cardbook.application.dto.command.CardExchangeCommand;
-import scanly.io.scanly_back.cardbook.application.dto.command.SaveCardBookCommand;
-import scanly.io.scanly_back.cardbook.application.dto.command.UpdateCardBookGroupCommand;
+import scanly.io.scanly_back.cardbook.application.dto.command.*;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardBookInfo;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardBookPreviewInfo;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardExchangeInfo;
@@ -35,6 +33,7 @@ import scanly.io.scanly_back.member.infrastructure.MemberJpaRepository;
 import scanly.io.scanly_back.notification.application.CardExchangeNotificationListener;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -387,9 +386,9 @@ class CardBookServiceTest extends IntegrationTestSupport {
 
             UpdateCardBookGroupCommand command
                     = new UpdateCardBookGroupCommand(
-                        savedCardBook.getId(),
-                        newGroupId,
-                        memberId
+                    savedCardBook.getId(),
+                    newGroupId,
+                    memberId
             );
 
             // when
@@ -422,6 +421,120 @@ class CardBookServiceTest extends IntegrationTestSupport {
                     .extracting("errorCode")
                     .isEqualTo(ErrorCode.GROUP_NOT_FOUND);
         }
+
+        @Test
+        @DisplayName("[Happy] 명함첩 메모를 수정한다.")
+        void updateMemo() {
+            // given
+            String memberId = UUID.randomUUID().toString();
+            Card card = createCard();
+            CardBook cardBook = createCardBookWithMemberIdAndCard(memberId, card);
+            CardBook savedCardBook = cardBookRepository.save(cardBook);
+            String newMemo = "신규 메모";
+
+            UpdateCardBookMemoCommand command
+                    = new UpdateCardBookMemoCommand(
+                    savedCardBook.getId(),
+                    newMemo,
+                    memberId
+            );
+
+            // when
+            CardBookInfo info = cardBookService.updateMemo(command);
+
+            // then
+            assertThat(info.memo()).isEqualTo(newMemo);
+        }
+
+        @Test
+        @DisplayName("[Happy] 명함첩 즐겨찾기를 수정한다.")
+        void updateFavorite() {
+            // given
+            String memberId = UUID.randomUUID().toString();
+            Card card = createCard();
+            CardBook cardBook = createCardBookWithMemberIdAndCard(memberId, card);
+            CardBook savedCardBook = cardBookRepository.save(cardBook);
+            boolean isFavorite = true;
+
+            UpdateCardBookFavoriteCommand command
+                    = new UpdateCardBookFavoriteCommand(
+                    savedCardBook.getId(),
+                    isFavorite,
+                    memberId
+            );
+
+            // when
+            CardBookInfo info = cardBookService.updateFavorite(command);
+
+            // then
+            assertThat(info.isFavorite()).isTrue();
+        }
+
+        @Test
+        @DisplayName("[Happy] 명함첩 프로필 스냅샷을 최신화한다.")
+        void refreshSnapshot() {
+            // given
+            String memberId = UUID.randomUUID().toString();
+            Card card = createCard();
+            Card savedCard = cardRepository.save(card);
+            CardBook cardBook = createCardBookWithMemberIdAndCard(memberId, savedCard);
+            CardBook savedCardBook = cardBookRepository.save(cardBook);
+            String cardBookId = savedCardBook.getId();
+
+            // when
+            cardBookService.refreshSnapshot(memberId, cardBookId);
+
+            // then
+            Optional<CardBook> updatedCardBook = cardBookRepository.findByIdAndMemberId(cardBookId, memberId);
+            assertThat(updatedCardBook).isPresent();
+
+            ProfileSnapshot profileSnapshot = updatedCardBook.get().getProfileSnapshot();
+            assertThat(profileSnapshot)
+                    .extracting(
+                            "name", "title", "company", "phone", "email",
+                            "bio", "profileImageUrl", "portfolioUrl", "location"
+                    ).contains(
+                            savedCard.getName(), savedCard.getTitle(), savedCard.getCompany(), savedCard.getPhone(), savedCard.getEmail(),
+                            savedCard.getBio(), savedCard.getProfileImageUrl(), savedCard.getPortfolioUrl(), savedCard.getLocation()
+                    );
+        }
+
+        @Test
+        @DisplayName("[Bad] 명함첩 프로필 스냅샷 최신화 시 원본 명함이 존재하지 않으면 오류가 발생한다.")
+        void refreshSnapshotWhenNotFoundOriginalCard() {
+            // given
+            String memberId = UUID.randomUUID().toString();
+            Card card = createCardWithId();
+            CardBook cardBook = createCardBookWithMemberIdAndCard(memberId, card);
+            CardBook savedCardBook = cardBookRepository.save(cardBook);
+            String cardBookId = savedCardBook.getId();
+
+            // when & then
+            assertThatThrownBy(() -> cardBookService.refreshSnapshot(memberId, cardBookId))
+                    .isInstanceOf(CustomException.class)
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.ORIGINAL_CARD_DELETED);
+        }
+
+        @Test
+        @DisplayName("[Happy] 명함첩의 명함 아이디를 null로 변경한다.")
+        void clearCardId() {
+            // given
+            String memberId = UUID.randomUUID().toString();
+            Card card = createCard();
+            Card savedCard = cardRepository.save(card);
+            CardBook cardBook = createCardBookWithMemberIdAndCard(memberId, savedCard);
+            cardBookRepository.save(cardBook);
+
+            String cardId = savedCard.getId();
+
+            // when
+            cardBookService.clearCardId(cardId);
+
+            // then
+            List<CardBook> cardBooks = cardBookJpaRepository.findAllByCardId(cardId);
+            assertThat(cardBooks).isEmpty();
+        }
     }
 
     private Member crateMember() {
@@ -450,6 +563,26 @@ class CardBookServiceTest extends IntegrationTestSupport {
                 "회사",
                 "01012341234",
                 "test@test.com",
+                null,
+                null,
+                null,
+                null
+        );
+    }
+
+    private Card createCardWithId() {
+        return Card.of(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                "이름",
+                "타이틀",
+                "회사",
+                "01012341234",
+                "test@test.com",
+                null,
+                null,
+                null,
+                null,
                 null,
                 null,
                 null,

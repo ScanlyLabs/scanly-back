@@ -371,11 +371,6 @@ public class CardBookService {
 
         // 2. 원본 명함 존재 여부 확인
         String cardId = cardBook.getCardId();
-        if (!StringUtils.hasText(cardId)) {
-            throw new CustomException(ErrorCode.ORIGINAL_CARD_DELETED);
-        }
-
-        // 3. 원본 명함 조회
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ORIGINAL_CARD_DELETED));
 
