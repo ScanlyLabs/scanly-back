@@ -48,6 +48,7 @@ public class CardBookService {
     private final CardExchangeRepository cardExchangeRepository;
     private final TagService tagService;
     private final CardRepository cardRepository;
+    private final GroupRepository groupRepository;
     private final MemberRepository memberRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final RateLimiterService rateLimiterService;
@@ -245,21 +246,29 @@ public class CardBookService {
     /**
      * 명함첩 그룹 수정
      * 1. 명함첩 조회
-     * 2. 명함첩 수정
-     * 3. 태그 조회
+     * 2. 그룹 조회
+     * 3. 명함첩 수정
+     * 4. 태그 조회
      * @param command 명함첩 정보
      * @return 수정된 명함첩
      */
     @Transactional
     public CardBookInfo updateGroup(UpdateCardBookGroupCommand command) {
+        String groupId = command.groupId();
+
         // 1. 명함첩 조회
         CardBook cardBook = getByIdAndMemberId(command.id(), command.memberId());
 
-        // 2. 명함첩 수정
+        // 2. 그룹 조회
+        if (!groupRepository.existsById(groupId)) {
+            throw new CustomException(ErrorCode.GROUP_NOT_FOUND);
+        }
+
+        // 3. 명함첩 수정
         cardBook.updateGroup(command.groupId());
         CardBook updatedCardBook = cardBookRepository.update(cardBook);
 
-        // 3. 태그 조회
+        // 4. 태그 조회
         List<Tag> tagList = tagService.getAllByCardBookId(cardBook.getId());
 
         return CardBookInfo.from(updatedCardBook, tagList);

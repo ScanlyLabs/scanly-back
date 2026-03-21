@@ -14,16 +14,16 @@ import scanly.io.scanly_back.card.domain.CardRepository;
 import scanly.io.scanly_back.card.infrastructure.CardJpaRepository;
 import scanly.io.scanly_back.cardbook.application.dto.command.CardExchangeCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.SaveCardBookCommand;
+import scanly.io.scanly_back.cardbook.application.dto.command.UpdateCardBookGroupCommand;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardBookInfo;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardBookPreviewInfo;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardExchangeInfo;
 import scanly.io.scanly_back.cardbook.application.dto.info.RegisterCardBookInfo;
-import scanly.io.scanly_back.cardbook.domain.CardBook;
-import scanly.io.scanly_back.cardbook.domain.CardBookRepository;
-import scanly.io.scanly_back.cardbook.domain.Tag;
+import scanly.io.scanly_back.cardbook.domain.*;
 import scanly.io.scanly_back.cardbook.domain.event.CardExchangedEvent;
 import scanly.io.scanly_back.cardbook.domain.model.ProfileSnapshot;
 import scanly.io.scanly_back.cardbook.infrastructure.CardBookJpaRepository;
+import scanly.io.scanly_back.cardbook.infrastructure.GroupJpaRepository;
 import scanly.io.scanly_back.cardbook.infrastructure.TagJpaRepository;
 import scanly.io.scanly_back.cardbook.infrastructure.TagRepository;
 import scanly.io.scanly_back.common.exception.CustomException;
@@ -75,6 +75,12 @@ class CardBookServiceTest extends IntegrationTestSupport {
     @Autowired
     private TagJpaRepository tagJpaRepository;
 
+    @Autowired
+    private GroupRepository groupRepository;
+
+    @Autowired
+    private GroupJpaRepository groupJpaRepository;
+
     @MockitoBean
     private RateLimiterService rateLimiterService;
 
@@ -86,6 +92,7 @@ class CardBookServiceTest extends IntegrationTestSupport {
         tagJpaRepository.deleteAllInBatch();
         cardJpaRepository.deleteAllInBatch();
         cardBookJpaRepository.deleteAllInBatch();
+        groupJpaRepository.deleteAllInBatch();
         memberJpaRepository.deleteAllInBatch();
     }
 
@@ -362,6 +369,61 @@ class CardBookServiceTest extends IntegrationTestSupport {
         }
     }
 
+    @Nested
+    @DisplayName("명함첩 수정 검증")
+    class Update {
+
+        @Test
+        @DisplayName("[Happy] 명함첩 그룹을 수정한다.")
+        void updateGroup() {
+            // given
+            String memberId = UUID.randomUUID().toString();
+            Card card = createCard();
+            CardBook cardBook = createCardBookWithMemberIdAndCard(memberId, card);
+            CardBook savedCardBook = cardBookRepository.save(cardBook);
+            Group group = createGroup();
+            Group savedGroup = groupRepository.save(group);
+            String newGroupId = savedGroup.getId();
+
+            UpdateCardBookGroupCommand command
+                    = new UpdateCardBookGroupCommand(
+                        savedCardBook.getId(),
+                        newGroupId,
+                        memberId
+            );
+
+            // when
+            CardBookInfo info = cardBookService.updateGroup(command);
+
+            // then
+            assertThat(info.groupId()).isEqualTo(newGroupId);
+        }
+
+        @Test
+        @DisplayName("[Bad] 명함첩 그룹이 존재하지 않으면 명함첩 그룹 수정 시 오류가 발생한다.")
+        void updateGroupWhenGroupIdNotFound() {
+            // given
+            String memberId = UUID.randomUUID().toString();
+            Card card = createCard();
+            CardBook cardBook = createCardBookWithMemberIdAndCard(memberId, card);
+            CardBook savedCardBook = cardBookRepository.save(cardBook);
+            String newGroupId = UUID.randomUUID().toString();
+
+            UpdateCardBookGroupCommand command
+                    = new UpdateCardBookGroupCommand(
+                    savedCardBook.getId(),
+                    newGroupId,
+                    memberId
+            );
+
+            // when & then
+            assertThatThrownBy(() -> cardBookService.updateGroup(command))
+                    .isInstanceOf(CustomException.class)
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.GROUP_NOT_FOUND);
+        }
+    }
+
     private Member crateMember() {
         return Member.signUP(
                 "test",
@@ -414,6 +476,14 @@ class CardBookServiceTest extends IntegrationTestSupport {
         return Tag.create(
                 cardBookId,
                 "태그명"
+        );
+    }
+
+    private Group createGroup() {
+        return Group.create(
+                UUID.randomUUID().toString(),
+                "그룹명",
+                0
         );
     }
 }
