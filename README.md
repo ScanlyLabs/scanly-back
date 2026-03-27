@@ -37,17 +37,19 @@ Scanly는 QR 코드를 활용한 디지털 명함 서비스입니다. 한 번의
       - 복구 테스트: 30초 후 HALF_OPEN → 3회 중 2회 이상 성공 시 CLOSED 복귀 
 
 ## Tech Stack
-| Category | Technology |
-|----------|------------|
-| Language | Java 21 |
+| Category  | Technology |
+|-----------|------------|
+| Language  | Java 21 |
 | Framework | Spring Boot 4.0.1 |
-| Security | Spring Security, JWT |
-| Database | PostgreSQL, Spring Data JPA |
-| Cache | Redis |
-| Storage | AWS S3 |
-| Docs | Swagger (springdoc-openapi) |
-| Build | Gradle |
-| QR Code | ZXing |
+| Security  | Spring Security, JWT |
+| Database  | PostgreSQL, Spring Data JPA |
+| Cache     | Redis |
+| Storage   | AWS S3 |
+| Docs      | Swagger (springdoc-openapi) |
+| Build     | Gradle |
+| QR Code   | ZXing |
+| CI/CD     | GitHub Actions |
+| Infra     | AWS EC2, Docker |
 
 ## Architecture
 
