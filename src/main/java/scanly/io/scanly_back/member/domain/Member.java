@@ -1,9 +1,11 @@
 package scanly.io.scanly_back.member.domain;
 
+import lombok.Getter;
 import scanly.io.scanly_back.common.domain.BaseDomain;
 
 import java.time.LocalDateTime;
 
+@Getter
 public class Member extends BaseDomain {
 
     private String id;
@@ -86,34 +88,5 @@ public class Member extends BaseDomain {
     public void withdrawal() {
         this.status = MemberStatus.WITHDRAWN;
         this.withdrawnAt = LocalDateTime.now();
-    }
-
-    // -- getters --
-    public String getId() {
-        return id;
-    }
-
-    public String getLoginId() {
-        return loginId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public MemberStatus getStatus() {
-        return status;
-    }
-
-    public LocalDateTime getWithdrawnAt() {
-        return withdrawnAt;
     }
 }
