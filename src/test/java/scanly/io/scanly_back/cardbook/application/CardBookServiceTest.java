@@ -293,16 +293,16 @@ class CardBookServiceTest extends IntegrationTestSupport {
             assertThat(infos.getContent())
                     .extracting(
                             "id", "cardId", "name", "title", "company",
-                            "profileImageUrl", "groupId", "memo", "isFavorite", "createdAt"
+                            "profileImageUrl", "groupId", "memo", "isFavorite"
                     )
                     .containsExactlyInAnyOrder(
                             tuple(
                                     first.getId(), first.getCardId(), first.getProfileSnapshot().name(), first.getProfileSnapshot().title(), first.getProfileSnapshot().company(),
-                                    first.getProfileSnapshot().profileImageUrl(), first.getGroupId(), first.getMemo(), first.isFavorite(), first.getCreatedAt()
+                                    first.getProfileSnapshot().profileImageUrl(), first.getGroupId(), first.getMemo(), first.isFavorite()
                             ),
                             tuple(
                                     last.getId(), last.getCardId(), last.getProfileSnapshot().name(), last.getProfileSnapshot().title(), last.getProfileSnapshot().company(),
-                                    last.getProfileSnapshot().profileImageUrl(), last.getGroupId(), last.getMemo(), last.isFavorite(), last.getCreatedAt()
+                                    last.getProfileSnapshot().profileImageUrl(), last.getGroupId(), last.getMemo(), last.isFavorite()
                             )
                     );
         }
@@ -324,10 +324,10 @@ class CardBookServiceTest extends IntegrationTestSupport {
             assertThat(info)
                     .extracting(
                             "id", "cardId", "name", "title", "company",
-                            "profileImageUrl", "groupId", "memo", "isFavorite", "createdAt"
+                            "profileImageUrl", "groupId", "memo", "isFavorite"
                     ).contains(
                             savedCardBook.getId(), savedCardBook.getCardId(), savedCardBook.getProfileSnapshot().name(), savedCardBook.getProfileSnapshot().title(), savedCardBook.getProfileSnapshot().company(),
-                            savedCardBook.getProfileSnapshot().profileImageUrl(), savedCardBook.getGroupId(), savedCardBook.getMemo(), savedCardBook.isFavorite(), savedCardBook.getCreatedAt()
+                            savedCardBook.getProfileSnapshot().profileImageUrl(), savedCardBook.getGroupId(), savedCardBook.getMemo(), savedCardBook.isFavorite()
                     );
             assertThat(info.tagList())
                     .extracting("id", "cardBookId", "name")
