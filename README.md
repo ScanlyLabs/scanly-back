@@ -122,7 +122,7 @@ src/main/java/scanly/io/scanly_back
 
 
 ### 👤 테스트 계정
-- ID: test
+- ID: test, test2
 - PW: test1234
 
 
