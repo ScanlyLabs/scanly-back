@@ -17,6 +17,7 @@ import scanly.io.scanly_back.cardbook.application.dto.info.CardBookInfo;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardBookPreviewInfo;
 import scanly.io.scanly_back.cardbook.application.dto.info.CardExchangeInfo;
 import scanly.io.scanly_back.cardbook.application.dto.info.RegisterCardBookInfo;
+import scanly.io.scanly_back.cardbook.presentation.dto.request.AcceptExchangeRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.CardExchangeRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.SaveCardBookRequest;
 import scanly.io.scanly_back.cardbook.presentation.dto.request.UpdateCardBookFavoriteRequest;
@@ -63,6 +64,19 @@ public class CardBookController {
         CardExchangeInfo cardExchangeInfo = cardBookService.cardExchange(request.toCommand(memberId));
 
         return ResponseEntity.ok(ApiResponse.success(CardExchangeResponse.from(cardExchangeInfo)));
+    }
+
+    @PostMapping("/exchange/accept")
+    @Operation(summary = "명함 교환 수락", description = "명함 교환 요청을 수락하고 상대방의 명함을 내 명함첩에 저장합니다.")
+    public ResponseEntity<ApiResponse<RegisterCardBookResponse>> acceptExchange(
+            @AuthenticationPrincipal String memberId,
+            @Valid @RequestBody AcceptExchangeRequest request
+    ) {
+        RegisterCardBookInfo registerCardBookInfo = cardBookService.acceptExchange(request.toCommand(memberId));
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.success(RegisterCardBookResponse.from(registerCardBookInfo)));
     }
 
     @GetMapping

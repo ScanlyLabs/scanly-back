@@ -40,5 +40,7 @@ public interface CardBookJpaRepository extends JpaRepository<CardBookEntity, Str
 
     void deleteAllByMemberId(String memberId);
 
-    List<CardBook> findAllByCardId(String cardId);
+    List<CardBookEntity> findAllByCardId(String cardId);
+
+    Optional<CardBookEntity> findByMemberIdAndCardId(String memberId, String cardId);
 }

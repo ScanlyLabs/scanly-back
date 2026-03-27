@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 import scanly.io.scanly_back.card.domain.Card;
 import scanly.io.scanly_back.card.domain.CardRepository;
 import scanly.io.scanly_back.cardbook.application.dto.TagService;
+import scanly.io.scanly_back.cardbook.application.dto.command.AcceptExchangeCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.CardExchangeCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.SaveCardBookCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.UpdateCardBookFavoriteCommand;
@@ -154,6 +155,53 @@ public class CardBookService {
         publishCardExchangedEvent(senderId, receiverId, savedCardExchange.getId());
 
         return CardExchangeInfo.from(savedCardExchange);
+    }
+
+    /**
+     * 명함 교환 수락
+     * 1. 명함 교환 내역 조회
+     * 2. 이미 처리된 요청인지 확인
+     * 3. 발신자 명함 조회 (senderId로 조회)
+     * 4. 중복 저장 검증
+     * 5. 명함첩에 저장
+     * 6. 교환 상태를 ACCEPTED로 변경
+     * @param command 수락 정보
+     * @return 저장된 명함첩 정보
+     */
+    @Transactional
+    public RegisterCardBookInfo acceptExchange(AcceptExchangeCommand command) {
+        String exchangeId = command.exchangeId();
+        String receiverId = command.receiverId();
+
+        // 1. 명함 교환 내역 조회
+        CardExchange cardExchange = cardExchangeRepository.findByIdAndReceiverId(exchangeId, receiverId)
+                .orElseThrow(() -> new CustomException(ErrorCode.EXCHANGE_NOT_FOUND));
+
+        // 2. 이미 처리된 요청인지 확인
+        if (!cardExchange.isPending()) {
+            throw new CustomException(ErrorCode.EXCHANGE_ALREADY_PROCESSED);
+        }
+
+        // 3. 발신자 명함 조회 (senderId로 조회)
+        Card senderCard = cardRepository.findByMemberId(cardExchange.getSenderId())
+                .orElseThrow(() -> new CustomException(ErrorCode.CARD_NOT_FOUND));
+        String senderCardId = senderCard.getId();
+
+        // 4. 중복 저장 검증
+        if (cardBookRepository.existsByMemberIdAndCardId(receiverId, senderCardId)) {
+            throw new CustomException(ErrorCode.CARD_BOOK_ALREADY_EXISTS);
+        }
+
+        // 5. 명함첩에 저장
+        ProfileSnapshot profileSnapshot = ProfileSnapshot.from(senderCard);
+        CardBook cardBook = CardBook.create(receiverId, senderCardId, profileSnapshot, null);
+        CardBook savedCardBook = cardBookRepository.save(cardBook);
+
+        // 6. 교환 상태를 ACCEPTED로 변경
+        cardExchange.accept();
+        cardExchangeRepository.updateStatus(cardExchange);
+
+        return RegisterCardBookInfo.from(savedCardBook);
     }
 
     /**
