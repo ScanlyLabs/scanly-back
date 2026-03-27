@@ -139,7 +139,7 @@ public class CardService {
      * @return 조회된 명함
      */
     public ReadCardInfo readCardByLoginId(String loginId) {
-        Member member = memberRepository.findById(loginId)
+        Member member = memberRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         return cardCacheService.getCardByMemberId(member.getId());
     }
