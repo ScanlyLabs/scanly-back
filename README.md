@@ -129,7 +129,7 @@ src/main/java/scanly/io/scanly_back
 ### 🧪 명함 교환 테스트 시나리오 (Swagger)
 
 #### 사전 준비
-- 테스트 계정 2개 필요 (`test`, `test2`)
+- 테스트 계정 2개 필요 (A: `test`, B: `test2`)
 - 각 계정에 명함이 생성되어 있어야 함
 
 #### 테스트 순서
