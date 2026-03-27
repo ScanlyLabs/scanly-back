@@ -250,13 +250,16 @@ class CardBookServiceTest extends IntegrationTestSupport {
         }
 
         @Test
-        @DisplayName("[Bad] 존재하지 않는 발신자로 교환 시도 시 실패한다.")
-        void senderNotFound() {
+        @DisplayName("[Bad] 자신의 명함으로 교환 시도 시 실패한다.")
+        void cannotExchangeOwnCard() {
             // given
-            Card card = createCard();
+            Member member = crateMember();
+            Member sender = memberRepository.save(member);
+            String senderId = sender.getId();
+            Card card = createdCardWithMemberId(senderId);
             Card savedCard = cardRepository.save(card);
 
-            CardExchangeCommand command = new CardExchangeCommand("sender-test", savedCard.getId());
+            CardExchangeCommand command = new CardExchangeCommand(senderId, savedCard.getId());
 
             given(rateLimiterService.isDailyExchangeAllowed(any(), any(), anyInt()))
                     .willReturn(false);
@@ -265,7 +268,7 @@ class CardBookServiceTest extends IntegrationTestSupport {
             assertThatThrownBy(() -> cardBookService.cardExchange(command))
                     .isInstanceOf(CustomException.class)
                     .extracting("errorCode")
-                    .isEqualTo(ErrorCode.DAILY_EXCHANGE_LIMIT_EXCEEDED);
+                    .isEqualTo(ErrorCode.CANNOT_EXCHANGE_OWN_CARD);
         }
     }
 

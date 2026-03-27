@@ -29,6 +29,7 @@ public enum ErrorCode {
     CANNOT_SAVE_OWN_CARD(HttpStatus.BAD_REQUEST, "CB002", "본인 명함은 저장할 수 없습니다."),
     CARD_BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "CB003", "명함첩을 찾을 수 없습니다."),
     ORIGINAL_CARD_DELETED(HttpStatus.BAD_REQUEST, "CB004", "원본 명함이 삭제되어 스냅샷을 갱신할 수 없습니다."),
+    CANNOT_EXCHANGE_OWN_CARD(HttpStatus.BAD_REQUEST, "CB002", "본인 명함과는 교환할 수 없습니다."),
 
     // tag
     TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "T001", "태그가 존재하지 않습니다."),

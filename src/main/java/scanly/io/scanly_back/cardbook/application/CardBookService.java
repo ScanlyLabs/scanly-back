@@ -116,28 +116,35 @@ public class CardBookService {
     /**
      * 명함 교환 내역 저장
      * 1. 명함 조회
-     * 2. 일일 교환 제한 확인
-     * 3. 명함 교환 내역 저장
-     * 4. 명함 교환 이벤트 발행
+     * 2. 명함 소유자 검증 (요청자와 명함 소유자가 동일한 경우 예외 발생)
+     * 3. 일일 교환 제한 확인
+     * 4. 명함 교환 내역 저장
+     * 5. 명함 교환 이벤트 발행
      * @param command 명함 교환 정보
      * @return 저장된 명함교환 정보
      */
     @Transactional
     public CardExchangeInfo cardExchange(CardExchangeCommand command) {
+        // 1. 명함 조회
         Card card = getCard(command.cardId());
 
         String senderId = command.senderId();
         String receiverId = card.getMemberId();
 
-        // 2. 일일 교환 제한 확인 (동일 수신자에게 하루 3회 제한)
+        // 2. 명함 소유자 검증 (요청자와 명함 소유자가 동일한 경우 예외 발생)
+        if (senderId.equals(receiverId)) {
+            throw new CustomException(ErrorCode.CANNOT_EXCHANGE_OWN_CARD);
+        }
+
+        // 3. 일일 교환 제한 확인 (동일 수신자에게 하루 3회 제한)
         if (!rateLimiterService.isDailyExchangeAllowed(senderId, receiverId, DAILY_EXCHANGE_LIMIT)) {
             throw new CustomException(ErrorCode.DAILY_EXCHANGE_LIMIT_EXCEEDED);
         }
 
-        // 3. 명함 교환 내역 저장
+        // 4. 명함 교환 내역 저장
         CardExchange savedCardExchange = saveCardExchange(senderId, receiverId);
 
-        // 4. 명함 교환 이벤트 발행
+        // 5. 명함 교환 이벤트 발행
         publishCardExchangedEvent(senderId, receiverId);
 
         return CardExchangeInfo.from(savedCardExchange);
