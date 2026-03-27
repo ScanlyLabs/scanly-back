@@ -129,18 +129,19 @@ src/main/java/scanly/io/scanly_back
 ### 🧪 명함 교환 테스트 시나리오 (Swagger)
 
 #### 사전 준비
-- 테스트 계정 2개 필요 (`test`, `test2`)
+- 테스트 계정 2개 필요 (A: `test`, B: `test2`)
 - 각 계정에 명함이 생성되어 있어야 함
 
 #### 테스트 순서
 1. **A 로그인** → `/api/auth/v1/login` (ID: test)
 2. **B 명함 조회** → `/api/cards/v1/member/{loginId}` (loginId: test2)
-3. **명함 교환 요청** → `/api/cardbooks/v1/exchange` (cardId: test2의 cardId)
+3. **B 명함 저장** → `/api/cardbooks/v1` (cardId: test2의 cardId)
+4. **명함 교환 요청** → `/api/cardbooks/v1/exchange` (cardId: test2의 cardId)
    - `test2`에게 명함 교환 요청 알림 전송됨 (응답에서 exchangeId 확인)
-4. **B 로그인** → `/api/auth/v1/login` (ID: test2)
-5. **명함 교환 수락** → `/api/cardbooks/v1/exchange/accept` (exchangeId 입력)
+5. **B 로그인** → `/api/auth/v1/login` (ID: test2)
+6. **명함 교환 수락** → `/api/cardbooks/v1/exchange/accept` (exchangeId 입력)
    - `test`의 명함이 `test2`의 명함첩에 자동 저장됨
-6. **명함첩 확인** → `/api/cardbooks/v1`
+7. **명함첩 확인** → `/api/cardbooks/v1`
 
 ## API Endpoints
 
