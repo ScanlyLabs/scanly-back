@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 import scanly.io.scanly_back.card.domain.Card;
 import scanly.io.scanly_back.card.domain.CardRepository;
 import scanly.io.scanly_back.cardbook.application.dto.TagService;
+import scanly.io.scanly_back.cardbook.application.dto.command.AcceptExchangeCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.CardExchangeCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.SaveCardBookCommand;
 import scanly.io.scanly_back.cardbook.application.dto.command.UpdateCardBookFavoriteCommand;
@@ -114,40 +115,93 @@ public class CardBookService {
     }
 
     /**
-     * 명함 교환 내역 저장
-     * 1. 명함 조회
-     * 2. 명함 소유자 검증 (요청자와 명함 소유자가 동일한 경우 예외 발생)
-     * 3. 일일 교환 제한 확인
-     * 4. 명함 교환 내역 저장
-     * 5. 명함 교환 이벤트 발행
+     * 명함 교환 요청
+     * 1. 발신자 명함 존재 확인
+     * 2. 수신자 명함 조회 (수신자 ID 확인용)
+     * 3. 명함 소유자 검증 (요청자와 명함 소유자가 동일한 경우 예외 발생)
+     * 4. 일일 교환 제한 확인
+     * 5. 명함 교환 내역 저장 (PENDING 상태)
+     * 6. 명함 교환 이벤트 발행
      * @param command 명함 교환 정보
      * @return 저장된 명함교환 정보
      */
     @Transactional
     public CardExchangeInfo cardExchange(CardExchangeCommand command) {
-        // 1. 명함 조회
-        Card card = getCard(command.cardId());
-
         String senderId = command.senderId();
-        String receiverId = card.getMemberId();
 
-        // 2. 명함 소유자 검증 (요청자와 명함 소유자가 동일한 경우 예외 발생)
+        // 1. 발신자 명함 존재 확인
+        if (!cardRepository.existsByMemberId(senderId)) {
+            throw new CustomException(ErrorCode.CARD_NOT_FOUND);
+        }
+
+        // 2. 수신자 명함 조회 (수신자 ID 확인용)
+        Card receiverCard = getCard(command.cardId());
+        String receiverId = receiverCard.getMemberId();
+
+        // 3. 명함 소유자 검증 (요청자와 명함 소유자가 동일한 경우 예외 발생)
         if (senderId.equals(receiverId)) {
             throw new CustomException(ErrorCode.CANNOT_EXCHANGE_OWN_CARD);
         }
 
-        // 3. 일일 교환 제한 확인 (동일 수신자에게 하루 3회 제한)
+        // 4. 일일 교환 제한 확인 (동일 수신자에게 하루 3회 제한)
         if (!rateLimiterService.isDailyExchangeAllowed(senderId, receiverId, DAILY_EXCHANGE_LIMIT)) {
             throw new CustomException(ErrorCode.DAILY_EXCHANGE_LIMIT_EXCEEDED);
         }
 
-        // 4. 명함 교환 내역 저장
+        // 5. 명함 교환 내역 저장 (PENDING 상태)
         CardExchange savedCardExchange = saveCardExchange(senderId, receiverId);
 
-        // 5. 명함 교환 이벤트 발행
-        publishCardExchangedEvent(senderId, receiverId);
+        // 6. 명함 교환 이벤트 발행
+        publishCardExchangedEvent(senderId, receiverId, savedCardExchange.getId());
 
         return CardExchangeInfo.from(savedCardExchange);
+    }
+
+    /**
+     * 명함 교환 수락
+     * 1. 명함 교환 내역 조회
+     * 2. 이미 처리된 요청인지 확인
+     * 3. 발신자 명함 조회 (senderId로 조회)
+     * 4. 중복 저장 검증
+     * 5. 명함첩에 저장
+     * 6. 교환 상태를 ACCEPTED로 변경
+     * @param command 수락 정보
+     * @return 저장된 명함첩 정보
+     */
+    @Transactional
+    public RegisterCardBookInfo acceptExchange(AcceptExchangeCommand command) {
+        String exchangeId = command.exchangeId();
+        String receiverId = command.receiverId();
+
+        // 1. 명함 교환 내역 조회
+        CardExchange cardExchange = cardExchangeRepository.findByIdAndReceiverId(exchangeId, receiverId)
+                .orElseThrow(() -> new CustomException(ErrorCode.EXCHANGE_NOT_FOUND));
+
+        // 2. 이미 처리된 요청인지 확인
+        if (!cardExchange.isPending()) {
+            throw new CustomException(ErrorCode.EXCHANGE_ALREADY_PROCESSED);
+        }
+
+        // 3. 발신자 명함 조회 (senderId로 조회)
+        Card senderCard = cardRepository.findByMemberId(cardExchange.getSenderId())
+                .orElseThrow(() -> new CustomException(ErrorCode.CARD_NOT_FOUND));
+        String senderCardId = senderCard.getId();
+
+        // 4. 중복 저장 검증
+        if (cardBookRepository.existsByMemberIdAndCardId(receiverId, senderCardId)) {
+            throw new CustomException(ErrorCode.CARD_BOOK_ALREADY_EXISTS);
+        }
+
+        // 5. 명함첩에 저장
+        ProfileSnapshot profileSnapshot = ProfileSnapshot.from(senderCard);
+        CardBook cardBook = CardBook.create(receiverId, senderCardId, profileSnapshot, null);
+        CardBook savedCardBook = cardBookRepository.save(cardBook);
+
+        // 6. 교환 상태를 ACCEPTED로 변경
+        cardExchange.accept();
+        cardExchangeRepository.updateStatus(cardExchange);
+
+        return RegisterCardBookInfo.from(savedCardBook);
     }
 
     /**
@@ -156,8 +210,9 @@ public class CardBookService {
      * 2. 명함 교환 이벤트 발행
      * @param senderId 발신자 아이디
      * @param receiverId 수신자 아이디
+     * @param exchangeId 교환 요청 아이디
      */
-    private void publishCardExchangedEvent(String senderId, String receiverId) {
+    private void publishCardExchangedEvent(String senderId, String receiverId, String exchangeId) {
         // 1. 발신자 조회
         Member member = memberRepository.findById(senderId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
@@ -166,7 +221,10 @@ public class CardBookService {
         String data;
         try {
             data = objectMapper.writeValueAsString(
-                    Map.of("senderLoginId", member.getLoginId())
+                    Map.of(
+                            "senderLoginId", member.getLoginId(),
+                            "exchangeId", exchangeId
+                    )
             );
         } catch (JsonProcessingException e) {
             log.error("Failed to publish CardExchangedEvent", e);

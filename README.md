@@ -9,8 +9,8 @@ Scanly는 QR 코드를 활용한 디지털 명함 서비스입니다. 한 번의
 - **명함 생성/관리**: 디지털 명함 생성 및 QR 코드 자동 생성
 - **QR 스캔**: 상대방 QR 코드 스캔으로 명함 조회
 - **명함첩**: 저장한 명함을 그룹별로 분류 및 관리
-- **명함 교환**: 명함 저장 시 내 명함도 상대방에게 전송
-- **알림**: 명함 교환 알림 및 푸시 알림 지원
+- **명함 교환 요청**: 명함 교환 요청 시 상대방에게 알림 전송
+- **알림**: 명함 교환 알림 지원
 
 ## 성능 및 안정성
 
@@ -37,17 +37,19 @@ Scanly는 QR 코드를 활용한 디지털 명함 서비스입니다. 한 번의
       - 복구 테스트: 30초 후 HALF_OPEN → 3회 중 2회 이상 성공 시 CLOSED 복귀 
 
 ## Tech Stack
-| Category | Technology |
-|----------|------------|
-| Language | Java 21 |
+| Category  | Technology |
+|-----------|------------|
+| Language  | Java 21 |
 | Framework | Spring Boot 4.0.1 |
-| Security | Spring Security, JWT |
-| Database | PostgreSQL, Spring Data JPA |
-| Cache | Redis |
-| Storage | AWS S3 |
-| Docs | Swagger (springdoc-openapi) |
-| Build | Gradle |
-| QR Code | ZXing |
+| Security  | Spring Security, JWT |
+| Database  | PostgreSQL, Spring Data JPA |
+| Cache     | Redis |
+| Storage   | AWS S3 |
+| Docs      | Swagger (springdoc-openapi) |
+| Build     | Gradle |
+| QR Code   | ZXing |
+| CI/CD     | GitHub Actions |
+| Infra     | AWS EC2, Docker |
 
 ## Architecture
 
@@ -124,6 +126,22 @@ src/main/java/scanly/io/scanly_back
 - PW: test1234
 
 
+### 🧪 명함 교환 테스트 시나리오 (Swagger)
+
+#### 사전 준비
+- 테스트 계정 2개 필요 (`test`, `test2`)
+- 각 계정에 명함이 생성되어 있어야 함
+
+#### 테스트 순서
+1. **A 로그인** → `/api/auth/v1/login` (ID: test)
+2. **B 명함 조회** → `/api/cards/v1/member/{loginId}` (loginId: test2)
+3. **명함 교환 요청** → `/api/cardbooks/v1/exchange` (cardId: test2의 cardId)
+   - `test2`에게 명함 교환 요청 알림 전송됨 (응답에서 exchangeId 확인)
+4. **B 로그인** → `/api/auth/v1/login` (ID: test2)
+5. **명함 교환 수락** → `/api/cardbooks/v1/exchange/accept` (exchangeId 입력)
+   - `test`의 명함이 `test2`의 명함첩에 자동 저장됨
+6. **명함첩 확인** → `/api/cardbooks/v1`
+
 ## API Endpoints
 
 ### 인증 (Auth)
@@ -154,9 +172,10 @@ src/main/java/scanly/io/scanly_back
 
 ### 명함첩 (CardBook)
 | Method | Endpoint | Description |
-|--------|----------|-------------|
+|--------|----------|-------|
 | POST | `/api/cardbooks/v1` | 명함 저장 |
 | POST | `/api/cardbooks/v1/exchange` | 명함 교환 요청 |
+| POST | `/api/cardbooks/v1/exchange/accept` | 명함 교환 수락 |
 | GET | `/api/cardbooks/v1` | 명함첩 목록 조회 |
 | GET | `/api/cardbooks/v1/{id}` | 명함첩 상세 조회 |
 | GET | `/api/cardbooks/v1/exists` | 명함첩 존재 여부 확인 |

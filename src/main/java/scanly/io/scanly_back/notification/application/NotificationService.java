@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -29,6 +30,9 @@ public class NotificationService {
     private final PushTokenService pushTokenService;
     private final ExpoPushClient expoPushClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Value("${push.enabled:true}")
+    private boolean pushEnabled;
 
 
     @Transactional
@@ -56,6 +60,11 @@ public class NotificationService {
             String title, String body, String data,
             Notification notification
     ) {
+        if (!pushEnabled) {
+            log.info("Push notification is disabled. Skipping push for receiverId: {}", receiverId);
+            return;
+        }
+
         // Expo 푸시 알림 전송
         PushToken pushToken = pushTokenService.getByMemberId(receiverId);
 

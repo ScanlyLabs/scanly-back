@@ -21,6 +21,7 @@ import scanly.io.scanly_back.cardbook.domain.*;
 import scanly.io.scanly_back.cardbook.domain.event.CardExchangedEvent;
 import scanly.io.scanly_back.cardbook.domain.model.ProfileSnapshot;
 import scanly.io.scanly_back.cardbook.infrastructure.*;
+import scanly.io.scanly_back.cardbook.infrastructure.entity.CardBookEntity;
 import scanly.io.scanly_back.common.exception.CustomException;
 import scanly.io.scanly_back.common.exception.ErrorCode;
 import scanly.io.scanly_back.common.ratelimit.RateLimiterService;
@@ -77,16 +78,26 @@ class CardBookServiceTest extends IntegrationTestSupport {
     @Autowired
     private GroupJpaRepository groupJpaRepository;
 
+    @Autowired
+    private CardExchangeRepository cardExchangeRepository;
+
+    @Autowired
+    private CardExchangeJpaRepository cardExchangeJpaRepository;
+
     @MockitoBean
     private RateLimiterService rateLimiterService;
 
     @MockitoBean
     private CardExchangeNotificationListener cardExchangeNotificationListener;
 
+    @Autowired
+    private CardBookMapper cardBookMapper;
+
     @AfterEach
     void after() {
         tagJpaRepository.deleteAllInBatch();
         cardJpaRepository.deleteAllInBatch();
+        cardExchangeJpaRepository.deleteAllInBatch();
         cardBookJpaRepository.deleteAllInBatch();
         groupJpaRepository.deleteAllInBatch();
         memberJpaRepository.deleteAllInBatch();
@@ -193,10 +204,13 @@ class CardBookServiceTest extends IntegrationTestSupport {
             // given
             Member member = crateMember();
             Member sender = memberRepository.save(member);
-            Card card = createCard();
-            Card savedCard = cardRepository.save(card);
+            Card senderCard = createdCardWithMemberId(sender.getId());
+            cardRepository.save(senderCard);
 
-            CardExchangeCommand command = new CardExchangeCommand(sender.getId(), savedCard.getId());
+            Card receiverCard = createCard();
+            Card savedReceiverCard = cardRepository.save(receiverCard);
+
+            CardExchangeCommand command = new CardExchangeCommand(sender.getId(), savedReceiverCard.getId());
 
             given(rateLimiterService.isDailyExchangeAllowed(any(), any(), anyInt()))
                     .willReturn(true);
@@ -207,7 +221,7 @@ class CardBookServiceTest extends IntegrationTestSupport {
             // then
             assertThat(info)
                     .extracting("senderId", "receiverId")
-                    .contains(sender.getId(), savedCard.getMemberId());
+                    .contains(sender.getId(), savedReceiverCard.getMemberId());
 
             verify(cardExchangeNotificationListener).handle(any(CardExchangedEvent.class));
         }
@@ -234,10 +248,13 @@ class CardBookServiceTest extends IntegrationTestSupport {
             // given
             Member member = crateMember();
             Member sender = memberRepository.save(member);
-            Card card = createCard();
-            Card savedCard = cardRepository.save(card);
+            Card senderCard = createdCardWithMemberId(sender.getId());
+            cardRepository.save(senderCard);
 
-            CardExchangeCommand command = new CardExchangeCommand(sender.getId(), savedCard.getId());
+            Card receiverCard = createCard();
+            Card savedReceiverCard = cardRepository.save(receiverCard);
+
+            CardExchangeCommand command = new CardExchangeCommand(sender.getId(), savedReceiverCard.getId());
 
             given(rateLimiterService.isDailyExchangeAllowed(any(), any(), anyInt()))
                     .willReturn(false);
@@ -269,6 +286,154 @@ class CardBookServiceTest extends IntegrationTestSupport {
                     .isInstanceOf(CustomException.class)
                     .extracting("errorCode")
                     .isEqualTo(ErrorCode.CANNOT_EXCHANGE_OWN_CARD);
+        }
+
+        @Test
+        @DisplayName("[Happy] 명함 교환을 수락한다.")
+        void acceptExchange() {
+            // given
+            Member sender = memberRepository.save(crateMember());
+            Member receiver = memberRepository.save(Member.signUP("test2", "test", "password123", "test2@test.com"));
+
+            String senderId = sender.getId();
+            String receiverId = receiver.getId();
+            Card senderCard = cardRepository.save(createdCardWithMemberId(senderId));
+            Card receiverCard = cardRepository.save(createdCardWithMemberId(receiverId));
+
+            CardExchange cardExchange = createCardExchange(senderId, receiverId);
+            CardExchange savedCardExchange = cardExchangeRepository.save(cardExchange);
+            String cardExchangeId = savedCardExchange.getId();
+
+            AcceptExchangeCommand command
+                    = new AcceptExchangeCommand(cardExchangeId, receiverId);
+
+            // when
+            RegisterCardBookInfo info = cardBookService.acceptExchange(command);
+
+            // then
+            Optional<CardBook> cardBookOpt = cardBookJpaRepository.findByMemberIdAndCardId(receiverId, senderCard.getId()).map(cardBookMapper::toDomain);
+            assertThat(cardBookOpt).isPresent();
+
+            ProfileSnapshot profileSnapshot = cardBookOpt.get().getProfileSnapshot();
+            assertThat(info)
+                    .extracting(
+                            "cardId", "name", "title", "company"
+                    ).contains(
+                            senderCard.getId(), senderCard.getName(), senderCard.getTitle(), senderCard.getCompany()
+                    );
+            assertThat(info.profileSnapshot())
+                    .extracting(
+                            "name", "title", "company", "phone", "email",
+                            "bio", "profileImageUrl", "portfolioUrl", "location"
+                    ).contains(
+                            profileSnapshot.name(), profileSnapshot.title(), profileSnapshot.company(), profileSnapshot.phone(), profileSnapshot.email(),
+                            profileSnapshot.bio(), profileSnapshot.profileImageUrl(), profileSnapshot.portfolioUrl(), profileSnapshot.location()
+                    );
+        }
+
+        @Test
+        @DisplayName("[Bad] 명함 교환을 수락 시 명함 교환 내역의 상태가 대기 중이 아닐 경우 실패한다.")
+        void acceptExchangeWhenAlreadyProcessed() {
+            // given
+            Member sender = memberRepository.save(crateMember());
+            Member receiver = memberRepository.save(Member.signUP("test2", "test", "password123", "test2@test.com"));
+
+            String senderId = sender.getId();
+            String receiverId = receiver.getId();
+            Card senderCard = cardRepository.save(createdCardWithMemberId(senderId));
+            Card receiverCard = cardRepository.save(createdCardWithMemberId(receiverId));
+
+            AcceptExchangeCommand command
+                    = new AcceptExchangeCommand(UUID.randomUUID().toString(), receiverId);
+
+            // when & then
+            assertThatThrownBy(() -> cardBookService.acceptExchange(command))
+                    .isInstanceOf(CustomException.class)
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.EXCHANGE_NOT_FOUND);
+        }
+
+        @Test
+        @DisplayName("[Bad] 명함 교환을 수락 시 명함 교환 내역이 존재하지 않으면 실패한다.")
+        void acceptExchangeWhenNotFoundCardExchange() {
+            // given
+            Member sender = memberRepository.save(crateMember());
+            Member receiver = memberRepository.save(Member.signUP("test2", "test", "password123", "test2@test.com"));
+
+            String senderId = sender.getId();
+            String receiverId = receiver.getId();
+            Card senderCard = cardRepository.save(createdCardWithMemberId(senderId));
+            Card receiverCard = cardRepository.save(createdCardWithMemberId(receiverId));
+
+            CardExchange cardExchange = createCardExchange(senderId, receiverId);
+            cardExchange.accept();
+            CardExchange savedCardExchange = cardExchangeRepository.save(cardExchange);
+            String cardExchangeId = savedCardExchange.getId();
+
+            AcceptExchangeCommand command
+                    = new AcceptExchangeCommand(cardExchangeId, receiverId);
+
+            // when & then
+            assertThatThrownBy(() -> cardBookService.acceptExchange(command))
+                    .isInstanceOf(CustomException.class)
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.EXCHANGE_ALREADY_PROCESSED);
+        }
+
+        @Test
+        @DisplayName("[Bad] 명함 교환을 수락 시 발신자(명함 교환 요청자)의 명함이 존재하지 않으면 실패한다.")
+        void acceptExchangeWhenSenderCardNotFound() {
+            // given
+            Member sender = memberRepository.save(crateMember());
+            Member receiver = memberRepository.save(Member.signUP("test2", "test", "password123", "test2@test.com"));
+
+            String senderId = sender.getId();
+            String receiverId = receiver.getId();
+            Card receiverCard = cardRepository.save(createdCardWithMemberId(receiverId));
+
+            CardExchange cardExchange = createCardExchange(senderId, receiverId);
+            CardExchange savedCardExchange = cardExchangeRepository.save(cardExchange);
+            String cardExchangeId = savedCardExchange.getId();
+
+            AcceptExchangeCommand command
+                    = new AcceptExchangeCommand(cardExchangeId, receiverId);
+
+            // when & then
+            assertThatThrownBy(() -> cardBookService.acceptExchange(command))
+                    .isInstanceOf(CustomException.class)
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.CARD_NOT_FOUND);
+        }
+
+
+        @Test
+        @DisplayName("[Bad] 명함 교환을 수락 시 이미 명함첩에 저장된 명함일 경우 실패한다.")
+        void acceptExchangeWhenAlreadyExists() {
+            // given
+            Member sender = memberRepository.save(crateMember());
+            Member receiver = memberRepository.save(Member.signUP("test2", "test", "password123", "test2@test.com"));
+
+            String senderId = sender.getId();
+            Card senderCard = cardRepository.save(createdCardWithMemberId(senderId));
+            String receiverId = receiver.getId();
+            Card receiverCard = cardRepository.save(createdCardWithMemberId(receiverId));
+
+            CardExchange cardExchange = createCardExchange(senderId, receiverId);
+            CardExchange savedCardExchange = cardExchangeRepository.save(cardExchange);
+            String cardExchangeId = savedCardExchange.getId();
+
+            CardBook cardBook = createCardBookWithMemberIdAndCard(receiverId, senderCard);
+            cardBookRepository.save(cardBook);
+
+            AcceptExchangeCommand command
+                    = new AcceptExchangeCommand(cardExchangeId, receiverId);
+
+
+            // when & then
+            assertThatThrownBy(() -> cardBookService.acceptExchange(command))
+                    .isInstanceOf(CustomException.class)
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.CARD_BOOK_ALREADY_EXISTS);
         }
     }
 
@@ -532,7 +697,8 @@ class CardBookServiceTest extends IntegrationTestSupport {
             cardBookService.clearCardId(cardId);
 
             // then
-            List<CardBook> cardBooks = cardBookJpaRepository.findAllByCardId(cardId);
+            List<CardBook> cardBooks
+                    = cardBookJpaRepository.findAllByCardId(cardId).stream().map(cardBookMapper::toDomain).toList();
             assertThat(cardBooks).isEmpty();
         }
     }
@@ -581,6 +747,10 @@ class CardBookServiceTest extends IntegrationTestSupport {
             List<CardBook> cardBooks = cardBookRepository.findAllByMemberId(memberId);
             assertThat(cardBooks).isEmpty();
         }
+    }
+
+    private CardExchange createCardExchange(String senderId, String receiverId) {
+        return CardExchange.create(senderId, receiverId);
     }
 
     private Member crateMember() {

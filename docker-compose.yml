@@ -25,6 +25,8 @@ services:
 
   db:
     image: postgres:15
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_DB: scanly
       POSTGRES_USER: ${DB_USERNAME}

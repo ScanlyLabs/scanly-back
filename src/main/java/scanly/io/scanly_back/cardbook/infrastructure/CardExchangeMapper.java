@@ -21,6 +21,7 @@ public class CardExchangeMapper {
                 domain.getId(),
                 domain.getSenderId(),
                 domain.getReceiverId(),
+                domain.getStatus(),
                 domain.getExchangedAt()
         );
     }
@@ -39,6 +40,7 @@ public class CardExchangeMapper {
                 entity.getId(),
                 entity.getSenderId(),
                 entity.getReceiverId(),
+                entity.getStatus(),
                 entity.getExchangedAt()
         );
     }
