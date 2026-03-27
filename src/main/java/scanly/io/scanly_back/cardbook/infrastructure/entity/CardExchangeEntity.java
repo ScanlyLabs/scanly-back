@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import scanly.io.scanly_back.cardbook.domain.model.ExchangeStatus;
 
 import java.time.LocalDateTime;
 
@@ -25,11 +26,15 @@ public class CardExchangeEntity {
     @Column(name = "receiver_id", nullable = false)
     private String receiverId;              // 수신자 ID(명함 받는 사람)
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private ExchangeStatus status;          // 교환 상태
+
     @CreatedDate
     @Column(name = "exchanged_at", nullable = false, updatable = false)
-    private LocalDateTime exchangedAt;         // 교환 일시
+    private LocalDateTime exchangedAt;      // 교환 요청 일시
 
-    public static CardExchangeEntity of (String id, String senderId, String receiverId, LocalDateTime exchangedAt) {
-        return new CardExchangeEntity(id, senderId, receiverId, exchangedAt);
+    public static CardExchangeEntity of(String id, String senderId, String receiverId, ExchangeStatus status, LocalDateTime exchangedAt) {
+        return new CardExchangeEntity(id, senderId, receiverId, status, exchangedAt);
     }
 }
