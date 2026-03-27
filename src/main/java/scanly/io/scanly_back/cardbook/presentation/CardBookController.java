@@ -54,7 +54,7 @@ public class CardBookController {
     }
 
     @PostMapping("/exchange")
-    @Operation(summary = "명함 교환", description = "타인에게 내 명함을 전송합니다.")
+    @Operation(summary = "명함 교환 요청", description = "타인에게 내 명함 저장 요청 알림을 전송합니다.")
     @RateLimiter(key = "cardExchange", limit = 15, window = 1, timeUnit = TimeUnit.HOURS)
     public ResponseEntity<ApiResponse<CardExchangeResponse>> cardExchange(
             @AuthenticationPrincipal String memberId,

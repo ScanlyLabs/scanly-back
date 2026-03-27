@@ -193,10 +193,13 @@ class CardBookServiceTest extends IntegrationTestSupport {
             // given
             Member member = crateMember();
             Member sender = memberRepository.save(member);
-            Card card = createCard();
-            Card savedCard = cardRepository.save(card);
+            Card senderCard = createdCardWithMemberId(sender.getId());
+            cardRepository.save(senderCard);
 
-            CardExchangeCommand command = new CardExchangeCommand(sender.getId(), savedCard.getId());
+            Card receiverCard = createCard();
+            Card savedReceiverCard = cardRepository.save(receiverCard);
+
+            CardExchangeCommand command = new CardExchangeCommand(sender.getId(), savedReceiverCard.getId());
 
             given(rateLimiterService.isDailyExchangeAllowed(any(), any(), anyInt()))
                     .willReturn(true);
@@ -207,7 +210,7 @@ class CardBookServiceTest extends IntegrationTestSupport {
             // then
             assertThat(info)
                     .extracting("senderId", "receiverId")
-                    .contains(sender.getId(), savedCard.getMemberId());
+                    .contains(sender.getId(), savedReceiverCard.getMemberId());
 
             verify(cardExchangeNotificationListener).handle(any(CardExchangedEvent.class));
         }
@@ -234,10 +237,13 @@ class CardBookServiceTest extends IntegrationTestSupport {
             // given
             Member member = crateMember();
             Member sender = memberRepository.save(member);
-            Card card = createCard();
-            Card savedCard = cardRepository.save(card);
+            Card senderCard = createdCardWithMemberId(sender.getId());
+            cardRepository.save(senderCard);
 
-            CardExchangeCommand command = new CardExchangeCommand(sender.getId(), savedCard.getId());
+            Card receiverCard = createCard();
+            Card savedReceiverCard = cardRepository.save(receiverCard);
+
+            CardExchangeCommand command = new CardExchangeCommand(sender.getId(), savedReceiverCard.getId());
 
             given(rateLimiterService.isDailyExchangeAllowed(any(), any(), anyInt()))
                     .willReturn(false);
