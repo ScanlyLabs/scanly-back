@@ -105,6 +105,25 @@ src/main/java/scanly/io/scanly_back
     └── infrastructure/  # NotificationEntity, PushTokenEntity
 ```
 
+## 📌 API 문서 (Swagger)
+- http://13.124.208.135:8080/swagger-ui/index.html
+
+※ 포트폴리오 시연을 위해 Swagger를 외부에 공개하였습니다.  
+※ 일부 API는 JWT 인증이 필요합니다.  
+
+
+### 🔐 API 테스트 방법
+1. 로그인 API(`/api/auth/login`) 실행
+2. 응답으로 받은 accessToken 복사
+3. Swagger 상단 [Authorize] 버튼 클릭
+4. value 입력칸에 accessToken 입력 후 인증
+
+
+### 👤 테스트 계정
+- ID: test
+- PW: test1234
+
+
 ## API Endpoints
 
 ### 인증 (Auth)
@@ -137,7 +156,7 @@ src/main/java/scanly/io/scanly_back
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/cardbooks/v1` | 명함 저장 |
-| POST | `/api/cardbooks/v1/exchange` | 명함 교환 |
+| POST | `/api/cardbooks/v1/exchange` | 명함 교환 요청 |
 | GET | `/api/cardbooks/v1` | 명함첩 목록 조회 |
 | GET | `/api/cardbooks/v1/{id}` | 명함첩 상세 조회 |
 | GET | `/api/cardbooks/v1/exists` | 명함첩 존재 여부 확인 |
